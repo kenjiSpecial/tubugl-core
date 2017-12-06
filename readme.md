@@ -1,7 +1,18 @@
-#TubuGL-core
+# tubugl-core
 
 personal micro webgl framework.
 
-referrences:
+## other modules
+
+- [tubugl-constants](https://github.com/kenjiSpecial/tubugl-constants)
+
+
+## referrences
+
+- [three.js](https://github.com/mrdoob/three.js/)
+- [nanogl](https://github.com/plepers/nanogl/)
+
+
+
 
 
