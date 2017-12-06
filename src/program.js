@@ -40,6 +40,7 @@ export  class Program{
 
         // uniforms
         const uniformNumber = this.gl.getProgramParameter(this._program, this.gl.ACTIVE_UNIFORMS);
+        console.log(uniformNumber)
         this._uniform = {};
         for(ii = 0; ii < uniformNumber; ii++){
             let uniform = this.gl.getActiveUniform(this._program, ii);
@@ -49,6 +50,8 @@ export  class Program{
                 size: uniform.size
             };
         }
+
+        console.log(this._uniform)
 
         //attributes
         const attributreNumber = this.gl.getProgramParameter(this._program, this.gl.ACTIVE_ATTRIBUTES);

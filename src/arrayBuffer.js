@@ -1,3 +1,7 @@
+
+import {ARRAY_BUFFER, STATIC_DRAW} from 'tubugl-constants';
+
+
 export class ArrayBuffer{
     constructor(gl, data){
         this.gl = gl;
@@ -6,18 +10,31 @@ export class ArrayBuffer{
 
         try{
             let success = data instanceof Float32Array || data instanceof Float64Array;
-            if(success)             this.setData(data);
+            if(success)             {
+                this.bind();
+                this.setData(data);
+                this.unbind();
+            }
             else throw 'data should be  Float32Array or Flaot64Array';
         }catch(error){
             console.error(error);
         }
     }
 
-    setData(array){
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.buffer);
-        this.gl.bufferData(this.gl.ARRAY_BUFFER, array, this.gl.STATIC_DRAW);
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, null);
+    bind(){
+        this.gl.bindBuffer(ARRAY_BUFFER, this.buffer);
+        return this;
     }
+
+    unbind(){
+        this.gl.bindBuffer(ARRAY_BUFFER, this.buffer);
+        return this;
+    }
+
+    setData(array){
+        this.gl.bufferData(ARRAY_BUFFER, array, STATIC_DRAW);
+    }
+
     setAttribs(name, size, type, normalize, stride, offset){
         this.attribs.push({
             name : name,
@@ -28,10 +45,7 @@ export class ArrayBuffer{
             offset: offset
         });
     }
-    bind(){
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.buffer);
-        return this;
-    }
+
     attribPointer(program){;
         this.attribs.forEach((attrib)=>{
             let location = program.getAttrib(attrib.name).location;
@@ -42,7 +56,5 @@ export class ArrayBuffer{
 
         return this;
     }
-    drawTriangles(count, offset = 0){
-        this.gl.drawArrays(this.gl.TRIANGLES, offset, count);
-    }
+
 }

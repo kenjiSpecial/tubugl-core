@@ -6,33 +6,31 @@ const Stats = require('../../vendors/stats.js/stats');
 
 const vertexShaderSrc = `// an attribute will receive data from a buffer
   attribute vec4 a_position;
+  attribute vec2 uv;
+  
   uniform float uTheta;
 
-  // all shaders have a main function
+  varying vec2 vUv;
+  
   void main() {
-
-    // gl_Position is a special variable a vertex shader
-    // is responsible for setting
-    gl_Position = a_position + vec4(0.0 * cos(uTheta), 0.0 * sin(uTheta), 0.0, 0.0);
+      vUv = uv;
+      
+      gl_Position = a_position + vec4(0.0 * cos(uTheta), 0.0 * sin(uTheta), 0.0, 0.0);
   }`;
 
-function fragmentShaderSrc(colorR, colorG, colorB){
-    return `
-  // fragment shaders don't have a default precision so we need
-  // to pick one. mediump is a good default
+const fragmentShaderSrc = `
   precision mediump float;
+  
+  uniform sampler2D uTexture;
 
+  varying vec2 vUv;
+    
   void main() {
-    // gl_FragColor is a special variable a fragment shader
-    // is responsible for setting
-    float colorR = gl_FrontFacing ? 1.0 : 0.0;
-    float colorG = gl_FrontFacing ? 0.0 : 1.0;
-    
-    gl_FragColor = vec4(colorR, colorG, 0.0, 1.0);
-    
+      vec4 color = texture2D( uTexture, vUv);
+      gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
   }
 `;
-}
+
 
 
 export default class App {
@@ -83,17 +81,18 @@ export default class App {
 
     _onload(){
         this._texture = new Texture(this.gl);
-
+        this._texture.bind().setFilter().wrap().fromImage(this._image, this._image.width, this._image.height);
     }
 
     createProgram(){
-        this._program = new Program(this.gl, vertexShaderSrc, fragmentShaderSrc(1.0, 0.0, 0.0));
+        this._program = new Program(this.gl, vertexShaderSrc, fragmentShaderSrc );
         let positions = [
             -0.5, -0.5,
             -0.5, 0.1,
             -0.1, 0.1,
             -0.1, -0.5,
         ];
+
         let indices = [
             0, 1, 2,
             0, 2, 3
@@ -137,7 +136,7 @@ export default class App {
         };
 
 
-        this._program1 = new Program(this.gl, vertexShaderSrc, fragmentShaderSrc(1.0, 1.0, 0.0));
+        this._program1 = new Program(this.gl, vertexShaderSrc, fragmentShaderSrc);
         let positions2 = [
             0, 0,
             0, 0.5,
@@ -197,9 +196,8 @@ export default class App {
         this._obj.program.bind();
         this._obj.indexBuffer.bind();
         this._obj.positionBuffer.bind().attribPointer(this._obj.program);
-        // this.gl.drawElements(this.gl.TRIANGLES, 3 * 2 , this.gl.UNSIGNED_SHORT, 0);
-        let gl = this.gl;
-        gl.drawElements(gl.TRIANGLES, this._shapeCnt, gl.UNSIGNED_SHORT, 0 );
+
+        this.gl.drawElements(this.gl.TRIANGLES, this._shapeCnt, this.gl.UNSIGNED_SHORT, 0 );
     }
 
     resize(width, height){
