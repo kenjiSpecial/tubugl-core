@@ -1,4 +1,4 @@
-import {Program, ArrayBuffer, IndexArrayBuffer, Texture} from 'tubuGL';
+import {Program, ArrayBuffer, IndexArrayBuffer} from 'tubuGL';
 
 const TweenLite = require('gsap');
 const dat = require('../../vendors/dat.gui/dat.gui');
@@ -6,37 +6,36 @@ const Stats = require('../../vendors/stats.js/stats');
 
 const vertexShaderSrc = `// an attribute will receive data from a buffer
   attribute vec4 a_position;
-  attribute vec2 uv;
-  
+  attribute vec2 uv; 
   uniform float uTheta;
-
-  varying vec2 vUv;
   
+   varying vec2 vUv;
+  // all shaders have a main function
   void main() {
-      vUv = uv;
-      
-      gl_Position = a_position + vec4(0.0 * cos(uTheta), 0.0 * sin(uTheta), 0.0, 0.0);
+
+    // gl_Position is a special variable a vertex shader
+    // is responsible for setting
+    gl_Position = a_position + vec4(0.0 * cos(uTheta), 0.0 * sin(uTheta), 0.0, 0.0);
+    vUv = uv;
   }`;
 
-const fragmentShaderSrc = `
+function fragmentShaderSrc(colorR, colorG, colorB){
+    return `
+  // fragment shaders don't have a default precision so we need
+  // to pick one. mediump is a good default
   precision mediump float;
   
-  uniform sampler2D uTexture;
-
   varying vec2 vUv;
-    
+
   void main() {
-      vec4 color = texture2D( uTexture, vUv);
-      gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+    gl_FragColor = vec4(vUv, 0.0, 1.0);
   }
 `;
-
+}
 
 
 export default class App {
     constructor(params){
-
-
         this.updateAttribute = this.updateAttribute.bind(this);
         this._playAndStop = this._playAndStop.bind(this);
 
@@ -79,20 +78,14 @@ export default class App {
         this._playAndStopGUI = this.gui.add(this, '_playAndStop').name('pause');
     }
 
-    _onload(){
-        this._texture = new Texture(this.gl);
-        this._texture.bind().setFilter().wrap().fromImage(this._image, this._image.width, this._image.height);
-    }
-
     createProgram(){
-        this._program = new Program(this.gl, vertexShaderSrc, fragmentShaderSrc );
+        this._program = new Program(this.gl, vertexShaderSrc, fragmentShaderSrc(1.0, 0.0, 0.0));
         let positions = [
             -0.5, -0.5,
             -0.5, 0.1,
             -0.1, 0.1,
             -0.1, -0.5,
         ];
-
         let indices = [
             0, 1, 2,
             0, 2, 3
@@ -102,58 +95,43 @@ export default class App {
         let pos1 = {x: -0.5, y: -0.1}
         let side = 0.1
         this.vertices = new Float32Array( [
-            -side/2 + pos0.x, -side/2 + pos1.y,
-             side/2 + pos0.x, -side/2 + pos1.y,
-             side/2 + pos0.x,  side/2 + pos1.y,
-            -side/2 + pos0.x,  side/2 + pos1.y,
-
-            -side/2 + pos1.x, -side/2 + pos1.y,
-             side/2 + pos1.x, -side/2 + pos1.y,
-             side/2 + pos1.x,  side/2 + pos1.y,
-            -side/2 + pos1.x,  side/2 + pos1.y,
+            -side/2, -side/2,
+             side/2, -side/2,
+             side/2,  side/2,
+            -side/2,  side/2,
         ] );
 
-        this._shapeCnt = 6 * 2
+        let uvs = new Float32Array( [
+            0., 0.,
+            1., 0.,
+            1., 1.,
+            0., 1.
+        ] );
+
+        this._shapeCnt = 6
 
         let shapeCnt = 4;
         this.indices = new Uint16Array( [
             0, 1, 2,
             0, 2, 3,
-            0 + shapeCnt, 1 + shapeCnt, 2 + shapeCnt,
-            0 + shapeCnt, 2 + shapeCnt, 3 + shapeCnt,
         ] );
 
         this._arrayBuffer = new ArrayBuffer(this.gl, this.vertices);
         this._arrayBuffer.setAttribs('a_position', 2, this.gl.FLOAT, false, 0, 0);
+
+        this._uvBuffer = new ArrayBuffer(this.gl, uvs);
+        this._uvBuffer.setAttribs('uv', 2, this.gl.FLOAT, false, 0, 0);
 
         this._indexBuffer = new IndexArrayBuffer(this.gl, this.indices);
 
         this._obj = {
             program: this._program,
             positionBuffer: this._arrayBuffer,
+
             indexBuffer: this._indexBuffer,
             count: 3
         };
 
-
-        this._program1 = new Program(this.gl, vertexShaderSrc, fragmentShaderSrc);
-        let positions2 = [
-            0, 0,
-            0, 0.5,
-            0.7, 0,
-        ];
-
-
-        this._arrayBuffer2 = new ArrayBuffer(this.gl, new Float32Array(positions2));
-        this._arrayBuffer2.setAttribs('a_position', 2, this.gl.FLOAT, false, 0, 0);
-
-
-
-        this._obj1 = {
-            program: this._program1,
-            positionBuffer: this._arrayBuffer2,
-            count: 3
-        };
 
     }
 
@@ -168,12 +146,6 @@ export default class App {
     }
 
     start(){
-        this._image = new Image();
-        this._image.onload = this._onload.bind(this);
-        this._image.src = '/assets/images/uv_img.jpg'
-    }
-
-    play(){
         this._isPlay = true;
         TweenMax.ticker.addEventListener('tick', this.update, this);
     }
@@ -194,10 +166,13 @@ export default class App {
         this.gl.clear(this.gl.COLOR_BUFFER_BIT);
 
         this._obj.program.bind();
+
         this._obj.indexBuffer.bind();
         this._obj.positionBuffer.bind().attribPointer(this._obj.program);
+        this._uvBuffer.bind().attribPointer(this._obj.program);
 
-        this.gl.drawElements(this.gl.TRIANGLES, this._shapeCnt, this.gl.UNSIGNED_SHORT, 0 );
+        let gl = this.gl;
+        gl.drawElements(gl.TRIANGLES, this._shapeCnt, gl.UNSIGNED_SHORT, 0 );
     }
 
     resize(width, height){
