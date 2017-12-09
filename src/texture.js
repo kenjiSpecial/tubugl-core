@@ -5,16 +5,21 @@ import {TEXTURE_2D, RGB, UNSIGNED_BYTE, TEXTURE0, RGBA, LINEAR, NEAREST, TEXTURE
 import {TEXTURE_WRAP_T, TEXTURE_WRAP_S, CLAMP_TO_EDGE} from 'tubugl-constants';
 
 export class Texture {
-    constructor(gl, format = RGB, internalFormat = RGB, type = UNSIGNED_BYTE, unit = textureNum){
+    constructor(gl, uniformName, format = RGB, internalFormat = RGB, type = UNSIGNED_BYTE, unit = textureNum){
 
         this._gl = gl;
         if(!this._gl){
-            console.error('gl is missed');
+            console.error('[Texture]gl is missed');
             return;
         }
 
         this._texture = this._gl.createTexture();
-
+        this.uniformName = uniformName;
+        if(!this.uniformName){
+            console.error('[Texture]ufniromName is missed');
+            return;
+        }
+        this.textureNum = textureNum;
         this.unit = TEXTURE0 + textureNum;
 
         this.setFormat(format, internalFormat, type)

@@ -79,7 +79,7 @@ export default class App {
     }
 
     _onload(){
-        this._texture = new Texture(this.gl);
+        this._texture = new Texture(this.gl, 'uTexture');
         this._texture.bind().setFilter().wrap().fromImage(this._image, this._image.width, this._image.height);
 
         this.play();
@@ -169,13 +169,8 @@ export default class App {
 
         this._obj.program.bind();
 
-
-        let location = this._obj.program.getUniforms('uTexture').location;
-        this.gl.uniform1i(location, 0);
-
+        this._obj.program.setUniformTexture( this._texture )
         this._texture.activeTexture().bind();
-
-
 
         this._obj.indexBuffer.bind();
         this._obj.positionBuffer.bind().attribPointer(this._obj.program);

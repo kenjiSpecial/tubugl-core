@@ -32,7 +32,6 @@ export class ArrayBuffer{
     }
 
     setData(array){
-        console.log(array);
         this.gl.bufferData(ARRAY_BUFFER, array, STATIC_DRAW);
     }
 
@@ -45,8 +44,6 @@ export class ArrayBuffer{
             stride: stride,
             offset: offset
         });
-
-        console.log(this.attribs)
     }
 
     attribPointer(program){;

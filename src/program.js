@@ -49,8 +49,8 @@ export  class Program{
                 type: uniform.type,
                 size: uniform.size
             };
-        }
 
+        }
 
         //attributes
         const attributreNumber = this.gl.getProgramParameter(this._program, this.gl.ACTIVE_ATTRIBUTES);
@@ -75,6 +75,12 @@ export  class Program{
 
     getUniforms(name){
         return this._uniform[name];
+    }
+
+    setUniformTexture(texture){
+        let {uniformName, textureNum} = texture;
+        let uniform = this.getUniforms(uniformName);
+        this.gl.uniform1i(uniform.location, textureNum);
     }
 
     dispose(){
