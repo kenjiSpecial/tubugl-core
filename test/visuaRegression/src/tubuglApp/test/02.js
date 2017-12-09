@@ -27,7 +27,7 @@ const fragmentShaderSrc = `
     
   void main() {
       vec4 color = texture2D( uTexture, vUv);
-      gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+      gl_FragColor = vec4(vUv, 0.0, 1.0);
   }
 `;
 
@@ -82,76 +82,51 @@ export default class App {
     _onload(){
         this._texture = new Texture(this.gl);
         this._texture.bind().setFilter().wrap().fromImage(this._image, this._image.width, this._image.height);
+
+        this.play();
     }
 
     createProgram(){
         this._program = new Program(this.gl, vertexShaderSrc, fragmentShaderSrc );
-        let positions = [
-            -0.5, -0.5,
-            -0.5, 0.1,
-            -0.1, 0.1,
-            -0.1, -0.5,
-        ];
 
-        let indices = [
-            0, 1, 2,
-            0, 2, 3
-        ];
-
-        let pos0 = {x: 0.4, y: 0.2};
-        let pos1 = {x: -0.5, y: -0.1}
+        let pos0 = {x: 0., y: 0.};
         let side = 0.1
-        this.vertices = new Float32Array( [
-            -side/2 + pos0.x, -side/2 + pos1.y,
-             side/2 + pos0.x, -side/2 + pos1.y,
-             side/2 + pos0.x,  side/2 + pos1.y,
-            -side/2 + pos0.x,  side/2 + pos1.y,
 
-            -side/2 + pos1.x, -side/2 + pos1.y,
-             side/2 + pos1.x, -side/2 + pos1.y,
-             side/2 + pos1.x,  side/2 + pos1.y,
-            -side/2 + pos1.x,  side/2 + pos1.y,
+        this.vertices = new Float32Array( [
+            -side/2 + pos0.x, -side/2 + pos0.y,
+             side/2 + pos0.x, -side/2 + pos0.y,
+             side/2 + pos0.x,  side/2 + pos0.y,
+            -side/2 + pos0.x,  side/2 + pos0.y,
         ] );
 
-        this._shapeCnt = 6 * 2
+        this._shapeCnt = 6;
 
         let shapeCnt = 4;
         this.indices = new Uint16Array( [
             0, 1, 2,
             0, 2, 3,
-            0 + shapeCnt, 1 + shapeCnt, 2 + shapeCnt,
-            0 + shapeCnt, 2 + shapeCnt, 3 + shapeCnt,
         ] );
+
+        let uvs = new Float32Array([
+            0, 0,
+            1, 0,
+            1, 1,
+            0, 1
+        ]);
 
         this._arrayBuffer = new ArrayBuffer(this.gl, this.vertices);
         this._arrayBuffer.setAttribs('a_position', 2, this.gl.FLOAT, false, 0, 0);
+
+        this._uvBuffer = new ArrayBuffer(this.gl, uvs);
+        this._uvBuffer.setAttribs('uv', 2, this.gl.FLOAT, false, 0, 0);
 
         this._indexBuffer = new IndexArrayBuffer(this.gl, this.indices);
 
         this._obj = {
             program: this._program,
             positionBuffer: this._arrayBuffer,
+            uvBuffer: this._uvBuffer,
             indexBuffer: this._indexBuffer,
-            count: 3
-        };
-
-
-        this._program1 = new Program(this.gl, vertexShaderSrc, fragmentShaderSrc);
-        let positions2 = [
-            0, 0,
-            0, 0.5,
-            0.7, 0,
-        ];
-
-
-        this._arrayBuffer2 = new ArrayBuffer(this.gl, new Float32Array(positions2));
-        this._arrayBuffer2.setAttribs('a_position', 2, this.gl.FLOAT, false, 0, 0);
-
-
-
-        this._obj1 = {
-            program: this._program1,
-            positionBuffer: this._arrayBuffer2,
             count: 3
         };
 
@@ -194,8 +169,16 @@ export default class App {
         this.gl.clear(this.gl.COLOR_BUFFER_BIT);
 
         this._obj.program.bind();
+
+        var u_image0Location = this.gl.getUniformLocation(this._obj.program._program, "uTexture");
+        this.gl.uniform1i(u_image0Location, 0);
+
+        this.gl.activeTexture(this.gl.TEXTURE0);
+        this.gl.bindTexture(this.gl.TEXTURE_2D, this._texture._texture)
+
         this._obj.indexBuffer.bind();
         this._obj.positionBuffer.bind().attribPointer(this._obj.program);
+        // this._obj.uvBuffer.bind().attribPointer(this._obj.program);
 
         this.gl.drawElements(this.gl.TRIANGLES, this._shapeCnt, this.gl.UNSIGNED_SHORT, 0 );
     }
