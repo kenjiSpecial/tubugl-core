@@ -24,7 +24,7 @@ export class Texture {
 
         return this;
     }
-    activate(){
+    activeTexture(){
         this._gl.activeTexture(this.unit);
         return this;
     }
@@ -46,6 +46,19 @@ export class Texture {
         if(type) this._type = type;
 
         return this;
+    }
+
+    /**
+     *
+     * usage:
+     * let activeTextureNum = this.gl.getParameter(this.gl.ACTIVE_TEXTURE);
+     * console.log(this._texture.isActiveTexture(activeTextureNum));
+     *
+     * @param unit
+     * @returns {boolean}
+     */
+    isActiveTexture(unit){
+        return unit === this.unit;
     }
 
     /**

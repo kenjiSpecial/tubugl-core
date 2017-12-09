@@ -73,6 +73,10 @@ export  class Program{
         return this._attrib[name];
     }
 
+    getUniforms(name){
+        return this._uniform[name];
+    }
+
     dispose(){
         if(this.gl === null) return;
 
