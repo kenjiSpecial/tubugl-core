@@ -44,11 +44,14 @@ export class ArrayBuffer{
             stride: stride,
             offset: offset
         });
+
+        console.log(this.attribs)
     }
 
     attribPointer(program){;
         this.attribs.forEach((attrib)=>{
             let location = program.getAttrib(attrib.name).location;
+            // console.log(location)
             let {size, type, normalize, stride, offset} = attrib;
             this.gl.enableVertexAttribArray(location);
             this.gl.vertexAttribPointer(this._positionAttribLocation1, size, type, normalize, stride, offset)
