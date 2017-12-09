@@ -1,4 +1,4 @@
-import {Program, ArrayBuffer, IndexArrayBuffer, Texture} from 'tubuGL';
+import {Program, ArrayBuffer, IndexArrayBuffer} from 'tubuGL';
 
 const TweenLite = require('gsap');
 const dat = require('../../vendors/dat.gui/dat.gui');
@@ -6,37 +6,41 @@ const Stats = require('../../vendors/stats.js/stats');
 
 const vertexShaderSrc = `// an attribute will receive data from a buffer
   attribute vec4 a_position;
-  attribute vec2 uv;
-  
+  attribute vec2 uv; 
   uniform float uTheta;
-
-  varying vec2 vUv;
   
+   varying vec2 vUv;
+  // all shaders have a main function
   void main() {
-      vUv = uv;
-      
-      gl_Position = a_position + vec4(0.0 * cos(uTheta), 0.0 * sin(uTheta), 0.0, 0.0);
+
+    // gl_Position is a special variable a vertex shader
+    // is responsible for setting
+    gl_Position = a_position + vec4(0.0 * cos(uTheta), 0.0 * sin(uTheta), 0.0, 0.0);
+    vUv = uv;
   }`;
 
-const fragmentShaderSrc = `
+function fragmentShaderSrc(colorR, colorG, colorB){
+    return `
+  // fragment shaders don't have a default precision so we need
+  // to pick one. mediump is a good default
   precision mediump float;
   
-  uniform sampler2D uTexture;
-
   varying vec2 vUv;
-    
+
   void main() {
+<<<<<<< HEAD
       vec4 color = texture2D( uTexture, vUv);
       gl_FragColor = vec4(vUv, 0.0, 1.0);
+=======
+    gl_FragColor = vec4(vUv, 0.0, 1.0);
+>>>>>>> 4505c6b38117413ccc6e972a8d248b4e52464bce
   }
 `;
-
+}
 
 
 export default class App {
     constructor(params){
-
-
         this.updateAttribute = this.updateAttribute.bind(this);
         this._playAndStop = this._playAndStop.bind(this);
 
@@ -79,6 +83,7 @@ export default class App {
         this._playAndStopGUI = this.gui.add(this, '_playAndStop').name('pause');
     }
 
+<<<<<<< HEAD
     _onload(){
         this._texture = new Texture(this.gl);
         this._texture.bind().setFilter().wrap().fromImage(this._image, this._image.width, this._image.height);
@@ -88,11 +93,26 @@ export default class App {
 
     createProgram(){
         this._program = new Program(this.gl, vertexShaderSrc, fragmentShaderSrc );
+=======
+    createProgram(){
+        this._program = new Program(this.gl, vertexShaderSrc, fragmentShaderSrc(1.0, 0.0, 0.0));
+        let positions = [
+            -0.5, -0.5,
+            -0.5, 0.1,
+            -0.1, 0.1,
+            -0.1, -0.5,
+        ];
+        let indices = [
+            0, 1, 2,
+            0, 2, 3
+        ];
+>>>>>>> 4505c6b38117413ccc6e972a8d248b4e52464bce
 
         let pos0 = {x: 0., y: 0.};
         let side = 0.1
 
         this.vertices = new Float32Array( [
+<<<<<<< HEAD
             -side/2 + pos0.x, -side/2 + pos0.y,
              side/2 + pos0.x, -side/2 + pos0.y,
              side/2 + pos0.x,  side/2 + pos0.y,
@@ -100,6 +120,22 @@ export default class App {
         ] );
 
         this._shapeCnt = 6;
+=======
+            -side/2, -side/2,
+             side/2, -side/2,
+             side/2,  side/2,
+            -side/2,  side/2,
+        ] );
+
+        let uvs = new Float32Array( [
+            0., 0.,
+            1., 0.,
+            1., 1.,
+            0., 1.
+        ] );
+
+        this._shapeCnt = 6
+>>>>>>> 4505c6b38117413ccc6e972a8d248b4e52464bce
 
         let shapeCnt = 4;
         this.indices = new Uint16Array( [
@@ -125,11 +161,19 @@ export default class App {
         this._obj = {
             program: this._program,
             positionBuffer: this._arrayBuffer,
+<<<<<<< HEAD
             uvBuffer: this._uvBuffer,
+=======
+
+>>>>>>> 4505c6b38117413ccc6e972a8d248b4e52464bce
             indexBuffer: this._indexBuffer,
             count: 3
         };
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 4505c6b38117413ccc6e972a8d248b4e52464bce
     }
 
     updateAttribute(){
@@ -143,12 +187,6 @@ export default class App {
     }
 
     start(){
-        this._image = new Image();
-        this._image.onload = this._onload.bind(this);
-        this._image.src = '/assets/images/uv_img.jpg'
-    }
-
-    play(){
         this._isPlay = true;
         TweenMax.ticker.addEventListener('tick', this.update, this);
     }
@@ -170,6 +208,7 @@ export default class App {
 
         this._obj.program.bind();
 
+<<<<<<< HEAD
         var u_image0Location = this.gl.getUniformLocation(this._obj.program._program, "uTexture");
         this.gl.uniform1i(u_image0Location, 0);
 
@@ -179,8 +218,14 @@ export default class App {
         this._obj.indexBuffer.bind();
         this._obj.positionBuffer.bind().attribPointer(this._obj.program);
         // this._obj.uvBuffer.bind().attribPointer(this._obj.program);
+=======
+        this._obj.indexBuffer.bind();
+        this._obj.positionBuffer.bind().attribPointer(this._obj.program);
+        this._uvBuffer.bind().attribPointer(this._obj.program);
+>>>>>>> 4505c6b38117413ccc6e972a8d248b4e52464bce
 
-        this.gl.drawElements(this.gl.TRIANGLES, this._shapeCnt, this.gl.UNSIGNED_SHORT, 0 );
+        let gl = this.gl;
+        gl.drawElements(gl.TRIANGLES, this._shapeCnt, gl.UNSIGNED_SHORT, 0 );
     }
 
     resize(width, height){
