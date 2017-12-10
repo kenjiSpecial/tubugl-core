@@ -1,4 +1,6 @@
 import {webGLShader} from './utils/webglShader'
+import {FLOAT, FLOAT_VEC2, FLOAT_VEC3, FLOAT_VEC4} from 'tubugl-constants';
+import {FLOAT_MAT2, FLOAT_MAT3, FLOAT_MAT4} from 'tubugl-constants'
 
 export  class Program{
     /**
@@ -45,8 +47,25 @@ export  class Program{
         for(ii = 0; ii < uniformNumber; ii++){
             let uniform = this.gl.getActiveUniform(this._program, ii);
             let uLocation = this.gl.getUniformLocation(this._program, uniform.name);
+
+            let typeName;
+            /**
+             * https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Constants
+             * */
+            switch(uniform.type){
+                case FLOAT: typeName = "float"; break;
+                case FLOAT_VEC2: typeName = "vec2"; break;
+                case FLOAT_VEC3: typeName = "vec3"; break;
+                case FLOAT_VEC4: typeName = "vec4"; break;
+                case FLOAT_MAT2: typeName = "mat2"; break;
+                case FLOAT_MAT3: typeName = "mat3"; break;
+                case FLOAT_MAT4: typeName = "mat4"; break;
+            }
+
             this._uniform[uniform.name] = {
+                location: uLocation,
                 type: uniform.type,
+                typeName: typeName,
                 size: uniform.size
             };
 
