@@ -1,4 +1,4 @@
-import {Program, ArrayBuffer, webglShader} from 'tubuGL';
+import {Program, ArrayBuffer, webglShader, draw} from 'tubuGL';
 
 const TweenLite = require('gsap');
 const dat = require('../../vendors/dat.gui/dat.gui');
@@ -135,12 +135,11 @@ export default class App {
 
         this._obj.program.bind();
         this._obj.positionBuffer.bind().attribPointer(this._obj.program);
-        this._obj.positionBuffer.drawTriangles(this._obj.count);
+        draw.array(this.gl, this._obj.count);
 
         this._obj1.program.bind();
         this._obj1.positionBuffer.bind().attribPointer(this._obj1.program);
-        this._obj1.positionBuffer.drawTriangles(this._obj1.count);
-
+        draw.array(this.gl, this._obj.count);
 
     }
 
