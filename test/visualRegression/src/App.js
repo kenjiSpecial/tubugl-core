@@ -25,6 +25,7 @@ export default () => (
             <Route exact path="/test/01" render={(props) => <TestApp globalStore={{appId: '1', description: 'test with program, arrayBuffer, and indexArrayBuffer'}} {...props} />}/>
             <Route exact path="/test/02" render={(props) => <TestApp globalStore={{appId: '2', description: 'test with program, arrayBuffer, indexArrayBuffer, texture'}} {...props} />}/>
             <Route exact path="/test/03" render={(props) => <TestApp globalStore={{appId: '3', description: 'test for draw function'}} {...props} />}/>
+            <Route exact path="/test/04" render={(props) => <TestApp globalStore={{appId: '4', description: 'test for framebuffer'}} {...props} />}/>
 
         </Switch>
     </Router>

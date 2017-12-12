@@ -73,6 +73,7 @@ export class Texture {
      *
      * @param filter
      */
+
     setFilter(filter = LINEAR){
         this.setMinFilter(filter);
         this.setMagFilter(filter);

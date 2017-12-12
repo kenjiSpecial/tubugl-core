@@ -1,6 +1,7 @@
 import {webGLShader} from './utils/webglShader'
 import {FLOAT, FLOAT_VEC2, FLOAT_VEC3, FLOAT_VEC4} from 'tubugl-constants';
-import {FLOAT_MAT2, FLOAT_MAT3, FLOAT_MAT4} from 'tubugl-constants'
+import {FLOAT_MAT2, FLOAT_MAT3, FLOAT_MAT4} from 'tubugl-constants';
+import {VERTEX_SHADER, FRAGMENT_SHADER, LINK_STATUS, ACTIVE_UNIFORMS, ACTIVE_ATTRIBUTES} from 'tubugl-constants';
 
 export  class Program{
     /**
@@ -14,18 +15,18 @@ export  class Program{
         this._isReady = false;
         this._isDebgu = params.isDebug;
 
-        this.gl = gl;
+        this._gl = gl;
 
-        this._vertexShader = webGLShader(gl, gl.VERTEX_SHADER, vertSrc);
-        this._fragmentShader = webGLShader(gl, gl.FRAGMENT_SHADER, fragSrc);
-        this._program = gl.createProgram();
-        gl.attachShader(this._program, this._vertexShader);
-        gl.attachShader(this._program, this._fragmentShader);
-        gl.linkProgram(this._program);
+        this._vertexShader = webGLShader(gl, VERTEX_SHADER, vertSrc);
+        this._fragmentShader = webGLShader(gl, FRAGMENT_SHADER, fragSrc);
+        this._program = this._gl.createProgram();
+        this._gl.attachShader(this._program, this._vertexShader);
+        this._gl.attachShader(this._program, this._fragmentShader);
+        this._gl.linkProgram(this._program);
 
         try{
-            let success = this.gl.getProgramParameter(this._program, this.gl.LINK_STATUS);
-            if(!success) throw this.gl.getProgramInfoLog(this._program);
+            let success = this._gl.getProgramParameter(this._program, LINK_STATUS);
+            if(!success) throw this._gl.getProgramInfoLog(this._program);
         }catch (error){
             console.error(`WebGLProgram: ${error}`)
         }
@@ -41,12 +42,12 @@ export  class Program{
         let ii;
 
         // uniforms
-        const uniformNumber = this.gl.getProgramParameter(this._program, this.gl.ACTIVE_UNIFORMS);
+        const uniformNumber = this._gl.getProgramParameter(this._program, ACTIVE_UNIFORMS);
 
         this._uniform = {};
         for(ii = 0; ii < uniformNumber; ii++){
-            let uniform = this.gl.getActiveUniform(this._program, ii);
-            let uLocation = this.gl.getUniformLocation(this._program, uniform.name);
+            let uniform = this._gl.getActiveUniform(this._program, ii);
+            let uLocation = this._gl.getUniformLocation(this._program, uniform.name);
 
             let typeName;
             /**
@@ -72,20 +73,23 @@ export  class Program{
         }
 
         //attributes
-        const attributreNumber = this.gl.getProgramParameter(this._program, this.gl.ACTIVE_ATTRIBUTES);
+        const attributreNumber = this._gl.getProgramParameter(this._program, ACTIVE_ATTRIBUTES);
         this._attrib = {};
         for(ii = 0; ii < attributreNumber; ii++){
-            let attrib = this.gl.getActiveAttrib(this._program, ii);
+            let attrib = this._gl.getActiveAttrib(this._program, ii);
             this._attrib[attrib.name] = {
-                location: this.gl.getAttribLocation(this._program, attrib.name),
+                location: this._gl.getAttribLocation(this._program, attrib.name),
                 type: attrib.type,
                 size: attrib.size
             };
         }
+
+        return this;
     }
 
     bind(){
-        this.gl.useProgram(this._program);
+        this._gl.useProgram(this._program);
+        return this;
     }
 
     getAttrib(name){
@@ -99,15 +103,15 @@ export  class Program{
     setUniformTexture(texture){
         let {uniformName, textureNum} = texture;
         let uniform = this.getUniforms(uniformName);
-        this.gl.uniform1i(uniform.location, textureNum);
+        this._gl.uniform1i(uniform.location, textureNum);
     }
 
     dispose(){
-        if(this.gl === null) return;
+        if(this._gl === null) return;
 
-        this.gl.deleteProgram(this._program);
-        this.gl.deleteShader(this._vertexShader);
-        this.gl.deleteShader(this._fragmentShader);
-        this.gl = null;
+        this._gl.deleteProgram(this._program);
+        this._gl.deleteShader(this._vertexShader);
+        this._gl.deleteShader(this._fragmentShader);
+        this._gl = null;
     }
 }
