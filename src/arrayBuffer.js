@@ -49,11 +49,19 @@ export class ArrayBuffer{
     attribPointer(program){;
         this.attribs.forEach((attrib)=>{
             let location = program.getAttrib(attrib.name).location;
-            // console.log(location)
             let {size, type, normalize, stride, offset} = attrib;
 
             this.gl.vertexAttribPointer(location, size, type, normalize, stride, offset)
             this.gl.enableVertexAttribArray(location);
+        });
+
+        return this;
+    }
+
+    disablePoiner(program){
+        this.attribs.forEach((attrib)=>{
+            let location = program.getAttrib(attrib.name).location;
+            this.gl.disableVertexAttribArray(location);
         });
 
         return this;
