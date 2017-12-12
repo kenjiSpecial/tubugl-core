@@ -1,4 +1,4 @@
-import {Program, ArrayBuffer, IndexArrayBuffer, Texture, draw} from 'tubuGL';
+import {Program, ArrayBuffer, IndexArrayBuffer, FrameBuffer} from 'tubuGL';
 
 const TweenLite = require('gsap');
 const dat = require('../../vendors/dat.gui/dat.gui');
@@ -6,22 +6,46 @@ const Stats = require('../../vendors/stats.js/stats');
 
 const vertexShaderSrc = `// an attribute will receive data from a buffer
   attribute vec4 a_position;
-  uniform vec2 uTrans;
   
+  uniform float uTheta;
+  varying vec2 vUv;
+  
+  // all shaders have a main function
   void main() {
-
-    gl_PointSize = 2.;
-    gl_Position = a_position + vec4(uTrans, 0.0, 0.0);
+    gl_Position = a_position;
+    
+    vUv = vec2( (a_position.x + 0.1)/0.2, (a_position.y + 0.1)/0.2 ); 
   }`;
 
-const fragmentShaderSrc = `
+function fragmentShaderSrc(colorR, colorG, colorB){
+    return `
   precision mediump float;
-  
+
   void main() {
-      gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+    // gl_FragColor is a special variable a fragment shader
+    // is responsible for setting
+    float colorR = gl_FrontFacing ? 1.0 : 0.0;
+    float colorG = gl_FrontFacing ? 0.0 : 1.0;
+    
+    gl_FragColor = vec4(colorR, colorG, 0.0, 1.0);
   }
 `;
+}
 
+
+const fragmentSrc = `
+precision mediump float;
+
+uniform sampler2D uTexture;
+
+varying vec2 vUv;
+
+void main(){
+    vec4 color = texture2D(uTexture, vUv) + vec4(0.0, 0.1, 0.1, 0.0);
+    
+    gl_FragColor = color;
+}
+`;
 
 
 export default class App {
@@ -37,6 +61,7 @@ export default class App {
         this.gl = this.canvas.getContext('webgl');
         this._description = params.description;
 
+        this.createFrameBuffer();
         this.createProgram();
         this.resize();
         this._setDebug();
@@ -68,55 +93,85 @@ export default class App {
         this._playAndStopGUI = this.gui.add(this, '_playAndStop').name('pause');
     }
 
+    createFrameBuffer(){
+        this._frambuffer = new FrameBuffer(this.gl, window.innerWidth, window.innerHeight);
+    }
+
     createProgram(){
-        this._program = new Program(this.gl, vertexShaderSrc, fragmentShaderSrc );
+        this._program = new Program(this.gl, vertexShaderSrc, fragmentShaderSrc(1.0, 0.0, 0.0));
+        let positions = [
+            -0.5, -0.5,
+            -0.5, 0.1,
+            -0.1, 0.1,
+            -0.1, -0.5,
+        ];
+        let indices = [
+            0, 1, 2,
+            0, 2, 3
+        ];
 
-        this._pointNum = 100;
+        let pos0 = {x: 0.4, y: 0.2};
+        let pos1 = {x: -0.5, y: -0.1}
+        let side = 0.1
+        this.vertices = new Float32Array( [
+            -side/2 + pos0.x, -side/2 + pos1.y,
+            side/2 + pos0.x, -side/2 + pos1.y,
+            side/2 + pos0.x,  side/2 + pos1.y,
+            -side/2 + pos0.x,  side/2 + pos1.y,
 
-        this.vertices = [];
-        let side = 0.2;
-        for(let ii = 0; ii < this._pointNum; ii++){
-            let xPos = parseInt(ii/10) / 10 * -side + side/2;
-            let yPos = (ii % 10)/10 * -side + side/2;
+            -side/2 + pos1.x, -side/2 + pos1.y,
+            side/2 + pos1.x, -side/2 + pos1.y,
+            side/2 + pos1.x,  side/2 + pos1.y,
+            -side/2 + pos1.x,  side/2 + pos1.y,
+        ] );
 
-            this.vertices.push(xPos);
-            this.vertices.push(yPos);
-        }
+        this._shapeCnt = 6 * 2
 
-
-        this.indices = [];
-        this._shapeCnt = 0;
-        for(var xx = 0; xx < 10 - 1; xx++){
-            for(var yy = 0; yy < 10 - 1; yy++) {
-                var num = xx * 10 + yy;
-                this.indices.push(num);  this.indices.push(num + 1); this.indices.push(num + 10);
-                this.indices.push(num + 1); this.indices.push(num + 10); this.indices.push(num + 11);
-                this._shapeCnt += 6;
-            }
-        }
-        this.indices = new Uint16Array(this.indices);
-
-
-
-
-        this.vertices = new Float32Array(this.vertices);
-        // this.vertices = new Float32Array( [
-        //     -side/2, -side/2,
-        //     side/2, -side/2,
-        //     side/2,  side/2,
-        //     -side/2,  side/2,
-        // ] );
+        let shapeCnt = 4;
+        this.indices = new Uint16Array( [
+            0, 1, 2,
+            0, 2, 3,
+            0 + shapeCnt, 1 + shapeCnt, 2 + shapeCnt,
+            0 + shapeCnt, 2 + shapeCnt, 3 + shapeCnt,
+        ] );
 
         this._arrayBuffer = new ArrayBuffer(this.gl, this.vertices);
         this._arrayBuffer.setAttribs('a_position', 2, this.gl.FLOAT, false, 0, 0);
 
         this._indexBuffer = new IndexArrayBuffer(this.gl, this.indices);
+
         this._obj = {
             program: this._program,
             positionBuffer: this._arrayBuffer,
             indexBuffer: this._indexBuffer,
-            count: this._pointNum
+            count: 6
         };
+
+
+        let program2 = new Program(this.gl, vertexShaderSrc, fragmentSrc);
+
+        let indices2 = new Uint16Array( [
+            0, 1, 2,
+            0, 2, 3,
+        ]);
+        let vertices2 = new Float32Array([
+            -side/2, -side/2,
+             side/2, -side/2,
+             side/2,  side/2,
+            -side/2,  side/2 ,
+        ])
+
+        let arrayBuffer = new ArrayBuffer(this.gl, vertices2);
+        arrayBuffer.setAttribute('a_position', 2, this.gl.FLOAT, false, 0, 0);
+
+        let indexBuffer2 = new IndexArrayBuffer(this.gl, indices2);
+
+        this._obj2 = {
+            program: program2,
+            indexBuffer: indexBuffer2,
+            positionBuffer: arrayBuffer,
+            count: 3
+        }
 
     }
 
@@ -131,10 +186,6 @@ export default class App {
     }
 
     start(){
-        this.play();
-    }
-
-    play(){
         this._isPlay = true;
         TweenMax.ticker.addEventListener('tick', this.update, this);
     }
@@ -147,23 +198,18 @@ export default class App {
     update(){
         this.stats.update();
 
+
         this.gl.clearColor(0, 0, 0, 1);
         this.gl.clear(this.gl.COLOR_BUFFER_BIT);
 
         this._obj.program.bind();
         this._obj.indexBuffer.bind();
         this._obj.positionBuffer.bind().attribPointer(this._obj.program);
+        // this.gl.drawElements(this.gl.TRIANGLES, 3 * 2 , this.gl.UNSIGNED_SHORT, 0);
+        let gl = this.gl;
+        gl.drawElements(gl.TRIANGLES, this._shapeCnt, gl.UNSIGNED_SHORT, 0 );
 
-        let uTrans = this._obj.program.getUniforms('uTrans');
 
-        this.gl.uniform2f(uTrans.location, -0.3, 0.0);
-        draw.arrayLines(this.gl, this._obj.count);
-
-        this.gl.uniform2f(uTrans.location, 0.0, 0.0);
-        draw.arrayPoint(this.gl, this._obj.count);
-
-        this.gl.uniform2f(uTrans.location, 0.3, 0.0);
-        draw.element(this.gl, this._shapeCnt);
     }
 
     resize(width, height){
