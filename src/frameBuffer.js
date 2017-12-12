@@ -39,6 +39,7 @@ export class FrameBuffer {
 
     _makeTexture(){
         let texture = this._gl.createTexture();
+        this._gl.bindTexture(TEXTURE_2D, texture);
 
         this._gl.texParameteri(TEXTURE_2D, TEXTURE_WRAP_S, CLAMP_TO_EDGE);
         this._gl.texParameteri(TEXTURE_2D, TEXTURE_WRAP_T, CLAMP_TO_EDGE);
@@ -47,5 +48,10 @@ export class FrameBuffer {
 
         return texture;
     }
+
+    getTexture(){
+        return this._texture;
+    }
+
 
 }
