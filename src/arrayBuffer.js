@@ -27,7 +27,7 @@ export class ArrayBuffer{
     }
 
     unbind(){
-        this.gl.bindBuffer(ARRAY_BUFFER, this.buffer);
+        this.gl.bindBuffer(ARRAY_BUFFER, null);
         return this;
     }
 

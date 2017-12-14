@@ -14,8 +14,6 @@ export  class Program2 extends Program{
      * @param params
      */
     constructor(gl, vertSrc, fragSrc, params = {}){
-
         super(gl, vertSrc, fragSrc, params);
-
     }
 }

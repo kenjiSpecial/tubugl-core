@@ -1,7 +1,7 @@
 /* eslint-disable react/no-unescaped-entities */
 import React from 'react'
-import App0 from '../tubuglApp/rawGL00';
-import App1 from '../tubuglApp/rawGL01';
+import App0 from '../tubuglApp/raw/rawGL00';
+import App1 from '../tubuglApp/raw/rawGL01';
 
 export default class SimpleExample extends React.Component {
     constructor(props){

@@ -1,5 +1,5 @@
 const TweenLite = require('gsap');
-import {webGLShader} from "../../../../src/utils/webglShader";
+import {webglShader} from 'tubuGL';
 
 const vertexShaderSrc = `// an attribute will receive data from a buffer
   attribute vec4 a_position;
