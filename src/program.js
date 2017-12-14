@@ -5,7 +5,7 @@ import {VERTEX_SHADER, FRAGMENT_SHADER, LINK_STATUS, ACTIVE_UNIFORMS, ACTIVE_ATT
 
 
 
-export  class Program{
+export class Program{
     /**
      *
      * @param gl
