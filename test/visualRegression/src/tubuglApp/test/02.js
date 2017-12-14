@@ -47,6 +47,7 @@ export default class App {
         this.gl = this.canvas.getContext('webgl');
         this._description = params.description;
 
+
         this.createProgram();
         this.resize();
         this._setDebug();

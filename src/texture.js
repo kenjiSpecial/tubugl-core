@@ -96,4 +96,10 @@ export class Texture {
 
         return this;
     }
+    generateMipmap(){
+        this._gl.generateMipmap(TEXTURE_2D);
+
+        return this;
+    }
+
 }
