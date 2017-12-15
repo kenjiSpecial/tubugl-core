@@ -33,11 +33,9 @@ export class ArrayBuffer{
 
     setData(array){
         this.gl.bufferData(ARRAY_BUFFER, array, STATIC_DRAW);
-        console.log(array)
     }
 
     setAttribs(name, size, type, normalize, stride, offset){
-        console.log(normalize)
         this.attribs.push({
             name : name,
             size: size,
@@ -46,6 +44,8 @@ export class ArrayBuffer{
             stride: stride,
             offset: offset
         });
+
+        return this;
     }
 
     /**
@@ -54,13 +54,12 @@ export class ArrayBuffer{
      * @returns {ArrayBuffer}
      */
     attribPointer(program){;
-        // console.log(this.attribs)
+
         this.attribs.forEach((attrib)=>{
             let location = program.getAttrib(attrib.name).location;
             let {size, type, normalize, stride, offset} = attrib;
 
             this.gl.enableVertexAttribArray(location);
-            console.log(location, size, type, normalize, stride, offset)
             this.gl.vertexAttribPointer(location, size, type, normalize, stride, offset)
         });
 

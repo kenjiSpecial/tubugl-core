@@ -1,7 +1,3 @@
-/**
- * test for vao(webgl2)
- */
-
 import {Program, ArrayBuffer, IndexArrayBuffer, FrameBuffer, VAO} from 'tubuGL';
 import {UNSIGNED_SHORT} from "tubugl-constants";
 
@@ -12,11 +8,11 @@ const Stats = require('../../vendors/stats.js/stats');
 const vertexShaderSrc = `#version 300 es
 in vec4 position;
 
-uniform vec2 uTrans;
+uniform float uTheta;
 
 // all shaders have a main function
 void main() {
-gl_Position = position + vec4(uTrans, 0.0, 0.0);
+gl_Position = position;
 
 }`;
 
@@ -32,6 +28,7 @@ const fragmentShaderSrc = `#version 300 es
     outColor = vec4(colorR, colorG, 0.0, 1.0);
   }
 `;
+
 
 
 
@@ -87,13 +84,25 @@ export default class App {
 
     createProgram(){
         this._program = new Program(this.gl, vertexShaderSrc, fragmentShaderSrc);
-
-        let side = 0.1;
+        /**
+        var x1 = -1;
+        var x2 = 1;
+        var y1 = -1;
+        var y2 = 1;
         let positions = new Float32Array([
-            -side, -side,
-             side, -side,
-             side,  side,
-            -side,  side,
+            x1, y1,
+            x2, y1,
+            x1, y2,
+            x1, y2,
+            x2, y1,
+            x2, y2,
+        ]);
+        */
+        let positions = new Float32Array([
+            -1, -1,
+            1, -1,
+            1, 1,
+            -1, 1,
         ]);
 
         let uvs = new Float32Array([
@@ -109,16 +118,52 @@ export default class App {
         ]);
 
         /** ====================================== **/
-        this._vao = new VAO(this.gl);
-        this._vao.bind();
 
-        this._arrayBuffer = new ArrayBuffer(this.gl, positions);
-        this._arrayBuffer.bind().setAttribs('position', 2, this.gl.FLOAT, false, 0, 0).attribPointer(this._program);
 
-        this._indexBuffer = new IndexArrayBuffer(this.gl, indices);
+        // this._program.bind();
+        // this._vao = new VAO(this.gl);
+        // this._vao.bind();
+
+        this._vao = this.gl.createVertexArray();
+        this.gl.bindVertexArray(this._vao);
+
+        var positionAttributeLocation = this.gl.getAttribLocation(this._program._program, "position");
+        this._positionBuffer = this.gl.createBuffer();
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this._positionBuffer);
+        this.gl.bufferData(this.gl.ARRAY_BUFFER, positions, this.gl.STATIC_DRAW);
+        console.log(positions);
+        this.gl.enableVertexAttribArray(positionAttributeLocation);
+        var size = 2;          // 2 components per iteration
+        var type = this.gl.FLOAT;   // the data is 32bit floats
+        var normalize = false; // don't normalize the data
+        var stride = 0;        // 0 = move forward size * sizeof(type) each iteration to get the next position
+        var offset = 0;        // start at the beginning of the buffer
+        this.gl.vertexAttribPointer(
+            positionAttributeLocation, size, type, normalize, stride, offset);
+
+        // console.log(positionAttributeLocation);
+
+        // this._arrayBuffer = new ArrayBuffer(this.gl, positions);
+        // this._arrayBuffer.setAttribs('position', 2, this.gl.FLOAT, false, 0, 0);
+        // this._arrayBuffer.attribPointer(this._program)
+
+        // this._uvBuffer = new ArrayBuffer(this.gl, uvs);
+        // this._uvBuffer.setAttribs('uv', 2, this.gl.FLOAT, false, 0, 0);
+
+        // this._vao.updateArrayBuffer(this._program, this._arrayBuffer, 'a_position');
+        // this._vao.updateArrayBuffer(this._program, this._uvBuffer, 'uv');
+
+        // this._indexBuffer = new IndexArrayBuffer(this.gl, indices);
+        // this._indexBuffer.setData()
+        // this._vao.updateIndexBuffer(this._indexBuffer);
+
+        this.indexBuffer =  this.gl.createBuffer();
+        this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
+        this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, indices, this.gl.STATIC_DRAW);
 
         this._obj = {
             program: this._program,
+            // vao: this._vao,
             count: 6
         };
 
@@ -157,17 +202,16 @@ export default class App {
         this.gl.clear(this.gl.COLOR_BUFFER_BIT);
 
         this._obj.program.bind();
-        this._vao.bind();
-        let uTrans = this._obj.program.getUniforms('uTrans')
-        this.gl.uniform2f(uTrans.location, -0.5, 0.0);
+        this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
 
         this.gl.drawElements(this.gl.TRIANGLES, this._obj.count, UNSIGNED_SHORT, 0);
+        // this.gl.drawArrays(this.gl.TRIANGLES, 0, 3 );
 
-        this._obj.program.bind();
-        this._vao.bind();
-        this.gl.uniform2f(uTrans.location, 0.5, 0.0);
+        // var primitiveType = gl.TRIANGLES;
+        // var offset = 0;
+        // var count = 3;
+        // gl.drawArrays(primitiveType, offset, count);
 
-        this.gl.drawElements(this.gl.TRIANGLES, this._obj.count, UNSIGNED_SHORT, 0);
     }
 
     resize(width, height){
