@@ -1,5 +1,5 @@
 /**
- *
+ * test for framebuffer
  */
 
 import {Program, ArrayBuffer, IndexArrayBuffer, FrameBuffer} from 'tubuGL';
