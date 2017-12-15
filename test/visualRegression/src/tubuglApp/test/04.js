@@ -101,16 +101,7 @@ export default class App {
 
     createProgram(){
         this._program = new Program(this.gl, vertexShaderSrc, fragmentShaderSrc(1.0, 0.0, 0.0));
-        let positions = [
-            -0.5, -0.5,
-            -0.5, 0.1,
-            -0.1, 0.1,
-            -0.1, -0.5,
-        ];
-        let indices = [
-            0, 1, 2,
-            0, 2, 3
-        ];
+
 
         let pos0 = {x: 0.4, y: 0};
         let pos1 = {x: -0.4, y: 0}

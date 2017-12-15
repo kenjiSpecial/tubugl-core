@@ -7,24 +7,28 @@ export class VAO{
     constructor(gl){
         this._gl = gl;
         this._vao = gl.createVertexArray();
-    }
-    bindVertexArray(){
-        this._gl.bindVertexArray();
-        return this;
-    }
-    updatBuffer(program, name, buffer, opts = {}){
-        let location = this._gl.getAttribLocation(program, name);
 
-        this._gl.enableVertexAttribArray(location);
-        this._gl.bindBuffer(ARRAY_BUFFER, buffer);
-        let {size, type, normalize, stride, offset} = opts;
-
+        this._arrayBuffers = {}
+    }
+    bind(){
+        this._gl.bindVertexArray(this._vao);
 
         return this;
     }
-    // Tell the attribute how to get data out of positionBuffer (ARRAY_BUFFER)
-    _setAttribPoint(location, size, type = FLOAT, normalize = false, stride = 0, offset = 0){
-        gl.vertexAttribPointer(location, size, type, normalize, stride, offset);
+    updateArrayBuffer(program, arrayBuffer, name){
+        this._arrayBuffers[name] = arrayBuffer;
+        // console.log(arrayBuffer)
+        arrayBuffer.attribPointer(program);
+
+        return this;
+    }
+    updateIndexBuffer(indexArrayBuffer){
+        indexArrayBuffer.bind();
+        return;
+    }
+    delete(){
+        this._gl.deleteVertexArray(this._vao);
+
         return this;
     }
 }

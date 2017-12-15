@@ -6,6 +6,7 @@ import App1 from '../tubuglApp/test/01';
 import App2 from '../tubuglApp/test/02';
 import App3 from '../tubuglApp/test/03';
 import App4 from '../tubuglApp/test/04';
+import App5 from '../tubuglApp/test/05';
 
 
 export default class TubuGlApp extends React.Component {
@@ -31,6 +32,7 @@ export default class TubuGlApp extends React.Component {
             case 2: App = App2; break;
             case 3: App = App3; break;
             case 4: App = App4; break;
+            case 5: App = App5; break;
         }
 
         this._app = new App({description: this._description, canvas: this.canvas, width: this.canvas.width, height: this.canvas.height});

@@ -161,9 +161,7 @@ export default class App {
     update(){
         this.stats.update();
 
-        // this.gl.frontFace(this.gl.CW);
         this.gl.enable(this.gl.CULL_FACE);
-        // this.gl.cullFace(this.gl.BACK);
 
         this.gl.clearColor(0, 0, 0, 1);
         this.gl.clear(this.gl.COLOR_BUFFER_BIT);

@@ -1,4 +1,4 @@
-import {Program, ArrayBuffer, IndexArrayBuffer, FrameBuffer} from 'tubuGL';
+import {Program, ArrayBuffer, IndexArrayBuffer, FrameBuffer, VAO} from 'tubuGL';
 
 const TweenLite = require('gsap');
 const dat = require('../../vendors/dat.gui/dat.gui');
@@ -42,11 +42,13 @@ uniform sampler2D uTexture;
 varying vec2 vUv;
 
 void main(){
-    vec4 color = texture2D(uTexture, vUv) + vec4(0.2, 0.2, 1.0, 0.0);
+    vec4 color = texture2D(uTexture, vUv) + vec4(0.3, 1.0, 1.0, 0.0);
     
     gl_FragColor = color;
 }
 `;
+
+console.log(VAO);
 
 
 export default class App {
@@ -59,7 +61,7 @@ export default class App {
         this._height = params.height ? params.height : window.innerHeight;
 
         this.canvas = params.canvas;
-        this.gl = this.canvas.getContext('webgl');
+        this.gl = this.canvas.getContext('webgl2');
         this._description = params.description;
 
         this.createFrameBuffer();
@@ -101,84 +103,13 @@ export default class App {
 
     createProgram(){
         this._program = new Program(this.gl, vertexShaderSrc, fragmentShaderSrc(1.0, 0.0, 0.0));
-        let positions = [
-            -0.5, -0.5,
-            -0.5, 0.1,
-            -0.1, 0.1,
-            -0.1, -0.5,
-        ];
-        let indices = [
-            0, 1, 2,
-            0, 2, 3
-        ];
-
-        let pos0 = {x: 0.4, y: 0};
-        let pos1 = {x: -0.4, y: 0}
-        let side = 0.1
-        this.vertices = new Float32Array( [
-            -side/2 + pos0.x, -side/2 + pos1.y,
-            side/2 + pos0.x, -side/2 + pos1.y,
-            side/2 + pos0.x,  side/2 + pos1.y,
-            -side/2 + pos0.x,  side/2 + pos1.y,
-
-            -side/2 + pos1.x, -side/2 + pos1.y,
-            side/2 + pos1.x, -side/2 + pos1.y,
-            side/2 + pos1.x,  side/2 + pos1.y,
-            -side/2 + pos1.x,  side/2 + pos1.y,
-        ] );
-
-        let uvsOrig = new Float32Array([
-            0, 1,
-            1, 1,
-            1, 0,
-            0, 0,
-
-            0, 1,
-            1, 1,
-            1, 0,
-            0, 0
+        let positions = new Float32Array([
+            -1, -1,
+             1, -1,
+             1, 1,
+            -1, 1,
         ]);
 
-        this._shapeCnt = 6 * 2
-
-        let shapeCnt = 4;
-        this.indices = new Uint16Array( [
-            0, 1, 2,
-            0, 2, 3,
-            0 + shapeCnt, 1 + shapeCnt, 2 + shapeCnt,
-            0 + shapeCnt, 2 + shapeCnt, 3 + shapeCnt,
-        ] );
-
-        this._arrayBuffer = new ArrayBuffer(this.gl, this.vertices);
-        this._arrayBuffer.setAttribs('a_position', 2, this.gl.FLOAT, false, 0, 0);
-
-        this._uvBuffer = new ArrayBuffer(this.gl, uvsOrig);
-        this._uvBuffer.setAttribs('uv', 2, this.gl.FLOAT, false, 0, 0);
-
-        this._indexBuffer = new IndexArrayBuffer(this.gl, this.indices);
-
-        this._obj = {
-            program: this._program,
-            positionBuffer: this._arrayBuffer,
-            indexBuffer: this._indexBuffer,
-            uvBuffer: this._uvBuffer,
-            count: 12
-        };
-
-
-        let program2 = new Program(this.gl, vertexShaderSrc, fragmentSrc);
-
-        side = 1.0;
-        let indices2 = new Uint16Array([
-            0, 1, 2,
-            0, 2, 3,
-        ]);
-        let vertices2 = new Float32Array([
-            -side/2, -side/2,
-            side/2, -side/2,
-            side/2,  side/2,
-            -side/2,  side/2 ,
-        ]);
         let uvs = new Float32Array([
             0, 1,
             1, 1,
@@ -186,21 +117,35 @@ export default class App {
             0, 0
         ]);
 
-        let arrayBuffer = new ArrayBuffer(this.gl, vertices2);
-        arrayBuffer.setAttribs('a_position', 2, this.gl.FLOAT, false, 0, 0);
+        let indices = new Uint16Array([
+            0, 1, 2,
+            0, 2, 3
+        ]);
 
-        let uvBuffer = new ArrayBuffer(this.gl, uvs);
-        uvBuffer.setAttribs('uv', 2, this.gl.FLOAT, false, 0, 0);
+        /** ====================================== **/
 
-        let indexBuffer2 = new IndexArrayBuffer(this.gl, indices2);
 
-        this._out = {
-            program: program2,
-            indexBuffer: indexBuffer2,
-            positionBuffer: arrayBuffer,
-            uvBuffer: uvBuffer,
+        this._program.bind();
+        this._vao = new VAO(this.gl);
+        this._vao.bind();
+
+        this._arrayBuffer = new ArrayBuffer(this.gl, positions);
+        this._arrayBuffer.setAttribs('a_position', 2, this.gl.FLOAT, false, 0, 0);
+
+        this._uvBuffer = new ArrayBuffer(this.gl, uvs);
+        this._uvBuffer.setAttribs('uv', 2, this.gl.FLOAT, false, 0, 0);
+
+        // this._vao.updateArrayBuffer(this._program, this._arrayBuffer, 'a_position');
+        this._vao.updateArrayBuffer(this._program, this._uvBuffer, 'uv');
+
+        this._indexBuffer = new IndexArrayBuffer(this.gl, indices);
+        // this._vao.updateIndexBuffer(this._indexBuffer);
+
+        this._obj = {
+            program: this._program,
+            vao: this._vao,
             count: 6
-        }
+        };
 
     }
 
@@ -233,34 +178,15 @@ export default class App {
          * =====================================
          */
 
-        this._frambuffer.bind().updateViewport();
-        this._obj.program.bind();
-
         this.gl.clearColor(0, 0, 0, 1);
         this.gl.clear(this.gl.COLOR_BUFFER_BIT);
 
-        this._obj.indexBuffer.bind();
-        this._obj.positionBuffer.bind().attribPointer(this._obj.program);
-        this._obj.uvBuffer.bind().attribPointer(this._obj.program);
+        this._obj.program.bind();
+        this._vao.bind();
 
         this.gl.drawElements(this.gl.TRIANGLES, this._obj.count, this.gl.UNSIGNED_SHORT, 0 );
 
-        /**
-         * =====================================
-         */
 
-        this._frambuffer.unbind();
-
-        this.gl.clearColor(0, 0, 0, 1);
-        this.gl.clear(this.gl.COLOR_BUFFER_BIT);
-        this.gl.viewport(0, 0, this._width, this._height);
-
-        this._out.program.bind();
-        this._out.indexBuffer.bind();
-        this._out.positionBuffer.bind().attribPointer(this._out.program);
-        this._out.uvBuffer.bind().attribPointer(this._out.program);
-
-        this.gl.drawElements(this.gl.TRIANGLES, this._out.count, this.gl.UNSIGNED_SHORT, 0 );
     }
 
     resize(width, height){
