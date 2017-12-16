@@ -1,3 +1,7 @@
+/**
+ * test for draw function
+ */
+
 import {Program, ArrayBuffer, IndexArrayBuffer, Texture, draw} from 'tubuGL';
 
 const TweenLite = require('gsap');

@@ -57,7 +57,7 @@ export class ArrayBuffer{
      * @returns {ArrayBuffer}
      */
     attribPointer(program){;
-        // console.log(this.attribs)
+
         this.attribs.forEach((attrib)=>{
             let location = program.getAttrib(attrib.name).location;
             let {size, type, normalize, stride, offset} = attrib;

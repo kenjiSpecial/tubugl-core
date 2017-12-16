@@ -1,3 +1,7 @@
+/**
+ * test with program, arrayBuffer, indexArrayBuffer, texture
+ */
+
 import {Program, ArrayBuffer, IndexArrayBuffer, Texture} from 'tubuGL';
 
 const TweenLite = require('gsap');
