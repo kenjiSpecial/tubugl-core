@@ -63,7 +63,7 @@ void main() {
     gl_Position = vec4(pos.xy, 0.0, 1.0);
 }`;
 
-const fragmentShaderSrc2 = `#version 300 es
+const fragmentShaderSrc2 = `#version 300 es 
   precision mediump float;
   
   out vec4 outColor;
@@ -167,8 +167,6 @@ export default class App {
         transformFeedback.addArrayBufer(0, {read: _positionBufferA, write: _positionBufferB, name: 'position'});
 
 
-        // this._arrayBuffer = new ArrayBuffer(this.gl, positions);
-        // this._arrayBuffer.bind().setAttribs('position', 2, this.gl.FLOAT, false, 0, 0).attribPointer(this._program);
 
         this._obj = {
             program: this._program,

@@ -1,8 +1,4 @@
-/**
-console.log('[tubugl] This is not three.js.' );
-console.log('[tubugl] It is tubugl,  %o', 'https://github.com/kenjiSpecial/tubugl');
-console.log('[tubugl] I could not develop tubugl without three.js and nanogl.');
-*/
+console.log('[tubugl] This is not three.js. It is tubugl,  %o', 'https://github.com/kenjiSpecial/tubugl');
 
 export {Program} from './src/program';
 export {Program2} from './src/program2';
