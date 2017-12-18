@@ -2,6 +2,8 @@
 import React from 'react'
 import App0 from '../tubuglApp/raw/rawGL00';
 import App1 from '../tubuglApp/raw/rawGL01';
+import App2 from '../tubuglApp/raw/rawGL02';
+import App3 from '../tubuglApp/raw/rawGL03';
 
 export default class SimpleExample extends React.Component {
     constructor(props){
@@ -21,6 +23,8 @@ export default class SimpleExample extends React.Component {
         switch(this._appId){
             case 0: App = App0; break;
             case 1: App = App1; break;
+            case 2: App = App2; break;
+            case 3: App = App3; break;
         }
 
         this._app = new App({canvas: this.canvas, width: this.canvas.width, height: this.canvas.height});

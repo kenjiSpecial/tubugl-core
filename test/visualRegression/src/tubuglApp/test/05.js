@@ -109,6 +109,7 @@ export default class App {
         ]);
 
         /** ====================================== **/
+
         this._vao = new VAO(this.gl);
         this._vao.bind();
 
