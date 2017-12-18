@@ -2,7 +2,7 @@
  * test for vao(webgl2)
  */
 
-import {Program2, ArrayBuffer, IndexArrayBuffer, FrameBuffer, VAO} from 'tubuGL';
+import {Program2, ArrayBuffer, IndexArrayBuffer, FrameBuffer, VAO, TransformFeedback} from 'tubuGL';
 import {UNSIGNED_SHORT, FLOAT, TRANSFORM_FEEDBACK_BUFFER, TRANSFORM_FEEDBACK} from "tubugl-constants";
 
 const TweenLite = require('gsap');
@@ -87,7 +87,7 @@ export default class App {
         this.createFrameBuffer();
         this.createProgram();
         this.resize();
-        this._setDebug();
+        // this._setDebug();
     }
 
     _playAndStop(){
@@ -105,7 +105,7 @@ export default class App {
         document.body.appendChild(this.stats.dom);
         let descriptionDom = document.createElement('div');
         descriptionDom.style.color = '#ffffff';
-        descriptionDom.style.fontSize = '12px'
+        descriptionDom.style.fontSize = '12px';
         descriptionDom.style.marginTop = '5px';
         descriptionDom.style.marginLeft = '4px';
         this.stats.dom.appendChild(descriptionDom);
@@ -135,17 +135,18 @@ export default class App {
         /** ====================================== **/
 
         let _positionBufferA = new ArrayBuffer(this.gl, positions, {usage: this.gl.DYNAMIC_COPY});
-        _positionBufferA.bind();
+        _positionBufferA.bind().setAttribs('position', 4);
         let _positionBufferB = new ArrayBuffer(this.gl, positions, {usage: this.gl.DYNAMIC_COPY});
-        _positionBufferB.bind();
+        _positionBufferB.bind().setAttribs('position', 4);
 
-        this._positionAttribLocation2 = this.gl.getAttribLocation(this._program._program, 'position');
-        let transformFeedback = this.gl.createTransformFeedback();
+        this._positionAttribLocation2 = this._program.getAttrib('position').location;
+        let transformFeedback = new TransformFeedback(this.gl);
+        transformFeedback.addArrayBufer(0, {read: _positionBufferA, write: _positionBufferB, name: 'position'});
 
         this._obj = {
             program: this._program,
+            positionAttribLocation: this._positionAttribLocation2,
             transformFeedback: transformFeedback,
-            positionBuffer: {a: _positionBufferA, b: _positionBufferB, read: _positionBufferA, write: _positionBufferB},
             count: 6
         };
 
@@ -153,18 +154,18 @@ export default class App {
         let program2 = new Program2(this.gl, vertexShaderSrc2.trim(), fragmentShaderSrc2.trim(), {transformFeedback: ['gl_Position']});
 
         let _positionBufferA2 = new ArrayBuffer(this.gl, positions, {usage: this.gl.DYNAMIC_COPY});
-        _positionBufferA2.bind();
+        _positionBufferA2.bind().setAttribs('position', 4);
         let _positionBufferB2 = new ArrayBuffer(this.gl, positions, {usage: this.gl.DYNAMIC_COPY});
-        _positionBufferB2.bind();
+        _positionBufferB2.bind().setAttribs('position', 4);
 
-        let positionAttribLocation2 = this.gl.getAttribLocation(program2._program, 'position');
-        let transformFeedback2 = this.gl.createTransformFeedback();
+        let positionAttribLocation2 = this._program.getAttrib('position').location;
+        let transformFeedback2 = new TransformFeedback(this.gl);
+        transformFeedback2.addArrayBufer(0, {read: _positionBufferA2, write: _positionBufferB2, name: 'position'});
 
         this._obj2 = {
             program: program2,
-            transformFeedback: transformFeedback2,
             positionAttribLocation: positionAttribLocation2,
-            positionBuffer: {a: _positionBufferA2, b: _positionBufferB2, read: _positionBufferA2, write: _positionBufferB2},
+            transformFeedback: transformFeedback2,
             count: 6
         };
 
@@ -191,11 +192,13 @@ export default class App {
     }
 
     update(){
-        this.stats.update();
+        if(this.stats) this.stats.update();
 
         let gl = this.gl;
 
         /**
+         * =====================================
+         *            draw obj
          * =====================================
          */
 
@@ -203,39 +206,24 @@ export default class App {
         this.gl.clear(this.gl.COLOR_BUFFER_BIT);
 
         this._obj.program.bind();
-
-        this.gl.bindTransformFeedback(TRANSFORM_FEEDBACK, this._obj.transformFeedback);
-
-        this.gl.enableVertexAttribArray( this._positionAttribLocation );
-
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this._obj.positionBuffer.read.buffer);
-        this.gl.vertexAttribPointer(this._positionAttribLocation, 4, this.gl.FLOAT, this.gl.FALSE, 0, 0);
-        this.gl.bindBufferBase(this.gl.TRANSFORM_FEEDBACK_BUFFER, 0, this._obj.positionBuffer.write.buffer);
-
+        this._obj.transformFeedback.bind().updateBufferBase(this._program);
 
         gl.beginTransformFeedback(gl.TRIANGLES)
         gl.drawArrays(gl.TRIANGLES, 0, 3)
-        gl.endTransformFeedback()
+        gl.endTransformFeedback();
 
         this.gl.bindBufferBase(this.gl.TRANSFORM_FEEDBACK_BUFFER, 0, null);
 
-        if(this._obj.positionBuffer.write === this._obj.positionBuffer.a){
-            this._obj.positionBuffer.read  = this._obj.positionBuffer.a;
-            this._obj.positionBuffer.write = this._obj.positionBuffer.b;
-        }else{
-            this._obj.positionBuffer.read  = this._obj.positionBuffer.b;
-            this._obj.positionBuffer.write = this._obj.positionBuffer.a;
-        }
+        this._obj.transformFeedback.swapArrayBuffers();
+
+        /**
+         * =====================================
+         *           draw obj2
+         * =====================================
+         */
 
         this._obj2.program.bind();
-
-        this.gl.bindTransformFeedback(TRANSFORM_FEEDBACK, this._obj2.transformFeedback);
-        this.gl.enableVertexAttribArray( this._obj2.positionAttribLocation );
-
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this._obj2.positionBuffer.read.buffer);
-        this.gl.vertexAttribPointer(this._positionAttribLocation2, 4, this.gl.FLOAT, this.gl.FALSE, 0, 0);
-        this.gl.bindBufferBase(this.gl.TRANSFORM_FEEDBACK_BUFFER, 0, this._obj2.positionBuffer.write.buffer);
-
+        this._obj2.transformFeedback.bind().updateBufferBase(this._obj2.program);
 
         gl.beginTransformFeedback(gl.TRIANGLES)
         gl.drawArrays(gl.TRIANGLES, 0, 3)
@@ -243,13 +231,7 @@ export default class App {
 
         this.gl.bindBufferBase(this.gl.TRANSFORM_FEEDBACK_BUFFER, 0, null);
 
-        if(this._obj2.positionBuffer.write === this._obj2.positionBuffer.a){
-            this._obj2.positionBuffer.read  = this._obj2.positionBuffer.a;
-            this._obj2.positionBuffer.write = this._obj2.positionBuffer.b;
-        }else{
-            this._obj2.positionBuffer.read  = this._obj2.positionBuffer.b;
-            this._obj2.positionBuffer.write = this._obj2.positionBuffer.a;
-        }
+        this._obj2.transformFeedback.swapArrayBuffers();
 
     }
 

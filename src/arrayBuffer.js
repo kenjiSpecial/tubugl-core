@@ -1,5 +1,5 @@
 
-import {ARRAY_BUFFER, STATIC_DRAW, DYNAMIC_COPY} from 'tubugl-constants';
+import {ARRAY_BUFFER, STATIC_DRAW, DYNAMIC_COPY, FLOAT} from 'tubugl-constants';
 
 
 export class ArrayBuffer{
@@ -40,7 +40,7 @@ export class ArrayBuffer{
         return this;
     }
 
-    setAttribs(name, size, type, normalize, stride, offset){
+    setAttribs(name, size = 2, type = FLOAT, normalize = false, stride = 0, offset = 0){
         this.attribs.push({
             name : name,
             size: size,

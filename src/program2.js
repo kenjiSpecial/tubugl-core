@@ -30,7 +30,6 @@ export  class Program2 extends Program{
 
         if(params.transformFeedback && Array.isArray(params.transformFeedback)){
             this._transformFeedback = params.transformFeedback;
-            console.log(this._transformFeedback);
             this._gl.transformFeedbackVaryings(this._program, this._transformFeedback, SEPARATE_ATTRIBS);
         }
 
