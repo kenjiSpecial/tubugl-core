@@ -212,9 +212,7 @@ export default class App {
         gl.drawArrays(gl.TRIANGLES, 0, 3)
         gl.endTransformFeedback();
 
-        this.gl.bindBufferBase(this.gl.TRANSFORM_FEEDBACK_BUFFER, 0, null);
-
-        this._obj.transformFeedback.swapArrayBuffers();
+        this._obj.transformFeedback.unbindBufferBase().swapArrayBuffers();
 
         /**
          * =====================================
@@ -229,9 +227,7 @@ export default class App {
         gl.drawArrays(gl.TRIANGLES, 0, 3)
         gl.endTransformFeedback()
 
-        this.gl.bindBufferBase(this.gl.TRANSFORM_FEEDBACK_BUFFER, 0, null);
-
-        this._obj2.transformFeedback.swapArrayBuffers();
+        this._obj2.transformFeedback.unbindBufferBase().swapArrayBuffers();
 
     }
 

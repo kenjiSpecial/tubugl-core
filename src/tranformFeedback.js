@@ -17,7 +17,9 @@ export class TransformFeedback{
         return this;
     }
     unbindBufferBase(){
-        this._arrayBuffers.forEach(arrayBuffers=> this._gl.bindBufferBase(TRANSFORM_FEEDBACK_BUFFER, index, null));
+        this._arrayBuffers.forEach((arrayBuffers, index)=> this._gl.bindBufferBase(TRANSFORM_FEEDBACK_BUFFER, index, null))
+
+        return this;
     }
 
     /**
