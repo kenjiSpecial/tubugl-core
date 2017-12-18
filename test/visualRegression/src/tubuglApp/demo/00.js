@@ -13,13 +13,9 @@ const Stats = require('../../vendors/stats.js/stats');
 const vertexShaderSrc = `#version 300 es
   precision mediump float;
 #define POSITION_LOCATION 0
-#define COLOR_LOCATION  1
 #define PI 3.141592
 
 layout(location = POSITION_LOCATION) in vec4 position;
-layout(location = COLOR_LOCATION) in vec3 color; 
-
-out vec3 vColor;
 
 // all shaders have a main function
 void main() {
@@ -30,18 +26,18 @@ void main() {
                          -SIN, COS);
     vec2 pos = rotation * position.xy;
     gl_Position = vec4(pos.xy, 0.0, 1.0);
-    vColor = color;
 }`;
 
 const fragmentShaderSrc = `#version 300 es
   precision mediump float;
   
-  in vec3 vColor;
-  
   out vec4 outColor;
 
   void main() {
-    outColor = vec4(vColor, 1.0);
+    float colorR = gl_FrontFacing ? 1.0 : 0.0;
+    float colorG = gl_FrontFacing ? 0.0 : 1.0;
+    
+    outColor = vec4(colorR, colorG, 0.0, 1.0);
   }
 `;
 
@@ -91,7 +87,7 @@ export default class App {
         this.createFrameBuffer();
         this.createProgram();
         this.resize();
-        this._setDebug();
+        // this._setDebug();
     }
 
     _playAndStop(){
@@ -135,45 +131,21 @@ export default class App {
              side + xPos, -side, 0.0, 1.0,
              side + xPos,  side, 0.0, 1.0
         ]);
-        let colors = new Float32Array([
-            1.0, 0.0, 0.0,
-            0.0, 1.0, 0.0,
-            0.0, 0.0, 1.0,
-        ]);
-
-        let colors2 = new Float32Array([
-            1.0, 1.0, 1.0,
-            0.0, 1.0, 0.0,
-            0.0, 0.0, 1.0,
-        ]);
 
         /** ====================================== **/
 
-        let vaoA = new VAO(this.gl);
-        vaoA.bind();
         let _positionBufferA = new ArrayBuffer(this.gl, positions, {usage: this.gl.DYNAMIC_COPY});
-        _positionBufferA.bind().setAttribs('position', 4).attribPointer(this._program);
-        let colorBufferA = new ArrayBuffer(this.gl, colors);
-        colorBufferA.bind().setAttribs('color', 3).attribPointer(this._program);
-
-        let vaoB = new VAO(this.gl);
-        vaoB.bind();
+        _positionBufferA.bind().setAttribs('position', 4);
         let _positionBufferB = new ArrayBuffer(this.gl, positions, {usage: this.gl.DYNAMIC_COPY});
-        _positionBufferB.bind().setAttribs('position', 4).attribPointer(this._program);
-        colorBufferA.bind().attribPointer(this._program);
+        _positionBufferB.bind().setAttribs('position', 4);
 
         this._positionAttribLocation2 = this._program.getAttrib('position').location;
         let transformFeedback = new TransformFeedback(this.gl);
         transformFeedback.addArrayBufer(0, {read: _positionBufferA, write: _positionBufferB, name: 'position'});
 
-
-        // this._arrayBuffer = new ArrayBuffer(this.gl, positions);
-        // this._arrayBuffer.bind().setAttribs('position', 2, this.gl.FLOAT, false, 0, 0).attribPointer(this._program);
-
         this._obj = {
             program: this._program,
             positionAttribLocation: this._positionAttribLocation2,
-            vaos: {read: vaoA, write: vaoB, a: vaoA, b: vaoB},
             transformFeedback: transformFeedback,
             count: 6
         };
@@ -232,25 +204,16 @@ export default class App {
 
         this.gl.clearColor(0, 0, 0, 1);
         this.gl.clear(this.gl.COLOR_BUFFER_BIT);
-        this._obj.vaos.read.bind()
 
         this._obj.program.bind();
         this._obj.transformFeedback.bind().updateBufferBase(this._program);
 
         gl.beginTransformFeedback(gl.TRIANGLES)
-
         gl.drawArrays(gl.TRIANGLES, 0, 3)
         gl.endTransformFeedback();
 
         this._obj.transformFeedback.unbindBufferBase().swapArrayBuffers();
 
-        let temp = this._obj.vaos.read;
-        this._obj.vaos.read = this._obj.vaos.write;
-        this._obj.vaos.write = temp;
-
-
-
-        this.gl.bindVertexArray(null);
         /**
          * =====================================
          *           draw obj2
