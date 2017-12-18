@@ -2,6 +2,6 @@
 # yarn lockfile v1
 
 
-tubugl-constants@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/tubugl-constants/-/tubugl-constants-1.0.1.tgz#6979d29044687dfdcc4ef00a86190ca609c6cccb"
+tubugl-constants@^1.0.2:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/tubugl-constants/-/tubugl-constants-1.0.3.tgz#bb59ff9fce6e47d14730ab9d0407da5d009e39b4"

@@ -1,9 +1,9 @@
 
-import {ARRAY_BUFFER, STATIC_DRAW} from 'tubugl-constants';
+import {ARRAY_BUFFER, STATIC_DRAW, DYNAMIC_COPY} from 'tubugl-constants';
 
 
 export class ArrayBuffer{
-    constructor(gl, data){
+    constructor(gl, data, params = {}){
         this.gl = gl;
         this.buffer = this.gl.createBuffer();
         this.attribs = [];
@@ -12,7 +12,7 @@ export class ArrayBuffer{
             let success = data instanceof Float32Array || data instanceof Float64Array;
             if(success)             {
                 this.bind();
-                this.setData(data);
+                this.setData(data, params.usage);
                 this.unbind();
             }
             else throw 'data should be  Float32Array or Flaot64Array';
@@ -33,8 +33,9 @@ export class ArrayBuffer{
         return this;
     }
 
-    setData(array){
-        this.gl.bufferData(ARRAY_BUFFER, array, STATIC_DRAW);
+    setData(array, usage = STATIC_DRAW){
+
+        this.gl.bufferData(ARRAY_BUFFER, array, usage);
 
         return this;
     }

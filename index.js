@@ -5,6 +5,7 @@ console.log('[tubugl] I could not develop tubugl without three.js and nanogl.');
 */
 
 export {Program} from './src/program';
+export {Program2} from './src/program2';
 export {ArrayBuffer} from './src/arrayBuffer';
 export {IndexArrayBuffer} from './src/indexArrayBuffer';
 export {Texture} from './src/texture';

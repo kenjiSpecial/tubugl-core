@@ -18,8 +18,13 @@ export class Program{
 
         this._gl = gl;
 
-        this._vertexShader = webGLShader(gl, VERTEX_SHADER, vertSrc);
-        this._fragmentShader = webGLShader(gl, FRAGMENT_SHADER, fragSrc);
+        this._initProgram(vertSrc, fragSrc, params);
+        this._setProperties();
+    }
+
+    _initProgram(vertSrc, fragSrc, params){
+        this._vertexShader = webGLShader(this._gl, VERTEX_SHADER, vertSrc);
+        this._fragmentShader = webGLShader(this._gl, FRAGMENT_SHADER, fragSrc);
         this._program = this._gl.createProgram();
         this._gl.attachShader(this._program, this._vertexShader);
         this._gl.attachShader(this._program, this._fragmentShader);
@@ -31,8 +36,6 @@ export class Program{
         }catch (error){
             console.error(`WebGLProgram: ${error}`)
         }
-
-        this._setProperties();
     }
 
     /**
@@ -59,7 +62,7 @@ export class Program{
                 case FLOAT_VEC2: typeName = "vec2"; break;
                 case FLOAT_VEC3: typeName = "vec3"; break;
                 case FLOAT_VEC4: typeName = "vec4"; break;
-                case FLOAT_MAT2: typeName = "mat2"; break;
+                case FLOAT_MAT2: typeName = "mat2"; break
                 case FLOAT_MAT3: typeName = "mat3"; break;
                 case FLOAT_MAT4: typeName = "mat4"; break;
             }

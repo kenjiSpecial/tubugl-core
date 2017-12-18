@@ -28,3 +28,12 @@ export let draw = {
         this.element(gl, cnt, LINES);
     }
 }
+
+export class DrawCall{
+    constructor(primitives = TRIANGLES){
+
+    }
+    draw(){
+
+    }
+}

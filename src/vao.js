@@ -17,7 +17,6 @@ export class VAO{
     }
     updateArrayBuffer(program, arrayBuffer, name){
         this._arrayBuffers[name] = arrayBuffer;
-        // console.log(arrayBuffer)
         arrayBuffer.attribPointer(program);
 
         return this;
