@@ -1,6 +1,6 @@
 # tubugl-core
 
-personal micro webgl framework.
+[tubugl](https://github.com/kenjiSpecial/tubugl) (personal micro webgl framework) core modules.
 
 ## other modules
 
