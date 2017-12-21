@@ -9,12 +9,11 @@ import App4 from '../tubuglApp/test/04';
 import App5 from '../tubuglApp/test/05';
 import App6 from '../tubuglApp/test/06';
 
-
 export default class TubuGlApp extends React.Component {
     constructor(props){
         super(props);
 
-        this._appId = parseInt(props.globalStore.appId);
+        this._appId = props.globalStore.appId;
         this._description = props.globalStore.description
     }
 
@@ -28,13 +27,13 @@ export default class TubuGlApp extends React.Component {
 
         let App;
         switch(this._appId){
-            case 0: App = App0; break;
-            case 1: App = App1; break;
-            case 2: App = App2; break;
-            case 3: App = App3; break;
-            case 4: App = App4; break;
-            case 5: App = App5; break;
-            case 6: App = App6; break;
+            case '0': App = App0; break;
+            case '1': App = App1; break;
+            case '2': App = App2; break;
+            case '3': App = App3; break;
+            case '4': App = App4; break;
+            case '5': App = App5; break;
+            case '6': App = App6; break;
         }
 
         this._app = new App({description: this._description, canvas: this.canvas, width: this.canvas.width, height: this.canvas.height});
