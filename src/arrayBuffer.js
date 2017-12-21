@@ -1,82 +1,86 @@
+import { ARRAY_BUFFER, STATIC_DRAW, DYNAMIC_COPY } from 'tubugl-constants';
 
-import {ARRAY_BUFFER, STATIC_DRAW, DYNAMIC_COPY} from 'tubugl-constants';
+export class ArrayBuffer {
+	constructor(gl, data, params = {}) {
+		this.gl = gl;
+		this.buffer = this.gl.createBuffer();
+		this.attribs = [];
 
+		try {
+			let success =
+				data instanceof Float32Array || data instanceof Float64Array;
+			if (success) {
+				this.bind();
+				this.setData(data, params.usage);
+				this.unbind();
+			} else throw 'data should be  Float32Array or Flaot64Array';
+		} catch (error) {
+			console.error(error);
+		}
+	}
 
-export class ArrayBuffer{
-    constructor(gl, data, params = {}){
-        this.gl = gl;
-        this.buffer = this.gl.createBuffer();
-        this.attribs = [];
+	bind() {
+		this.gl.bindBuffer(ARRAY_BUFFER, this.buffer);
 
-        try{
-            let success = data instanceof Float32Array || data instanceof Float64Array;
-            if(success)             {
-                this.bind();
-                this.setData(data, params.usage);
-                this.unbind();
-            }
-            else throw 'data should be  Float32Array or Flaot64Array';
-        }catch(error){
-            console.error(error);
-        }
-    }
+		return this;
+	}
 
-    bind(){
-        this.gl.bindBuffer(ARRAY_BUFFER, this.buffer);
+	unbind() {
+		this.gl.bindBuffer(ARRAY_BUFFER, null);
 
-        return this;
-    }
+		return this;
+	}
 
-    unbind(){
-        this.gl.bindBuffer(ARRAY_BUFFER, null);
+	setData(array, usage = STATIC_DRAW) {
+		this.dataArray = array;
 
-        return this;
-    }
+		this.gl.bufferData(ARRAY_BUFFER, array, usage);
 
-    setData(array, usage = STATIC_DRAW){
+		return this;
+	}
 
-        this.gl.bufferData(ARRAY_BUFFER, array, usage);
+	setAttribs(name, size, type, normalize, stride, offset) {
+		this.attribs.push({
+			name: name,
+			size: size,
+			type: type,
+			normalize: normalize,
+			stride: stride,
+			offset: offset
+		});
 
-        return this;
-    }
+		return this;
+	}
 
-    setAttribs(name, size, type, normalize, stride, offset){
-        this.attribs.push({
-            name : name,
-            size: size,
-            type: type,
-            normalize: normalize,
-            stride: stride,
-            offset: offset
-        });
+	/**
+	 * @param {Program} program
+	 * @returns {ArrayBuffer}
+	 */
+	attribPointer(program) {
+		this.attribs.forEach(attrib => {
+			let location = program.getAttrib(attrib.name).location;
+			let { size, type, normalize, stride, offset } = attrib;
 
-        return this;
-    }
+			this.gl.enableVertexAttribArray(location);
+			this.gl.vertexAttribPointer(
+				location,
+				size,
+				type,
+				normalize,
+				stride,
+				offset
+			);
+		});
 
-    /**
-     * @param {Program} program
-     * @returns {ArrayBuffer}
-     */
-    attribPointer(program){;
+		return this;
+	}
 
-        this.attribs.forEach((attrib)=>{
-            let location = program.getAttrib(attrib.name).location;
-            let {size, type, normalize, stride, offset} = attrib;
+	disablePoiner(program) {
+		this.attribs.forEach(attrib => {
+			let location = program.getAttrib(attrib.name).location;
+			this.gl.disableVertexAttribArray(location);
+		});
 
-            this.gl.enableVertexAttribArray(location);
-            this.gl.vertexAttribPointer(location, size, type, normalize, stride, offset)
-        });
-
-        return this;
-    }
-
-    disablePoiner(program){
-        this.attribs.forEach((attrib)=>{
-            let location = program.getAttrib(attrib.name).location;
-            this.gl.disableVertexAttribArray(location);
-        });
-
-        return this;
-    }
-
+		return this;
+	}
 }

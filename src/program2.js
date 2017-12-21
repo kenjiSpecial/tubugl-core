@@ -1,46 +1,62 @@
-import {webGLShader} from './utils/webglShader';
-import {detectorWebGL2} from "./utils/detector";
+import { webGLShader } from './utils/webglShader';
+import { detectorWebGL2 } from './utils/detector';
 
-import {Program} from './program';
+import { Program } from './program';
 
-import {FLOAT, FLOAT_VEC2, FLOAT_VEC3, FLOAT_VEC4} from 'tubugl-constants';
-import {FLOAT_MAT2, FLOAT_MAT3, FLOAT_MAT4} from 'tubugl-constants';
-import {VERTEX_SHADER, FRAGMENT_SHADER, LINK_STATUS, ACTIVE_UNIFORMS, ACTIVE_ATTRIBUTES} from 'tubugl-constants';
-import {SEPARATE_ATTRIBS} from 'tubugl-constants';
-console.log(SEPARATE_ATTRIBS)
+import { FLOAT, FLOAT_VEC2, FLOAT_VEC3, FLOAT_VEC4 } from 'tubugl-constants';
+import { FLOAT_MAT2, FLOAT_MAT3, FLOAT_MAT4 } from 'tubugl-constants';
+import {
+	VERTEX_SHADER,
+	FRAGMENT_SHADER,
+	LINK_STATUS,
+	ACTIVE_UNIFORMS,
+	ACTIVE_ATTRIBUTES
+} from 'tubugl-constants';
+import { SEPARATE_ATTRIBS } from 'tubugl-constants';
 
 /**
  * Program2 support Vertex Buffer Object(VBO)
  */
-export  class Program2 extends Program{
-    constructor(gl, vertSrc, fragSrc, params = {}){
-        if(!detectorWebGL2()){
-            console.error('gl is not webgl2. make sure your webgl context is webgl2, or use the brose which support webgl2.');
-        }
+export class Program2 extends Program {
+	constructor(gl, vertSrc, fragSrc, params = {}) {
+		if (!detectorWebGL2()) {
+			console.error(
+				'gl is not webgl2. make sure your webgl context is webgl2, or use the brose which support webgl2.'
+			);
+		}
 
-        super(gl, vertSrc, fragSrc, params);
-    }
+		super(gl, vertSrc, fragSrc, params);
+	}
 
-    _initProgram(vertSrc, fragSrc, params = {}){
-        this._vertexShader = webGLShader(this._gl, VERTEX_SHADER, vertSrc);
-        this._fragmentShader = webGLShader(this._gl, FRAGMENT_SHADER, fragSrc);
-        this._program = this._gl.createProgram();
-        this._gl.attachShader(this._program, this._vertexShader);
-        this._gl.attachShader(this._program, this._fragmentShader);
+	_initProgram(vertSrc, fragSrc, params = {}) {
+		this._vertexShader = webGLShader(this._gl, VERTEX_SHADER, vertSrc);
+		this._fragmentShader = webGLShader(this._gl, FRAGMENT_SHADER, fragSrc);
+		this._program = this._gl.createProgram();
+		this._gl.attachShader(this._program, this._vertexShader);
+		this._gl.attachShader(this._program, this._fragmentShader);
 
-        if(params.transformFeedback && Array.isArray(params.transformFeedback)){
-            this._transformFeedback = params.transformFeedback;
-            console.log(this._transformFeedback);
-            this._gl.transformFeedbackVaryings(this._program, this._transformFeedback, SEPARATE_ATTRIBS);
-        }
+		if (
+			params.transformFeedback &&
+			Array.isArray(params.transformFeedback)
+		) {
+			this._transformFeedback = params.transformFeedback;
+			this._gl.transformFeedbackVaryings(
+				this._program,
+				this._transformFeedback,
+				SEPARATE_ATTRIBS
+			);
+		}
 
-        this._gl.linkProgram(this._program);
+		this._gl.linkProgram(this._program);
 
-        try{
-            let success = this._gl.getProgramParameter(this._program, LINK_STATUS);
-            if(!success) throw this._gl.getProgramInfoLog(this._program);
-        }catch (error){
-            console.error(`WebGLProgram: ${error}`)
-        }
-    }
+		try {
+			let success = this._gl.getProgramParameter(
+				this._program,
+				LINK_STATUS
+			);
+			if (!success) throw this._gl.getProgramInfoLog(this._program);
+		} catch (error) {
+			console.error(`WebGLProgram: ${error}`);
+		}
+	}
 }

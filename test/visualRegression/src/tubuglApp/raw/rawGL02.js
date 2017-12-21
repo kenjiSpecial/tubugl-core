@@ -131,7 +131,6 @@ export default class App {
         this._positionBuffer = this.gl.createBuffer();
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this._positionBuffer);
         this.gl.bufferData(this.gl.ARRAY_BUFFER, positions, this.gl.STATIC_DRAW);
-        console.log(positions);
         this.gl.enableVertexAttribArray(positionAttributeLocation);
         var size = 2;          // 2 components per iteration
         var type = this.gl.FLOAT;   // the data is 32bit floats
