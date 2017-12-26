@@ -1,9 +1,4 @@
-import {
-	ARRAY_BUFFER,
-	STATIC_DRAW,
-	DYNAMIC_COPY,
-	FLOAT
-} from 'tubugl-constants';
+import { ARRAY_BUFFER, STATIC_DRAW, FLOAT } from 'tubugl-constants';
 
 export class ArrayBuffer {
 	constructor(gl, data, params = {}) {
@@ -12,8 +7,7 @@ export class ArrayBuffer {
 		this.attribs = [];
 
 		try {
-			let success =
-				data instanceof Float32Array || data instanceof Float64Array;
+			let success = data instanceof Float32Array || data instanceof Float64Array;
 			if (success) {
 				this.bind();
 				this.setData(data, params.usage);
@@ -44,14 +38,7 @@ export class ArrayBuffer {
 		return this;
 	}
 
-	setAttribs(
-		name,
-		size,
-		type = FLOAT,
-		normalize = false,
-		stride = 0,
-		offset = 0
-	) {
+	setAttribs(name, size, type = FLOAT, normalize = false, stride = 0, offset = 0) {
 		this.attribs.push({
 			name: name,
 			size: size,
@@ -74,14 +61,7 @@ export class ArrayBuffer {
 			let { size, type, normalize, stride, offset } = attrib;
 
 			this.gl.enableVertexAttribArray(location);
-			this.gl.vertexAttribPointer(
-				location,
-				size,
-				type,
-				normalize,
-				stride,
-				offset
-			);
+			this.gl.vertexAttribPointer(location, size, type, normalize, stride, offset);
 		});
 
 		return this;

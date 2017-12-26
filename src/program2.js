@@ -5,13 +5,7 @@ import { Program } from './program';
 
 import { FLOAT, FLOAT_VEC2, FLOAT_VEC3, FLOAT_VEC4 } from 'tubugl-constants';
 import { FLOAT_MAT2, FLOAT_MAT3, FLOAT_MAT4 } from 'tubugl-constants';
-import {
-	VERTEX_SHADER,
-	FRAGMENT_SHADER,
-	LINK_STATUS,
-	ACTIVE_UNIFORMS,
-	ACTIVE_ATTRIBUTES
-} from 'tubugl-constants';
+import { VERTEX_SHADER, FRAGMENT_SHADER, LINK_STATUS, ACTIVE_UNIFORMS, ACTIVE_ATTRIBUTES } from 'tubugl-constants';
 import { SEPARATE_ATTRIBS } from 'tubugl-constants';
 
 /**
@@ -35,25 +29,15 @@ export class Program2 extends Program {
 		this._gl.attachShader(this._program, this._vertexShader);
 		this._gl.attachShader(this._program, this._fragmentShader);
 
-		if (
-			params.transformFeedback &&
-			Array.isArray(params.transformFeedback)
-		) {
+		if (params.transformFeedback && Array.isArray(params.transformFeedback)) {
 			this._transformFeedback = params.transformFeedback;
-			this._gl.transformFeedbackVaryings(
-				this._program,
-				this._transformFeedback,
-				SEPARATE_ATTRIBS
-			);
+			this._gl.transformFeedbackVaryings(this._program, this._transformFeedback, SEPARATE_ATTRIBS);
 		}
 
 		this._gl.linkProgram(this._program);
 
 		try {
-			let success = this._gl.getProgramParameter(
-				this._program,
-				LINK_STATUS
-			);
+			let success = this._gl.getProgramParameter(this._program, LINK_STATUS);
 			if (!success) throw this._gl.getProgramInfoLog(this._program);
 		} catch (error) {
 			console.error(`WebGLProgram: ${error}`);

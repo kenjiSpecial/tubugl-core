@@ -16,11 +16,7 @@ export class IndexArrayBuffer {
 		this.dataArray = data;
 
 		this.bind();
-		this.gl.bufferData(
-			this.gl.ELEMENT_ARRAY_BUFFER,
-			data,
-			this.gl.STATIC_DRAW
-		);
+		this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, data, this.gl.STATIC_DRAW);
 		return this;
 	}
 	bind() {
