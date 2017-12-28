@@ -1,9 +1,9 @@
 /**
  * test with program and arrayBuffer
  */
-import { Program, ArrayBuffer, webglShader, draw } from 'tubuGL';
+import { Program, ArrayBuffer, draw } from 'tubuGL';
 
-const TweenLite = require('gsap');
+const TweenMax = require('gsap');
 const dat = require('../../vendors/dat.gui/dat.gui');
 const Stats = require('../../vendors/stats.js/stats');
 
@@ -33,6 +33,9 @@ function fragmentShaderSrc(colorR, colorG, colorB) {
 `;
 }
 
+let urlParams = new URLSearchParams(window.location.search);
+const isDebug = !(urlParams.has('NoDebug') || urlParams.has('NoDebug/'));
+
 export default class App {
 	constructor(params) {
 		this.updateAttribute = this.updateAttribute.bind(this);
@@ -48,7 +51,7 @@ export default class App {
 
 		this.createProgram();
 		this.resize();
-		this._setDebug();
+		if (isDebug) this._setDebug();
 	}
 
 	_playAndStop() {
@@ -78,11 +81,7 @@ export default class App {
 	}
 
 	createProgram() {
-		this._program = new Program(
-			this.gl,
-			vertexShaderSrc,
-			fragmentShaderSrc(1.0, 0.0, 0.0)
-		);
+		this._program = new Program(this.gl, vertexShaderSrc, fragmentShaderSrc(1.0, 0.0, 0.0));
 		let positions = [-0.5, -0.5, -0.3, 0.1, 0, -0.5];
 		this._arrayBuffer = new ArrayBuffer(this.gl, new Float32Array(positions));
 		this._arrayBuffer.setAttribs('a_position', 2, this.gl.FLOAT, false, 0, 0);
@@ -93,11 +92,7 @@ export default class App {
 			count: 3
 		};
 
-		this._program1 = new Program(
-			this.gl,
-			vertexShaderSrc,
-			fragmentShaderSrc(1.0, 1.0, 0.0)
-		);
+		this._program1 = new Program(this.gl, vertexShaderSrc, fragmentShaderSrc(1.0, 1.0, 0.0));
 		let positions2 = [0, 0, 0, 0.5, 0.7, 0];
 		this._arrayBuffer2 = new ArrayBuffer(this.gl, new Float32Array(positions2));
 		this._arrayBuffer2.setAttribs('a_position', 2, this.gl.FLOAT, false, 0, 0);
@@ -119,11 +114,7 @@ export default class App {
 			Math.random() - 0.5,
 			Math.random() - 0.5
 		];
-		this.gl.bufferData(
-			this.gl.ARRAY_BUFFER,
-			new Float32Array(positions2),
-			this.gl.STATIC_DRAW
-		);
+		this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(positions2), this.gl.STATIC_DRAW);
 	}
 
 	start() {
@@ -137,7 +128,10 @@ export default class App {
 	}
 
 	update() {
-		this.stats.update();
+		if (this.stats) this.stats.update();
+
+		this.gl.clearColor(0, 0, 0, 1);
+		this.gl.clear(this.gl.COLOR_BUFFER_BIT);
 
 		this._obj.program.bind();
 		this._obj.positionBuffer.bind().attribPointer(this._obj.program);

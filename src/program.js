@@ -1,5 +1,5 @@
 import { webGLShader } from './utils/webglShader';
-import { FLOAT, FLOAT_VEC2, FLOAT_VEC3, FLOAT_VEC4 } from 'tubugl-constants';
+import { FLOAT, FLOAT_VEC2, FLOAT_VEC3, FLOAT_VEC4, TEXTURE_2D, SAMPLER_2D } from 'tubugl-constants';
 import { FLOAT_MAT2, FLOAT_MAT3, FLOAT_MAT4 } from 'tubugl-constants';
 import { VERTEX_SHADER, FRAGMENT_SHADER, LINK_STATUS, ACTIVE_UNIFORMS, ACTIVE_ATTRIBUTES } from 'tubugl-constants';
 
@@ -78,6 +78,9 @@ export class Program {
 				case FLOAT_MAT4:
 					typeName = 'mat4';
 					break;
+				case SAMPLER_2D:
+					typeName = 'sampler2D';
+					break; // TODO Do we need to some method or not
 			}
 
 			this._uniform[uniform.name] = {
@@ -115,9 +118,13 @@ export class Program {
 	getUniforms(name) {
 		return this._uniform[name];
 	}
-
-	setUniformTexture(texture) {
-		let { uniformName, textureNum } = texture;
+	/**
+	 * set texture as uniform
+	 * @param {Texture} texture
+	 * @param {String} uniformName
+	 */
+	setUniformTexture(texture, uniformName) {
+		let { textureNum } = texture;
 		let uniform = this.getUniforms(uniformName);
 		this._gl.uniform1i(uniform.location, textureNum);
 	}

@@ -4,7 +4,7 @@
 
 import { Program, ArrayBuffer, IndexArrayBuffer, Texture } from 'tubuGL';
 
-const TweenLite = require('gsap');
+const TweenMax = require('gsap');
 const dat = require('../../vendors/dat.gui/dat.gui');
 const Stats = require('../../vendors/stats.js/stats');
 
@@ -36,6 +36,9 @@ const fragmentShaderSrc = `
   }
 `;
 
+let urlParams = new URLSearchParams(window.location.search);
+const isDebug = !(urlParams.has('NoDebug') || urlParams.has('NoDebug/'));
+
 export default class App {
 	constructor(params) {
 		this.updateAttribute = this.updateAttribute.bind(this);
@@ -51,7 +54,8 @@ export default class App {
 
 		this.createProgram();
 		this.resize();
-		this._setDebug();
+
+		if (isDebug) this._setDebug();
 	}
 
 	_playAndStop() {
@@ -81,7 +85,7 @@ export default class App {
 	}
 
 	_onload() {
-		this._texture = new Texture(this.gl, 'uTexture');
+		this._texture = new Texture(this.gl);
 		this._texture
 			.bind()
 			.setFilter()
@@ -94,7 +98,6 @@ export default class App {
 	createProgram() {
 		this._program = new Program(this.gl, vertexShaderSrc, fragmentShaderSrc);
 
-		let pos0 = { x: 0, y: 0 };
 		let side = 1.9;
 
 		this.vertices = new Float32Array([
@@ -142,11 +145,7 @@ export default class App {
 			Math.random() - 0.5,
 			Math.random() - 0.5
 		];
-		this.gl.bufferData(
-			this.gl.ARRAY_BUFFER,
-			new Float32Array(positions2),
-			this.gl.STATIC_DRAW
-		);
+		this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(positions2), this.gl.STATIC_DRAW);
 	}
 
 	start() {
@@ -166,7 +165,7 @@ export default class App {
 	}
 
 	update() {
-		this.stats.update();
+		if (this.stats) this.stats.update();
 
 		this.gl.enable(this.gl.CULL_FACE);
 
@@ -175,7 +174,7 @@ export default class App {
 
 		this._obj.program.bind();
 
-		this._obj.program.setUniformTexture(this._texture);
+		this._obj.program.setUniformTexture(this._texture, 'uTexture');
 		this._texture.activeTexture().bind();
 
 		this._obj.indexBuffer.bind();

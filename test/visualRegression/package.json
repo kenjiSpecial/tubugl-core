@@ -1,7 +1,5 @@
 {
-  "name": "react-static-example-basic",
-  "version": "1.0.1",
-  "main": "index.js",
+  "version": "1.0.0",
   "license": "MIT",
   "scripts": {
     "start": "react-static start",

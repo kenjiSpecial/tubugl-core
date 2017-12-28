@@ -11,30 +11,30 @@ async function captureScreen(url) {
 	expect(screenshot).toMatchImageSnapshot();
 }
 
-it('test00', async () => {
-	await captureScreen('http://localhost:3000/test/00');
+it('#00: program and arrayBuffer', async () => {
+	await captureScreen('http://localhost:3000/test/00?NoDebug');
 });
 
-it('test01', async () => {
-	await captureScreen('http://localhost:3000/test/01');
+it('#01: program, arrayBuffer, and indexArrayBuffer', async () => {
+	await captureScreen('http://localhost:3000/test/01?NoDebug');
 });
 
-it('test02', async () => {
-	await captureScreen('http://localhost:3000/test/02');
+it('#02: program, arrayBuffer, indexArrayBuffer, texture', async () => {
+	await captureScreen('http://localhost:3000/test/02?NoDebug');
 });
 
-it('test03', async () => {
-	await captureScreen('http://localhost:3000/test/03');
+it('#03: draw function', async () => {
+	await captureScreen('http://localhost:3000/test/03?NoDebug');
 });
 
-it('test04', async () => {
-	await captureScreen('http://localhost:3000/test/04');
+it('#04: framebuffer', async () => {
+	await captureScreen('http://localhost:3000/test/04?NoDebug');
 });
 
-it('test05', async () => {
-	await captureScreen('http://localhost:3000/test/05');
+it('#05: vao(webgl2)', async () => {
+	await captureScreen('http://localhost:3000/test/05?NoDebug');
 });
 
-it('test06', async () => {
-	await captureScreen('http://localhost:3000/test/06');
+it('#06: program2 and transformFeedback(webgl2)', async () => {
+	await captureScreen('http://localhost:3000/test/06?NoDebug');
 });

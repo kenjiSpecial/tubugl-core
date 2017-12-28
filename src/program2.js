@@ -3,9 +3,7 @@ import { detectorWebGL2 } from './utils/detector';
 
 import { Program } from './program';
 
-import { FLOAT, FLOAT_VEC2, FLOAT_VEC3, FLOAT_VEC4 } from 'tubugl-constants';
-import { FLOAT_MAT2, FLOAT_MAT3, FLOAT_MAT4 } from 'tubugl-constants';
-import { VERTEX_SHADER, FRAGMENT_SHADER, LINK_STATUS, ACTIVE_UNIFORMS, ACTIVE_ATTRIBUTES } from 'tubugl-constants';
+import { VERTEX_SHADER, FRAGMENT_SHADER, LINK_STATUS } from 'tubugl-constants';
 import { SEPARATE_ATTRIBS } from 'tubugl-constants';
 
 /**

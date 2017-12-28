@@ -38,6 +38,9 @@ function fragmentShaderSrc(colorR, colorG, colorB) {
 `;
 }
 
+let urlParams = new URLSearchParams(window.location.search);
+const isDebug = !(urlParams.has('NoDebug') || urlParams.has('NoDebug/'));
+
 export default class App {
 	constructor(params) {
 		this.updateAttribute = this.updateAttribute.bind(this);
@@ -53,7 +56,7 @@ export default class App {
 
 		this.createProgram();
 		this.resize();
-		this._setDebug();
+		if (isDebug) this._setDebug();
 	}
 
 	_playAndStop() {
@@ -84,11 +87,7 @@ export default class App {
 	}
 
 	createProgram() {
-		this._program = new Program(
-			this.gl,
-			vertexShaderSrc,
-			fragmentShaderSrc(1.0, 0.0, 0.0)
-		);
+		this._program = new Program(this.gl, vertexShaderSrc, fragmentShaderSrc(1.0, 0.0, 0.0));
 		let positions = [-0.5, -0.5, -0.5, 0.1, -0.1, 0.1, -0.1, -0.5];
 		let indices = [0, 1, 2, 0, 2, 3];
 
@@ -145,11 +144,7 @@ export default class App {
 			count: 3
 		};
 
-		this._program1 = new Program(
-			this.gl,
-			vertexShaderSrc,
-			fragmentShaderSrc(1.0, 1.0, 0.0)
-		);
+		this._program1 = new Program(this.gl, vertexShaderSrc, fragmentShaderSrc(1.0, 1.0, 0.0));
 		let positions2 = [0, 0, 0, 0.5, 0.7, 0];
 
 		this._arrayBuffer2 = new ArrayBuffer(this.gl, new Float32Array(positions2));
@@ -172,11 +167,7 @@ export default class App {
 			Math.random() - 0.5,
 			Math.random() - 0.5
 		];
-		this.gl.bufferData(
-			this.gl.ARRAY_BUFFER,
-			new Float32Array(positions2),
-			this.gl.STATIC_DRAW
-		);
+		this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(positions2), this.gl.STATIC_DRAW);
 	}
 
 	start() {
@@ -190,7 +181,7 @@ export default class App {
 	}
 
 	update() {
-		this.stats.update();
+		if (this.stats) this.stats.update();
 
 		// this.gl.frontFace(this.gl.CW);
 		this.gl.enable(this.gl.CULL_FACE);

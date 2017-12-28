@@ -2,24 +2,15 @@
  * test for vao(webgl2)
  */
 
-import {
-	Program2,
-	ArrayBuffer,
-	IndexArrayBuffer,
-	FrameBuffer,
-	VAO,
-	TransformFeedback
-} from 'tubuGL';
-import {
-	UNSIGNED_SHORT,
-	FLOAT,
-	TRANSFORM_FEEDBACK_BUFFER,
-	TRANSFORM_FEEDBACK
-} from 'tubugl-constants';
+import { Program2, ArrayBuffer, IndexArrayBuffer, FrameBuffer, VAO, TransformFeedback } from 'tubuGL';
+import { UNSIGNED_SHORT, FLOAT, TRANSFORM_FEEDBACK_BUFFER, TRANSFORM_FEEDBACK } from 'tubugl-constants';
 
 const TweenLite = require('gsap');
 const dat = require('../../vendors/dat.gui/dat.gui');
 const Stats = require('../../vendors/stats.js/stats');
+
+let urlParams = new URLSearchParams(window.location.search);
+const isDebug = !(urlParams.has('NoDebug') || urlParams.has('NoDebug/'));
 
 const vertexShaderSrc = `#version 300 es
   precision mediump float;
@@ -100,7 +91,7 @@ export default class App {
 		this.createFrameBuffer();
 		this.createProgram();
 		this.resize();
-		this._setDebug();
+		if (isDebug) this._setDebug();
 	}
 
 	_playAndStop() {
@@ -130,21 +121,14 @@ export default class App {
 	}
 
 	createFrameBuffer() {
-		this._frambuffer = new FrameBuffer(
-			this.gl,
-			window.innerWidth,
-			window.innerHeight
-		);
+		this._frambuffer = new FrameBuffer(this.gl, window.innerWidth, window.innerHeight);
 		this._frambuffer.unbind();
 	}
 
 	createProgram() {
-		this._program = new Program2(
-			this.gl,
-			vertexShaderSrc.trim(),
-			fragmentShaderSrc.trim(),
-			{ transformFeedback: ['gl_Position'] }
-		);
+		this._program = new Program2(this.gl, vertexShaderSrc.trim(), fragmentShaderSrc.trim(), {
+			transformFeedback: ['gl_Position']
+		});
 
 		let side = 0.1;
 		let xPos = 0.5;
@@ -162,29 +146,9 @@ export default class App {
 			0.0,
 			1.0
 		]);
-		let colors = new Float32Array([
-			1.0,
-			0.0,
-			0.0,
-			0.0,
-			1.0,
-			0.0,
-			0.0,
-			0.0,
-			1.0
-		]);
+		let colors = new Float32Array([1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]);
 
-		let colors2 = new Float32Array([
-			1.0,
-			1.0,
-			1.0,
-			0.0,
-			1.0,
-			0.0,
-			0.0,
-			0.0,
-			1.0
-		]);
+		let colors2 = new Float32Array([1.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]);
 		/** ====================================== **/
 
 		let vaoA = new VAO(this.gl);
@@ -213,9 +177,7 @@ export default class App {
 			.attribPointer(this._program);
 		colorBufferA.bind().attribPointer(this._program);
 
-		this._positionAttribLocation2 = this._program.getAttrib(
-			'position'
-		).location;
+		this._positionAttribLocation2 = this._program.getAttrib('position').location;
 		let transformFeedback = new TransformFeedback(this.gl);
 		transformFeedback.addArrayBufer(0, {
 			read: _positionBufferA,
@@ -231,12 +193,9 @@ export default class App {
 			count: 6
 		};
 
-		let program2 = new Program2(
-			this.gl,
-			vertexShaderSrc2.trim(),
-			fragmentShaderSrc2.trim(),
-			{ transformFeedback: ['gl_Position'] }
-		);
+		let program2 = new Program2(this.gl, vertexShaderSrc2.trim(), fragmentShaderSrc2.trim(), {
+			transformFeedback: ['gl_Position']
+		});
 
 		let _positionBufferA2 = new ArrayBuffer(this.gl, positions, {
 			usage: this.gl.DYNAMIC_COPY
@@ -273,11 +232,7 @@ export default class App {
 			Math.random() - 0.5,
 			Math.random() - 0.5
 		];
-		this.gl.bufferData(
-			this.gl.ARRAY_BUFFER,
-			new Float32Array(positions2),
-			this.gl.STATIC_DRAW
-		);
+		this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(positions2), this.gl.STATIC_DRAW);
 	}
 
 	start() {

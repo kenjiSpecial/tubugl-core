@@ -21,12 +21,15 @@ export class Texture {
 		}
 
 		this._texture = this._gl.createTexture();
-		this.uniformName = uniformName;
-		if (!this.uniformName) {
-			console.error('[Texture]ufniromName is missed');
-			return;
+		if (uniformName) {
+			this.uniformName = uniformName;
+			if (this.uniformName) {
+				console.warn('[Texture]uniformName is removed');
+			}
 		}
+
 		this.textureNum = textureNum;
+
 		this.unit = TEXTURE0 + textureNum;
 
 		this.setFormat(format, internalFormat, type);

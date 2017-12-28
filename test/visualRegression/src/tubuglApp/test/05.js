@@ -2,18 +2,15 @@
  * test for vao(webgl2)
  */
 
-import {
-	Program,
-	ArrayBuffer,
-	IndexArrayBuffer,
-	FrameBuffer,
-	VAO
-} from 'tubuGL';
+import { Program, ArrayBuffer, IndexArrayBuffer, FrameBuffer, VAO } from 'tubuGL';
 import { UNSIGNED_SHORT } from 'tubugl-constants';
 
 const TweenLite = require('gsap');
 const dat = require('../../vendors/dat.gui/dat.gui');
 const Stats = require('../../vendors/stats.js/stats');
+
+let urlParams = new URLSearchParams(window.location.search);
+const isDebug = !(urlParams.has('NoDebug') || urlParams.has('NoDebug/'));
 
 const vertexShaderSrc = `#version 300 es
 in vec4 position;
@@ -53,7 +50,7 @@ export default class App {
 		this.createFrameBuffer();
 		this.createProgram();
 		this.resize();
-		this._setDebug();
+		if (isDebug) this._setDebug();
 	}
 
 	_playAndStop() {
@@ -83,11 +80,7 @@ export default class App {
 	}
 
 	createFrameBuffer() {
-		this._frambuffer = new FrameBuffer(
-			this.gl,
-			window.innerWidth,
-			window.innerHeight
-		);
+		this._frambuffer = new FrameBuffer(this.gl, window.innerWidth, window.innerHeight);
 		this._frambuffer.unbind();
 	}
 
@@ -95,16 +88,7 @@ export default class App {
 		this._program = new Program(this.gl, vertexShaderSrc, fragmentShaderSrc);
 
 		let side = 0.1;
-		let positions = new Float32Array([
-			-side,
-			-side,
-			side,
-			-side,
-			side,
-			side,
-			-side,
-			side
-		]);
+		let positions = new Float32Array([-side, -side, side, -side, side, side, -side, side]);
 
 		let uvs = new Float32Array([0, 1, 1, 1, 1, 0, 0, 0]);
 
@@ -139,11 +123,7 @@ export default class App {
 			Math.random() - 0.5,
 			Math.random() - 0.5
 		];
-		this.gl.bufferData(
-			this.gl.ARRAY_BUFFER,
-			new Float32Array(positions2),
-			this.gl.STATIC_DRAW
-		);
+		this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(positions2), this.gl.STATIC_DRAW);
 	}
 
 	start() {
@@ -157,7 +137,7 @@ export default class App {
 	}
 
 	update() {
-		this.stats.update();
+		if (this.stats) this.stats.update();
 
 		let gl = this.gl;
 

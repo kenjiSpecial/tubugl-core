@@ -4,9 +4,12 @@
 
 import { Program, ArrayBuffer, IndexArrayBuffer, FrameBuffer } from 'tubuGL';
 
-const TweenLite = require('gsap');
+const TweenMax = require('gsap');
 const dat = require('../../vendors/dat.gui/dat.gui');
 const Stats = require('../../vendors/stats.js/stats');
+
+let urlParams = new URLSearchParams(window.location.search);
+const isDebug = !(urlParams.has('NoDebug') || urlParams.has('NoDebug/'));
 
 const vertexShaderSrc = `// an attribute will receive data from a buffer
   attribute vec4 a_position;
@@ -67,7 +70,7 @@ export default class App {
 		this.createFrameBuffer();
 		this.createProgram();
 		this.resize();
-		this._setDebug();
+		if (isDebug) this._setDebug();
 	}
 
 	_playAndStop() {
@@ -97,20 +100,12 @@ export default class App {
 	}
 
 	createFrameBuffer() {
-		this._frambuffer = new FrameBuffer(
-			this.gl,
-			window.innerWidth,
-			window.innerHeight
-		);
+		this._frambuffer = new FrameBuffer(this.gl, window.innerWidth, window.innerHeight);
 		this._frambuffer.unbind();
 	}
 
 	createProgram() {
-		this._program = new Program(
-			this.gl,
-			vertexShaderSrc,
-			fragmentShaderSrc(1.0, 0.0, 0.0)
-		);
+		this._program = new Program(this.gl, vertexShaderSrc, fragmentShaderSrc(1.0, 0.0, 0.0));
 
 		let pos0 = { x: 0.4, y: 0 };
 		let pos1 = { x: -0.4, y: 0 };
@@ -135,25 +130,7 @@ export default class App {
 			side / 2 + pos1.y
 		]);
 
-		let uvsOrig = new Float32Array([
-			0,
-			1,
-			1,
-			1,
-			1,
-			0,
-			0,
-			0,
-
-			0,
-			1,
-			1,
-			1,
-			1,
-			0,
-			0,
-			0
-		]);
+		let uvsOrig = new Float32Array([0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0]);
 
 		this._shapeCnt = 6 * 2;
 
@@ -232,11 +209,7 @@ export default class App {
 			Math.random() - 0.5,
 			Math.random() - 0.5
 		];
-		this.gl.bufferData(
-			this.gl.ARRAY_BUFFER,
-			new Float32Array(positions2),
-			this.gl.STATIC_DRAW
-		);
+		this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(positions2), this.gl.STATIC_DRAW);
 	}
 
 	start() {
@@ -250,7 +223,7 @@ export default class App {
 	}
 
 	update() {
-		this.stats.update();
+		if (this.stats) this.stats.update();
 
 		let gl = this.gl;
 
@@ -268,12 +241,7 @@ export default class App {
 		this._obj.positionBuffer.bind().attribPointer(this._obj.program);
 		this._obj.uvBuffer.bind().attribPointer(this._obj.program);
 
-		this.gl.drawElements(
-			this.gl.TRIANGLES,
-			this._obj.count,
-			this.gl.UNSIGNED_SHORT,
-			0
-		);
+		this.gl.drawElements(this.gl.TRIANGLES, this._obj.count, this.gl.UNSIGNED_SHORT, 0);
 
 		/**
 		 * =====================================
@@ -290,12 +258,7 @@ export default class App {
 		this._out.positionBuffer.bind().attribPointer(this._out.program);
 		this._out.uvBuffer.bind().attribPointer(this._out.program);
 
-		this.gl.drawElements(
-			this.gl.TRIANGLES,
-			this._out.count,
-			this.gl.UNSIGNED_SHORT,
-			0
-		);
+		this.gl.drawElements(this.gl.TRIANGLES, this._out.count, this.gl.UNSIGNED_SHORT, 0);
 	}
 
 	resize(width, height) {
