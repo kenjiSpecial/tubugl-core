@@ -89,8 +89,8 @@ export default class App {
 		this.gl.disable(this.gl.DEPTH_TEST);
 		this._description = params.description;
 
-		this.createFrameBuffer();
-		this.createProgram();
+		this.makeFrameBuffer();
+		this.makeProgram();
 		this.resize();
 		if (isDebug) this._setDebug();
 	}
@@ -121,12 +121,22 @@ export default class App {
 		this._playAndStopGUI = this.gui.add(this, '_playAndStop').name('pause');
 	}
 
-	createFrameBuffer() {
-		this.gl.pixelStorei(UNPACK_FLIP_Y_WEBGL, 1);
-		let frameBuffer0 = new FrameBuffer(this.gl, { type: FLOAT }, window.innerWidth, window.innerHeight);
+	makeFrameBuffer() {
+		// this.gl.pixelStorei(UNPACK_FLIP_Y_WEBGL, 1);
+		let frameBuffer0 = new FrameBuffer(
+			this.gl,
+			{ type: FLOAT },
+			window.innerWidth,
+			window.innerHeight
+		);
 		frameBuffer0.unbind();
 
-		let frameBuffer1 = new FrameBuffer(this.gl, { type: FLOAT }, window.innerWidth, window.innerHeight);
+		let frameBuffer1 = new FrameBuffer(
+			this.gl,
+			{ type: FLOAT },
+			window.innerWidth,
+			window.innerHeight
+		);
 		frameBuffer1.unbind();
 
 		this._buffers = {
@@ -135,19 +145,14 @@ export default class App {
 			front: frameBuffer0,
 			back: frameBuffer1
 		};
-
-		// this.gl.pixelStorei(UNPACK_FLIP_Y_WEBGL, 0);
 	}
 
-	createProgram() {
+	makeProgram() {
 		this._program = new Program(this.gl, vertexShader, fragmentShader);
 		let particleNum = 16 * 16;
 		let positions = [];
 
 		for (let ii = 0; ii < particleNum; ii++) {
-			// let xPos = Math.random() * 2 - 1;
-			// let yPos = Math.random() * 2 - 1;
-
 			positions[4 * ii + 0] = (ii % 16) / 16 * 1.4 - 0.7;
 			positions[4 * ii + 1] = parseInt(ii / 16) / 16 * 1.4 - 0.7;
 			positions[4 * ii + 2] = (ii % 16) / 16;
@@ -246,25 +251,15 @@ export default class App {
 
 		this._buffers.write.unbind();
 
+		/**
+		 * ===============================
+		 */
+
 		this._obj.program.bind();
-		// this._debugProgram.bind();
 
 		this.gl.clearColor(0, 0, 0, 1);
 		this.gl.clear(this.gl.COLOR_BUFFER_BIT);
 		this.gl.viewport(0, 0, this._width, this._height);
-
-		/**
-		 * rendering of position texture;
-		 */
-		/** 
-		this._debugProgram.setUniformTexture(this._buffers.write.texture, 'uTexture');
-		this._buffers.write.texture.activeTexture().bind();
-
-		this._position.indexBuffer.bind();
-		this._position.positionBuffer.bind().attribPointer(this._debugProgram);
-		this._position.uvBuffer.bind().attribPointer(this._debugProgram);
-		this.gl.drawElements(this.gl.TRIANGLES, this._position.count, this.gl.UNSIGNED_SHORT, 0);
-		*/
 
 		this._obj.program.setUniformTexture(this._buffers.write.texture, 'uTexture');
 		this._buffers.write.texture.activeTexture().bind();

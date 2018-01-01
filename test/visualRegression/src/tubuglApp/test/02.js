@@ -9,31 +9,28 @@ const dat = require('../../vendors/dat.gui/dat.gui');
 const Stats = require('../../vendors/stats.js/stats');
 
 const vertexShaderSrc = `// an attribute will receive data from a buffer
-  attribute vec4 a_position;
-  attribute vec2 uv; 
-  uniform float uTheta;
-  
-   varying vec2 vUv;
-  // all shaders have a main function
-  void main() {
+attribute vec4 a_position;
+attribute vec2 uv;
+uniform float uTheta;
 
-    // gl_Position is a special variable a vertex shader
-    // is responsible for setting
-    gl_Position = a_position + vec4(0.0 * cos(uTheta), 0.0 * sin(uTheta), 0.0, 0.0);
-    vUv = uv;
-  }`;
+varying vec2 vUv;
+
+void main() {
+	gl_Position = a_position;
+	vUv = uv;
+}`;
 
 const fragmentShaderSrc = `
-  precision mediump float;
-  
-  varying vec2 vUv;
-  
-  uniform sampler2D uTexture;
+precision mediump float;
 
-  void main() {
-      vec4 color = texture2D( uTexture, vUv);
-      gl_FragColor = color;
-  }
+varying vec2 vUv;
+
+uniform sampler2D uTexture;
+
+void main() {
+	vec4 color = texture2D( uTexture, vUv);
+	gl_FragColor = color;
+}
 `;
 
 let urlParams = new URLSearchParams(window.location.search);
