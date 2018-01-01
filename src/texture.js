@@ -13,7 +13,7 @@ import {
 import { TEXTURE_WRAP_T, TEXTURE_WRAP_S, CLAMP_TO_EDGE } from 'tubugl-constants';
 
 export class Texture {
-	constructor(gl, uniformName, format = RGB, internalFormat = RGB, type = UNSIGNED_BYTE, unit = textureNum) {
+	constructor(gl, format = RGB, internalFormat = RGB, type = UNSIGNED_BYTE, unit = textureNum) {
 		this._gl = gl;
 		if (!this._gl) {
 			console.error('[Texture]gl is missed');
@@ -21,21 +21,14 @@ export class Texture {
 		}
 
 		this._texture = this._gl.createTexture();
-		if (uniformName) {
-			this.uniformName = uniformName;
-			if (this.uniformName) {
-				console.warn('[Texture]uniformName is removed');
-			}
-		}
-
 		this.textureNum = textureNum;
-
 		this.unit = TEXTURE0 + textureNum;
 
 		this.setFormat(format, internalFormat, type);
 
 		textureNum++;
 
+		// gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
 		return this;
 	}
 	activeTexture() {
@@ -52,6 +45,41 @@ export class Texture {
 
 		this._gl.texImage2D(TEXTURE_2D, 0, this._internalFormt, this._format, this._type, image);
 
+		return this;
+	}
+	fromSize(width, height) {
+		if (width) this._width = width;
+		if (height) this._height = height;
+
+		this._gl.texImage2D(
+			TEXTURE_2D,
+			0,
+			this._internalFormt,
+			this._width,
+			this._height,
+			0,
+			this._format,
+			this._type,
+			null
+		);
+
+		return this;
+	}
+	fromData(width, height, dataArray) {
+		if (width) this._width = width;
+		if (height) this._height = height;
+
+		this._gl.texImage2D(
+			TEXTURE_2D,
+			0,
+			this._internalFormt,
+			this._width,
+			this._height,
+			0,
+			this._format,
+			this._type,
+			dataArray
+		);
 		return this;
 	}
 	setFormat(format, internalFormat, type) {
@@ -109,5 +137,11 @@ export class Texture {
 		this._gl.generateMipmap(TEXTURE_2D);
 
 		return this;
+	}
+	/**
+	 * return webglTexture
+	 */
+	getTexture() {
+		return this._texture;
 	}
 }

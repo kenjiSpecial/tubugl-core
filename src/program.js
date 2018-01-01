@@ -126,6 +126,7 @@ export class Program {
 	setUniformTexture(texture, uniformName) {
 		let { textureNum } = texture;
 		let uniform = this.getUniforms(uniformName);
+		// console.log(textureNum);
 		this._gl.uniform1i(uniform.location, textureNum);
 	}
 

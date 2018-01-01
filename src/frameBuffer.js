@@ -1,4 +1,4 @@
-import { FRAMEBUFFER, COLOR_ATTACHMENT0 } from 'tubugl-constants';
+import { FRAMEBUFFER, COLOR_ATTACHMENT0, RGB, LINEAR, UNSIGNALED } from 'tubugl-constants';
 import {
 	TEXTURE_2D,
 	TEXTURE_WRAP_S,
@@ -10,20 +10,36 @@ import {
 } from 'tubugl-constants';
 import { RGBA, UNSIGNED_BYTE } from 'tubugl-constants';
 import { isPowerOf2 } from './utils/functions';
+import { Texture } from './texture';
 
 export class FrameBuffer {
-	constructor(gl, width = 256, height = 256) {
+	/**
+	 *
+	 * @param {webglContext} gl
+	 * @param {{internalFormat: GLenum, format, GLenum, type: GLenum }} params
+	 * @param {number} width
+	 * @param {number} height
+	 */
+	constructor(gl, params, width = 256, height = 256) {
+		console.log(params);
+		if (typeof params == 'number') {
+			console.error('Framebuffer api has been updated. make sure Framebuffer code');
+		} else {
+			params.internalFormat = params.internalFormat ? params.internalFormat : RGBA;
+			params.format = params.format ? params.format : RGBA;
+
+			params.type = params.type ? params.type : UNSIGNED_BYTE;
+		}
+
 		this._gl = gl;
 		this._width = width;
 		this._height = height;
 
-		this._texture = this._makeTexture();
-		this._gl.texImage2D(TEXTURE_2D, 0, RGBA, width, height, 0, RGBA, UNSIGNED_BYTE, null);
-
+		this.texture = this._makeTexture(params);
 		this._frameBuffer = this._gl.createFramebuffer();
 		this._gl.bindFramebuffer(FRAMEBUFFER, this._frameBuffer);
 
-		this._gl.framebufferTexture2D(FRAMEBUFFER, COLOR_ATTACHMENT0, TEXTURE_2D, this._texture, 0);
+		this._gl.framebufferTexture2D(FRAMEBUFFER, COLOR_ATTACHMENT0, TEXTURE_2D, this.texture.getTexture(), 0);
 	}
 
 	bind() {
@@ -43,19 +59,24 @@ export class FrameBuffer {
 		return this;
 	}
 
-	_makeTexture() {
-		let texture = this._gl.createTexture();
-		this._gl.bindTexture(TEXTURE_2D, texture);
+	updateSize(width, height) {
+		this._width = width;
+		this._height = height;
+		// this.texture
+	}
 
-		this._gl.texParameteri(TEXTURE_2D, TEXTURE_WRAP_S, CLAMP_TO_EDGE);
-		this._gl.texParameteri(TEXTURE_2D, TEXTURE_WRAP_T, CLAMP_TO_EDGE);
-		this._gl.texParameteri(TEXTURE_2D, TEXTURE_MIN_FILTER, NEAREST);
-		this._gl.texParameteri(TEXTURE_2D, TEXTURE_MAG_FILTER, NEAREST);
+	_makeTexture(params) {
+		let texture = new Texture(this._gl, params.internalFormat, params.format, params.type);
+		texture
+			.bind()
+			.setFilter(NEAREST) //https://evanw.github.io/lightgl.js/docs/texture.html
+			.wrap(CLAMP_TO_EDGE)
+			.fromSize(this._width, this._height);
 
 		return texture;
 	}
 
-	getTexture() {
-		return this._texture;
+	reset() {
+		this.texture.bind().fromSize(this._width, this._height);
 	}
 }

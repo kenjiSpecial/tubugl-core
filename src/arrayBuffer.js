@@ -1,8 +1,4 @@
-import {
-	ARRAY_BUFFER,
-	STATIC_DRAW,
-	FLOAT
-} from 'tubugl-constants';
+import { ARRAY_BUFFER, STATIC_DRAW, FLOAT } from 'tubugl-constants';
 
 export class ArrayBuffer {
 	constructor(gl, data, params = {}) {
@@ -61,14 +57,8 @@ export class ArrayBuffer {
 	 */
 	attribPointer(program) {
 		this.attribs.forEach(attrib => {
-			let location = program.getAttrib(attrib.name).location;
-			let {
-				size,
-				type,
-				normalize,
-				stride,
-				offset
-			} = attrib;
+			let location = program.getAttrib(attrib.name).location; // cached location from program
+			let { size, type, normalize, stride, offset } = attrib;
 
 			this.gl.enableVertexAttribArray(location);
 			this.gl.vertexAttribPointer(location, size, type, normalize, stride, offset);
