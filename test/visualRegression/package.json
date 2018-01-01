@@ -1,11 +1,13 @@
 {
+  "name": "test-for-tubugl-core",
   "version": "1.0.0",
   "license": "MIT",
   "scripts": {
     "start": "react-static start",
     "build": "react-static build",
     "serve": "serve dist -p 3000",
-    "test": "cross-env NODE_ENV=test jest --config jest.config.json"
+    "test": "cross-env NODE_ENV=test jest --config jest.config.json",
+    "updateTestImage": "cross-env NODE_ENV=test jest --config jest.config.json -u"
   },
   "dependencies": {
     "axios": "^0.16.2",
@@ -13,7 +15,7 @@
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
     "react-router": "^4.2.0",
-    "react-static": "^4.7.0-beta.0"
+    "react-static": "^4.8.3"
   },
   "devDependencies": {
     "cross-env": "^5.1.1",
@@ -22,7 +24,6 @@
     "jest-image-snapshot": "^2.2.0",
     "path": "^0.12.7",
     "prettier": "^1.9.2",
-    "puppeteer": "^0.13.0",
     "serve": "^6.4.2"
   }
 }

@@ -95,6 +95,19 @@ export default () => (
 					/>
 				)}
 			/>
+			<Route
+				exact
+				path="/test/07"
+				render={props => (
+					<TestApp
+						globalStore={{
+							appId: '7',
+							description: 'test for program and '
+						}}
+						{...props}
+					/>
+				)}
+			/>
 		</Switch>
 	</Router>
 );

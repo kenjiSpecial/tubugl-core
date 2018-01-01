@@ -38,3 +38,7 @@ it('#05: vao(webgl2)', async () => {
 it('#06: program2 and transformFeedback(webgl2)', async () => {
 	await captureScreen('http://localhost:3000/test/06?NoDebug');
 });
+
+it('#07: program and gpgpu based on frameBuffer', async () => {
+	await captureScreen('http://localhost:3000/test/07?NoDebug');
+});

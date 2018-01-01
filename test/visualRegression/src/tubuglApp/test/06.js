@@ -2,10 +2,9 @@
  * test for vao(webgl2)
  */
 
-import { Program2, ArrayBuffer, IndexArrayBuffer, FrameBuffer, VAO, TransformFeedback } from 'tubuGL';
-import { UNSIGNED_SHORT, FLOAT, TRANSFORM_FEEDBACK_BUFFER, TRANSFORM_FEEDBACK } from 'tubugl-constants';
+import { Program2, ArrayBuffer, FrameBuffer, VAO, TransformFeedback } from 'tubuGL';
 
-const TweenLite = require('gsap');
+const TweenMax = require('gsap');
 const dat = require('../../vendors/dat.gui/dat.gui');
 const Stats = require('../../vendors/stats.js/stats');
 
@@ -148,7 +147,6 @@ export default class App {
 		]);
 		let colors = new Float32Array([1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]);
 
-		let colors2 = new Float32Array([1.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]);
 		/** ====================================== **/
 
 		let vaoA = new VAO(this.gl);
@@ -237,7 +235,12 @@ export default class App {
 
 	start() {
 		this._isPlay = true;
-		TweenMax.ticker.addEventListener('tick', this.update, this);
+		if (isDebug) TweenMax.ticker.addEventListener('tick', this.update, this);
+		else {
+			for (var ii = 0; ii < 10; ii++) {
+				this.update();
+			}
+		}
 	}
 
 	stop() {
