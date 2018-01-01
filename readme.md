@@ -3,6 +3,12 @@
 
 [tubugl](https://github.com/kenjiSpecial/tubugl) (personal micro webgl framework) core modules.
 
+## functionality test
+
+https://kenjispecial.github.io/tubugl-core/
+
+source: https://github.com/kenjiSpecial/tubugl-core/tree/master/test/visualRegression
+
 ## other modules
 
 - [tubugl-constants](https://github.com/kenjiSpecial/tubugl-constants)
