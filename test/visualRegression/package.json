@@ -15,7 +15,8 @@
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
     "react-router": "^4.2.0",
-    "react-static": "^4.8.3"
+    "react-static": "^4.8.3",
+    "tubugl-constants": "^1.0.3"
   },
   "devDependencies": {
     "cross-env": "^5.1.1",
