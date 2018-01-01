@@ -39,7 +39,13 @@ export class FrameBuffer {
 		this._frameBuffer = this._gl.createFramebuffer();
 		this._gl.bindFramebuffer(FRAMEBUFFER, this._frameBuffer);
 
-		this._gl.framebufferTexture2D(FRAMEBUFFER, COLOR_ATTACHMENT0, TEXTURE_2D, this.texture.getTexture(), 0);
+		this._gl.framebufferTexture2D(
+			FRAMEBUFFER,
+			COLOR_ATTACHMENT0,
+			TEXTURE_2D,
+			this.texture.getTexture(),
+			0
+		);
 	}
 
 	bind() {
@@ -71,12 +77,16 @@ export class FrameBuffer {
 			.bind()
 			.setFilter(NEAREST) //https://evanw.github.io/lightgl.js/docs/texture.html
 			.wrap(CLAMP_TO_EDGE)
-			.fromSize(this._width, this._height);
+			.fromData(this._width, this._height, params.dataArray);
 
 		return texture;
 	}
 
 	reset() {
 		this.texture.bind().fromSize(this._width, this._height);
+	}
+
+	delete() {
+		this.texture.delete();
 	}
 }

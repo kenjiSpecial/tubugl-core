@@ -144,4 +144,8 @@ export class Texture {
 	getTexture() {
 		return this._texture;
 	}
+	delete() {
+		this._gl.deleteTexture(this._texture);
+		this._texture = null;
+	}
 }
