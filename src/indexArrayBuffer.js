@@ -4,9 +4,9 @@ export class IndexArrayBuffer {
 		this.buffer = this.gl.createBuffer();
 
 		try {
-			let sucess = data instanceof Uint16Array;
+			let sucess = data instanceof Uint16Array || data instanceof Uint32Array;
 			if (sucess) this.setData(data);
-			else throw 'data should be Uint16Array';
+			else throw 'data should be Uint16Array or Uint32Array';
 		} catch (error) {
 			console.error(error);
 		}
