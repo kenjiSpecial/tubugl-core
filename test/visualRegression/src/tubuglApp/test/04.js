@@ -100,8 +100,8 @@ export default class App {
 	}
 
 	createFrameBuffer() {
-		this._frambuffer = new FrameBuffer(this.gl, window.innerWidth, window.innerHeight);
-		this._frambuffer.unbind();
+		this._framebuffer = new FrameBuffer(this.gl, {}, window.innerWidth, window.innerHeight);
+		this._framebuffer.unbind();
 	}
 
 	createProgram() {
@@ -225,13 +225,11 @@ export default class App {
 	update() {
 		if (this.stats) this.stats.update();
 
-		let gl = this.gl;
-
 		/**
 		 * =====================================
 		 */
 
-		this._frambuffer.bind().updateViewport();
+		this._framebuffer.bind().updateViewport();
 		this._obj.program.bind();
 
 		this.gl.clearColor(0, 0, 0, 1);

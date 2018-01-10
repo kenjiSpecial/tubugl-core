@@ -80,7 +80,7 @@ export default class App {
 	}
 
 	createFrameBuffer() {
-		this._frambuffer = new FrameBuffer(this.gl, window.innerWidth, window.innerHeight);
+		this._frambuffer = new FrameBuffer(this.gl, {}, window.innerWidth, window.innerHeight);
 		this._frambuffer.unbind();
 	}
 

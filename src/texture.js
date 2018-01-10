@@ -8,7 +8,8 @@ import {
 	LINEAR,
 	NEAREST,
 	TEXTURE_MIN_FILTER,
-	TEXTURE_MAG_FILTER
+	TEXTURE_MAG_FILTER,
+	UNPACK_FLIP_Y_WEBGL
 } from 'tubugl-constants';
 import { TEXTURE_WRAP_T, TEXTURE_WRAP_S, CLAMP_TO_EDGE } from 'tubugl-constants';
 
@@ -80,6 +81,14 @@ export class Texture {
 			this._type,
 			dataArray
 		);
+		return this;
+	}
+	setFlip() {
+		this.setPixelStore(UNPACK_FLIP_Y_WEBGL, true);
+		return;
+	}
+	setPixelStore(pname, params) {
+		this._gl.pixelStorei(pname, params);
 		return this;
 	}
 	setFormat(format, internalFormat, type) {

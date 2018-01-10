@@ -75,6 +75,7 @@ export class FrameBuffer {
 		let texture = new Texture(this._gl, params.internalFormat, params.format, params.type);
 		texture
 			.bind()
+			.setFlip()
 			.setFilter(NEAREST) //https://evanw.github.io/lightgl.js/docs/texture.html
 			.wrap(CLAMP_TO_EDGE)
 			.fromData(this._width, this._height, params.dataArray);
