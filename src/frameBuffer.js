@@ -1,4 +1,13 @@
-import { FRAMEBUFFER, COLOR_ATTACHMENT0, RGB, LINEAR, UNSIGNALED } from 'tubugl-constants';
+import {
+	FRAMEBUFFER,
+	COLOR_ATTACHMENT0,
+	RGB,
+	LINEAR,
+	UNSIGNALED,
+	RENDERBUFFER,
+	DEPTH_COMPONENT16,
+	DEPTH_ATTACHMENT
+} from 'tubugl-constants';
 import {
 	TEXTURE_2D,
 	TEXTURE_WRAP_S,
@@ -46,6 +55,20 @@ export class FrameBuffer {
 			this.texture.getTexture(),
 			0
 		);
+	}
+	makeDepthBUffer() {
+		/**
+		 * https://webglfundamentals.org/webgl/lessons/webgl-render-to-texture.html
+		 */
+		// create a depth renderbuffer
+		let depthBuffer = this._gl.createRenderbuffer();
+		this._gl.bindRenderbuffer(RENDERBUFFER, depthBuffer);
+
+		// make a depth buffer and the same size as the targetTexture
+		this._gl.renderbufferStorage(RENDERBUFFER, DEPTH_COMPONENT16, this._width, this._heightc);
+		this._gl.framebufferRenderbuffer(FRAMEBUFFER, DEPTH_ATTACHMENT, RENDERBUFFER, depthBuffer);
+
+		return this;
 	}
 
 	bind() {

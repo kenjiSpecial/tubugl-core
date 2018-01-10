@@ -29,7 +29,6 @@ export class Texture {
 
 		textureNum++;
 
-		// gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
 		return this;
 	}
 	activeTexture() {
