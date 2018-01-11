@@ -45,12 +45,14 @@ export default class App {
 
 		this.canvas = params.canvas;
 		this.gl = this.canvas.getContext('webgl2');
-		this._description = params.description;
 
-		this.createFrameBuffer();
-		this.createProgram();
-		this.resize();
-		if (isDebug) this._setDebug();
+		if (this.gl) {
+			this._description = params.description;
+			this.createFrameBuffer();
+			this.createProgram();
+			this.resize();
+			if (isDebug) this._setDebug();
+		}
 	}
 
 	_playAndStop() {
@@ -127,10 +129,31 @@ export default class App {
 	}
 
 	start() {
+		if (!this.gl) {
+			this.notSupportWebGL2();
+			return;
+		}
+
 		this._isPlay = true;
 		TweenLite.ticker.addEventListener('tick', this.update, this);
 	}
+	notSupportWebGL2() {
+		let div = document.createElement('div');
+		div.style.position = 'absolute';
+		div.style.top = '20px';
+		div.style.left = '20px';
+		div.style.zIndex = 9999;
+		let span = document.createElement('span');
+		span.innerHTML =
+			"Your browser doesn't support webgl2. see which browsers support webgl from ";
+		let a = document.createElement('a');
+		a.setAttribute('href', 'https://caniuse.com/#feat=webgl2');
+		a.innerHTML = 'here';
+		div.appendChild(span);
+		div.appendChild(a);
 
+		document.body.appendChild(div);
+	}
 	stop() {
 		this._isPlay = false;
 		TweenLite.ticker.removeEventListener('tick', this.update, this);

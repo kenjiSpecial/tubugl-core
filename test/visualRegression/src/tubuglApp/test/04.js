@@ -245,7 +245,7 @@ export default class App {
 		 * =====================================
 		 */
 
-		this._frambuffer.unbind();
+		this._framebuffer.unbind();
 
 		this.gl.clearColor(0, 0, 0, 1);
 		this.gl.clear(this.gl.COLOR_BUFFER_BIT);
