@@ -18,20 +18,20 @@ export function webGLShader(gl, type, shaderSource) {
 	gl.shaderSource(shader, shaderSource);
 	gl.compileShader(shader);
 
-	if (gl.getShaderParameter(shader, gl.COMPILE_STATUS) === false) {
+	if (gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+		return shader;
+	} else {
 		console.error("[WebGLShader]: Shader couldn't compile.");
+
+		if (gl.getShaderInfoLog(shader) !== '') {
+			console.warn(
+				'[WebGLShader]: gl.getShaderInfoLog()',
+				type === gl.VERTEX_SHADER ? 'vertex' : 'fragment',
+				gl.getShaderInfoLog(shader),
+				addLineNumbers(shaderSource)
+			);
+
+			return null;
+		}
 	}
-
-	if (gl.getShaderInfoLog(shader) !== '') {
-		console.warn(
-			'[WebGLShader]: gl.getShaderInfoLog()',
-			type === gl.VERTEX_SHADER ? 'vertex' : 'fragment',
-			gl.getShaderInfoLog(shader),
-			addLineNumbers(shaderSource)
-		);
-
-		return null;
-	}
-
-	return shader;
 }

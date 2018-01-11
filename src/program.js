@@ -1,7 +1,20 @@
 import { webGLShader } from './utils/webglShader';
-import { FLOAT, FLOAT_VEC2, FLOAT_VEC3, FLOAT_VEC4, TEXTURE_2D, SAMPLER_2D } from 'tubugl-constants';
+import {
+	FLOAT,
+	FLOAT_VEC2,
+	FLOAT_VEC3,
+	FLOAT_VEC4,
+	TEXTURE_2D,
+	SAMPLER_2D
+} from 'tubugl-constants';
 import { FLOAT_MAT2, FLOAT_MAT3, FLOAT_MAT4 } from 'tubugl-constants';
-import { VERTEX_SHADER, FRAGMENT_SHADER, LINK_STATUS, ACTIVE_UNIFORMS, ACTIVE_ATTRIBUTES } from 'tubugl-constants';
+import {
+	VERTEX_SHADER,
+	FRAGMENT_SHADER,
+	LINK_STATUS,
+	ACTIVE_UNIFORMS,
+	ACTIVE_ATTRIBUTES
+} from 'tubugl-constants';
 
 export class Program {
 	/**

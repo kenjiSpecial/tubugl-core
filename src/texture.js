@@ -84,7 +84,7 @@ export class Texture {
 	}
 	setFlip() {
 		this.setPixelStore(UNPACK_FLIP_Y_WEBGL, true);
-		return;
+		return this;
 	}
 	setPixelStore(pname, params) {
 		this._gl.pixelStorei(pname, params);

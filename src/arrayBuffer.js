@@ -59,7 +59,7 @@ export class ArrayBuffer {
 		this.attribs.forEach(attrib => {
 			let programAttr = program.getAttrib(attrib.name); // cached location from program
 			if (!programAttr) {
-				console.warn(`attribute ${attrib.name} is not used`);
+				// console.warn(`attribute ${attrib.name} is not used`);
 			} else {
 				let location = programAttr.location;
 				let { size, type, normalize, stride, offset } = attrib;
