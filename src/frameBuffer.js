@@ -1,24 +1,12 @@
 import {
 	FRAMEBUFFER,
 	COLOR_ATTACHMENT0,
-	RGB,
-	LINEAR,
-	UNSIGNALED,
 	RENDERBUFFER,
 	DEPTH_COMPONENT16,
 	DEPTH_ATTACHMENT
 } from 'tubugl-constants';
-import {
-	TEXTURE_2D,
-	TEXTURE_WRAP_S,
-	TEXTURE_WRAP_T,
-	CLAMP_TO_EDGE,
-	TEXTURE_MIN_FILTER,
-	TEXTURE_MAG_FILTER,
-	NEAREST
-} from 'tubugl-constants';
+import { TEXTURE_2D, CLAMP_TO_EDGE, NEAREST } from 'tubugl-constants';
 import { RGBA, UNSIGNED_BYTE } from 'tubugl-constants';
-import { isPowerOf2 } from './utils/functions';
 import { Texture } from './texture';
 
 export class FrameBuffer {
@@ -30,7 +18,6 @@ export class FrameBuffer {
 	 * @param {number} height
 	 */
 	constructor(gl, params, width = 256, height = 256) {
-		console.log(params);
 		if (typeof params == 'number') {
 			console.error('Framebuffer api has been updated. make sure Framebuffer code');
 		} else {
