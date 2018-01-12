@@ -91,7 +91,18 @@ export class FrameBuffer {
 	updateSize(width, height) {
 		this._width = width;
 		this._height = height;
-		// this.texture
+
+		this.texture.bind().fromSize(this._width, this._height);
+
+		if (this.depthBuffer) {
+			this._gl.bindRenderbuffer(RENDERBUFFER, this.depthBuffer);
+			this._gl.renderbufferStorage(
+				RENDERBUFFER,
+				DEPTH_COMPONENT16,
+				this._width,
+				this._height
+			);
+		}
 	}
 
 	_makeTexture(params) {
