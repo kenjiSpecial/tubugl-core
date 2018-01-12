@@ -65,7 +65,7 @@ export class FrameBuffer {
 		this._gl.bindRenderbuffer(RENDERBUFFER, depthBuffer);
 
 		// make a depth buffer and the same size as the targetTexture
-		this._gl.renderbufferStorage(RENDERBUFFER, DEPTH_COMPONENT16, this._width, this._heightc);
+		this._gl.renderbufferStorage(RENDERBUFFER, DEPTH_COMPONENT16, this._width, this._height);
 		this._gl.framebufferRenderbuffer(FRAMEBUFFER, DEPTH_ATTACHMENT, RENDERBUFFER, depthBuffer);
 
 		return this;
