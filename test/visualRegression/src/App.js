@@ -15,10 +15,36 @@ export default () => (
 			<Route exact path="/" component={Home} />
 
 			{/* raw sample */}
-			<Route exact path="/raw/sample00" render={props => <RawSample globalStore={{ appId: '0' }} {...props} />} />
-			<Route exact path="/raw/sample01" render={props => <RawSample globalStore={{ appId: '1' }} {...props} />} />
-			<Route exact path="/raw/sample02" render={props => <RawSample globalStore={{ appId: '2' }} {...props} />} />
-			<Route exact path="/raw/sample03" render={props => <RawSample globalStore={{ appId: '3' }} {...props} />} />
+			<Route
+				exact
+				path="/raw/sample00"
+				render={props => <RawSample globalStore={{ appId: '0' }} {...props} />}
+			/>
+			<Route
+				exact
+				path="/raw/sample01"
+				render={props => <RawSample globalStore={{ appId: '1' }} {...props} />}
+			/>
+			<Route
+				exact
+				path="/raw/sample02"
+				render={props => <RawSample globalStore={{ appId: '2' }} {...props} />}
+			/>
+			<Route
+				exact
+				path="/raw/sample03"
+				render={props => <RawSample globalStore={{ appId: '3' }} {...props} />}
+			/>
+			<Route
+				exact
+				path="/raw/sample04"
+				render={props => <RawSample globalStore={{ appId: '4' }} {...props} />}
+			/>
+			<Route
+				exact
+				path="/raw/sample05"
+				render={props => <RawSample globalStore={{ appId: '5' }} {...props} />}
+			/>
 
 			{/* main test */}
 			<Route
@@ -65,21 +91,30 @@ export default () => (
 				exact
 				path="/test/03"
 				render={props => (
-					<TestApp globalStore={{ appId: '3', description: 'test for draw function' }} {...props} />
+					<TestApp
+						globalStore={{ appId: '3', description: 'test for draw function' }}
+						{...props}
+					/>
 				)}
 			/>
 			<Route
 				exact
 				path="/test/04"
 				render={props => (
-					<TestApp globalStore={{ appId: '4', description: 'test for framebuffer' }} {...props} />
+					<TestApp
+						globalStore={{ appId: '4', description: 'test for framebuffer' }}
+						{...props}
+					/>
 				)}
 			/>
 			<Route
 				exact
 				path="/test/05"
 				render={props => (
-					<TestApp globalStore={{ appId: '5', description: 'test for vao(webgl2)' }} {...props} />
+					<TestApp
+						globalStore={{ appId: '5', description: 'test for vao(webgl2)' }}
+						{...props}
+					/>
 				)}
 			/>
 			<Route
