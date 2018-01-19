@@ -6,6 +6,7 @@ import App2 from '../tubuglApp/raw/rawGL02';
 import App3 from '../tubuglApp/raw/rawGL03';
 import App4 from '../tubuglApp/raw/rawGL04';
 import App5 from '../tubuglApp/raw/rawGL05';
+import App6 from '../tubuglApp/raw/rawGL06';
 
 export default class SimpleExample extends React.Component {
 	constructor(props) {
@@ -40,6 +41,9 @@ export default class SimpleExample extends React.Component {
 				break;
 			case 5:
 				App = App5;
+				break;
+			case 6:
+				App = App6;
 				break;
 		}
 

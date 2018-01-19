@@ -45,6 +45,11 @@ export default () => (
 				path="/raw/sample05"
 				render={props => <RawSample globalStore={{ appId: '5' }} {...props} />}
 			/>
+			<Route
+				exact
+				path="/raw/sample06"
+				render={props => <RawSample globalStore={{ appId: '6' }} {...props} />}
+			/>
 
 			{/* main test */}
 			<Route
