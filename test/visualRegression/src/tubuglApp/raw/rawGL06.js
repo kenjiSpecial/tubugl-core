@@ -7,7 +7,6 @@ import { UNSIGNED_SHORT } from 'tubugl-constants';
 import { PerspectiveCamera, CameraController } from 'tubugl-camera';
 import { Cube } from './components/cube';
 import { mat4 } from 'gl-matrix';
-console.log(PerspectiveCamera);
 
 const TweenLite = require('gsap');
 const dat = require('../../vendors/dat.gui/dat.gui');
@@ -90,7 +89,6 @@ export default class App {
 		this.gl = this.canvas.getContext('webgl2', { antialias: true });
 		this._description = params.description;
 
-		// this.createFrameBuffer();
 		this._makeProgram();
 		this._makeFramebuffer();
 		this._makeCamera();
@@ -110,6 +108,8 @@ export default class App {
 		}
 	}
 
+	_makeDesc() {}
+
 	_setDebug() {
 		this.stats = new Stats();
 		document.body.appendChild(this.stats.dom);
@@ -118,8 +118,17 @@ export default class App {
 		descriptionDom.style.fontSize = '12px';
 		descriptionDom.style.marginTop = '5px';
 		descriptionDom.style.marginLeft = '4px';
+		let p0 = document.createElement('p');
+		p0.innerHTML = 'top left: normal rendering( without postprocessing )';
+		descriptionDom.appendChild(p0);
+		let p1 = document.createElement('p');
+		p1.innerHTML = 'bottom left: rendering with post processing  without maltisampling';
+		descriptionDom.appendChild(p1);
+		let p2 = document.createElement('p');
+		p2.innerHTML = 'top right: rendering with post processing and maltisampling';
+		descriptionDom.appendChild(p2);
+
 		this.stats.dom.appendChild(descriptionDom);
-		descriptionDom.innerHTML = this._description;
 
 		this.gui = new dat.GUI();
 		this.gui.add(this, 'updateAttribute');
