@@ -23,4 +23,8 @@ export class IndexArrayBuffer {
 		this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.buffer);
 		return this;
 	}
+	unbind() {
+		this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, null);
+		return this;
+	}
 }

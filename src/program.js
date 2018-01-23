@@ -119,6 +119,10 @@ export class Program {
 		return this;
 	}
 
+	use() {
+		return this.bind();
+	}
+
 	bind() {
 		this._gl.useProgram(this._program);
 		return this;
