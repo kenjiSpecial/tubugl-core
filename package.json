@@ -1,6 +1,6 @@
 {
   "name": "tubugl-core",
-  "version": "1.1.7",
+  "version": "1.1.8",
   "description": "core parts of webgl module based framework ",
   "main": "src/main.js",
   "license": "MIT",
