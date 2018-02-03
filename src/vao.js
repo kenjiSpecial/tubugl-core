@@ -13,6 +13,11 @@ export class VAO {
 
 		return this;
 	}
+	unbind(){
+		this._gl.bindVertexArray(null);
+		
+		return this;
+	}
 	updateArrayBuffer(program, arrayBuffer, name) {
 		this._arrayBuffers[name] = arrayBuffer;
 		arrayBuffer.attribPointer(program);
