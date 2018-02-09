@@ -1,10 +1,11 @@
 {
   "name": "tubugl-core",
-  "version": "1.1.9",
+  "version": "1.2.0",
   "description": "core parts of webgl module based framework ",
   "cjs": "build/tubu.cjs.js",
   "module": "build/tubu.esm.js",
   "main": "build/tubu.js",
+  "libName": "Tubu",
   "license": "MIT",
   "dependencies": {
     "tubugl-constants": "^1.0.3"
@@ -17,7 +18,8 @@
     "rollup": "^0.55.0",
     "rollup-plugin-babel": "^3.0.3",
     "rollup-plugin-commonjs": "^8.2.6",
-    "rollup-plugin-node-resolve": "^3.0.2"
+    "rollup-plugin-node-resolve": "^3.0.2",
+    "rollup-plugin-replace": "^2.0.0"
   },
   "scripts": {
     "build": "rollup -c"

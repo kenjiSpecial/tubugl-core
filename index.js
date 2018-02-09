@@ -1,3 +1,5 @@
+console.log('[tubugl] version: TUBUGL_VERSOIN, %o', 'https://github.com/kenjiSpecial/tubugl');
+
 export { Program } from './src/program';
 export { Program2 } from './src/program2';
 export { ArrayBuffer } from './src/arrayBuffer';

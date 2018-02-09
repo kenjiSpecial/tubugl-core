@@ -26,3 +26,10 @@ https://github.com/stackgl/gl-fbo/blob/master/fbo.js
 
 [npm-image]: https://img.shields.io/npm/v/tubugl-core.svg?style=flat-square
 [npm-url]: https://www.npmjs.com/package/tubugl-core 
+
+
+## TODO
+
+- [ ] update version
+- [ ] add test for build(amd, cjs, esm)
+- [ ] add api doc.md in docs like nano.gl

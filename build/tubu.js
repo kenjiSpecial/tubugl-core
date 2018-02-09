@@ -1724,6 +1724,8 @@ var DrawCall = function () {
 	return DrawCall;
 }();
 
+console.log('[tubugl] version: 1.2.0, %o', 'https://github.com/kenjiSpecial/tubugl');
+
 exports.Program = Program;
 exports.Program2 = Program2;
 exports.ArrayBuffer = ArrayBuffer;

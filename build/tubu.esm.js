@@ -707,4 +707,6 @@ let draw = {
 	}
 };
 
+console.log('[tubugl] version: 1.2.0, %o', 'https://github.com/kenjiSpecial/tubugl');
+
 export { Program, Program2, ArrayBuffer, IndexArrayBuffer, Texture, FrameBuffer, TransformFeedback, VAO, draw, webGLShader };
