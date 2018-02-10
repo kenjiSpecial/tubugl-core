@@ -3,6 +3,19 @@
 
 [tubugl](https://github.com/kenjiSpecial/tubugl) (personal micro webgl framework) core modules.
 
+## Contentsa
+[DOCS about core modules]()
+
+### Program
+In program class, parogram is created, shaders are compiled, and they are liked to gl context to render frambebuffers.
+
+[program.js]() | [guide]() | [docs]()
+
+
+
+
+
+
 ## functionality test
 
 https://kenjispecial.github.io/tubugl-core/
@@ -19,9 +32,7 @@ source: https://github.com/kenjiSpecial/tubugl-core/tree/master/test/visualRegre
 - [three.js](https://github.com/mrdoob/three.js/)
 - [nanogl](https://github.com/plepers/nanogl/)
 - [stack.gl](http://stack.gl/)
-
-https://github.com/stackgl/gl-fbo/blob/master/fbo.js
-
+- [stack.gl/fbo.js](https://github.com/stackgl/gl-fbo/blob/master/fbo.js)
 - [picogl](https://tsherif.github.io/picogl.js/)
 
 [npm-image]: https://img.shields.io/npm/v/tubugl-core.svg?style=flat-square

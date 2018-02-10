@@ -17,7 +17,7 @@ export default {
 	),
 	webpack: (config, { defaultLoaders }) => {
 		config.resolve.alias = {
-			tubuGL$: path.resolve(__dirname, '../../src/main.js'),
+			tubuGL$: path.resolve(__dirname, '../../src/index.js'),
 			'tubugl-constants$': path.resolve(__dirname, '../../node_modules/tubugl-constants')
 		};
 
