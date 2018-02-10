@@ -1,4 +1,8 @@
-test core functionalities
+[## tubugl core modules API](https://kenjispecial.github.io/tubugl-core/api/)
+
+## tubugl core modules GUIDE
+
+### test core functionalities
 
 ## #00 -  test with program and arrayBuffer
 
