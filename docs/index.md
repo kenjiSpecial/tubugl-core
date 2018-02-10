@@ -1,4 +1,6 @@
-[## tubugl core modules API](https://kenjispecial.github.io/tubugl-core/api/)
+## tubugl core modules API
+
+API documents: https://kenjispecial.github.io/tubugl-core/api/
 
 ## tubugl core modules GUIDE
 

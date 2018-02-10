@@ -13,6 +13,32 @@ Program
 ``` JavaScript
 let {Program} = require( 'tubugl-core' );
 
-// make a Program with a given gl context and vertex shader and fragment shader
-var prgram = new Program( gl, vertexShaderSrc, fragmentShaderSrc )
+// make program with vertexShaderSrc and fragmentShaderSrc
+let program  = new Program( gl, vertexShaderSrc, fragmentShaderSrc )
+```
+
+### use program
+
+``` JavaScript
+// use program
+program.use();
+```
+
+### use program
+
+``` JavaScript
+// use program
+program.use();
+```
+
+### update uniform
+
+``` JavaScript
+// update uniform
+let uColorUniform = program.getUniforms('uColor');
+gl.uniform3f(uColorUniform.location, 1.0, 0.0, 0.0);
+
+// update uniform
+program.uniform['uColor'].update(1.0, 0.0, 0.0);
+
 ```

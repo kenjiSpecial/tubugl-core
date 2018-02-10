@@ -4,16 +4,15 @@
 [tubugl](https://github.com/kenjiSpecial/tubugl) (personal micro webgl framework) core modules.
 
 ## Contentsa
-[API Document](https://kenjispecial.github.io/tubugl-core/api/)
+[Framework API Document](https://kenjispecial.github.io/tubugl-core/api/)
 
 ### Program
 In program class, parogram is created, shaders are compiled, and they are liked to gl context to render frambebuffers.
 
-[program.js]() | [guide]() | [docs]()
+[program.js](https://github.com/kenjiSpecial/tubugl-core/blob/master/src/program.js) | [guide](https://kenjispecial.github.io/tubugl-core/guide/program) | [docs](https://kenjispecial.github.io/tubugl-core/api/Program.html)
 
-
-
-
+###  ArrayBuffer
+ 
 
 
 ## functionality test

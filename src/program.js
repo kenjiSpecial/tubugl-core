@@ -1,19 +1,20 @@
 import { webGLShader } from './utils/webglShader';
+import { Uniform } from './uniform';
 import {
 	FLOAT,
 	FLOAT_VEC2,
 	FLOAT_VEC3,
 	FLOAT_VEC4,
 	TEXTURE_2D,
-	SAMPLER_2D
-} from 'tubugl-constants';
-import { FLOAT_MAT2, FLOAT_MAT3, FLOAT_MAT4 } from 'tubugl-constants';
-import {
+	SAMPLER_2D,
 	VERTEX_SHADER,
 	FRAGMENT_SHADER,
 	LINK_STATUS,
 	ACTIVE_UNIFORMS,
-	ACTIVE_ATTRIBUTES
+	ACTIVE_ATTRIBUTES,
+	FLOAT_MAT2,
+	FLOAT_MAT3,
+	FLOAT_MAT4
 } from 'tubugl-constants';
 
 export class Program {
@@ -47,7 +48,7 @@ export class Program {
 	 * @param {string} fragSrc fragment shader src
 	 * @param {Object} params optinal paramters
 	 */
-	_initProgram(vertSrc, fragSrc, params = {}) {
+	initProgram(vertSrc, fragSrc, params = {}) {
 		this._vertexShader = webGLShader(this._gl, VERTEX_SHADER, vertSrc);
 		this._fragmentShader = webGLShader(this._gl, FRAGMENT_SHADER, fragSrc);
 		this._program = this._gl.createProgram();
@@ -75,56 +76,61 @@ export class Program {
 		// uniforms
 		const uniformNumber = this._gl.getProgramParameter(this._program, ACTIVE_UNIFORMS);
 
-		this._uniform = {};
+		this.uniform = {};
 		for (ii = 0; ii < uniformNumber; ii++) {
-			let uniform = this._gl.getActiveUniform(this._program, ii);
-			let uLocation = this._gl.getUniformLocation(this._program, uniform.name);
+			let uniformInfo = this._gl.getActiveUniform(this._program, ii);
+			// let uLocation = this._gl.getUniformLocation(this._program, uniform.name);
 
-			let typeName;
-			/**
-			 * https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Constants
-			 * */
-			switch (uniform.type) {
-				case FLOAT:
-					typeName = 'float';
-					break;
-				case FLOAT_VEC2:
-					typeName = 'vec2';
-					break;
-				case FLOAT_VEC3:
-					typeName = 'vec3';
-					break;
-				case FLOAT_VEC4:
-					typeName = 'vec4';
-					break;
-				case FLOAT_MAT2:
-					typeName = 'mat2';
-					break;
-				case FLOAT_MAT3:
-					typeName = 'mat3';
-					break;
-				case FLOAT_MAT4:
-					typeName = 'mat4';
-					break;
-				case SAMPLER_2D:
-					typeName = 'sampler2D';
-					break; // TODO Do we need to some method or not
-			}
+			// let typeName;
+			// /**
+			//  * https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Constants
+			//  * */
+			// switch (uniform.type) {
+			// 	case FLOAT:
+			// 		typeName = 'float';
+			// 		break;
+			// 	case FLOAT_VEC2:
+			// 		typeName = 'vec2';
+			// 		break;
+			// 	case FLOAT_VEC3:
+			// 		typeName = 'vec3';
+			// 		break;
+			// 	case FLOAT_VEC4:
+			// 		typeName = 'vec4';
+			// 		break;
+			// 	case FLOAT_MAT2:
+			// 		typeName = 'mat2';
+			// 		break;
+			// 	case FLOAT_MAT3:
+			// 		typeName = 'mat3';
+			// 		break;
+			// 	case FLOAT_MAT4:
+			// 		typeName = 'mat4';
+			// 		break;
+			// 	case SAMPLER_2D:
+			// 		typeName = 'sampler2D';
+			// 		break; // TODO Do we need to some method or not
+			// }
 
-			this._uniform[uniform.name] = {
-				location: uLocation,
-				type: uniform.type,
-				typeName: typeName,
-				size: uniform.size
-			};
+			// this.uniform[uniform.name] = {
+			// 	location: uLocation,
+			// 	type: uniform.type,
+			// 	typeName: typeName,
+			// 	size: uniform.size
+			// };
+
+			//new Uniform(this._gl, this._program, uniform);
+			// new Uniform()
+			// let uniform = new Uniform(this._gl, this._program, uniformInfo);
+			this.uniform[uniformInfo.name] = new Uniform(this._gl, this._program, uniformInfo);
 		}
 
 		//attributes
 		const attributreNumber = this._gl.getProgramParameter(this._program, ACTIVE_ATTRIBUTES);
-		this._attrib = {};
+		this.attrib = {};
 		for (ii = 0; ii < attributreNumber; ii++) {
 			let attrib = this._gl.getActiveAttrib(this._program, ii);
-			this._attrib[attrib.name] = {
+			this.attrib[attrib.name] = {
 				location: this._gl.getAttribLocation(this._program, attrib.name),
 				type: attrib.type,
 				size: attrib.size
