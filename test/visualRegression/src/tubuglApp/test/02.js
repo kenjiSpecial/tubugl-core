@@ -171,15 +171,16 @@ export default class App {
 
 		this._obj.program.bind();
 
-		this._obj.program.setUniformTexture(this._texture, 'uTexture');
 		this._texture.activeTexture().bind();
-
+		//
+		this._obj.program.setUniformTexture(this._texture, 'uTexture');
 		this._obj.indexBuffer.bind();
 		this._obj.positionBuffer.bind().attribPointer(this._obj.program);
 		this._obj.uvBuffer.bind().attribPointer(this._obj.program);
 
 		let gl = this.gl;
 		gl.drawElements(gl.TRIANGLES, this._shapeCnt, gl.UNSIGNED_SHORT, 0);
+		// this._texture.unbind();
 	}
 
 	resize(width, height) {

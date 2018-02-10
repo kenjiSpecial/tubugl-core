@@ -147,13 +147,13 @@ export default class App {
 		this.gl.clearColor(0, 0, 0, 1);
 		this.gl.clear(this.gl.COLOR_BUFFER_BIT);
 
-		this._obj.program.bind();
+		this._obj.program.use();
 		this._obj.positionBuffer.bind().attribPointer(this._obj.program);
 		this._obj.program.uniform['uColorB'].update(this._obj.uniforms.uColorB.value);
 		this._obj.program.uniform['uMat'].update(this._obj.uniforms.uMat.value);
 		draw.array(this.gl, this._obj.count);
 
-		this._obj1.program.bind();
+		this._obj1.program.use();
 		this._obj1.positionBuffer.bind().attribPointer(this._obj1.program);
 
 		this.gl.uniform1f(
