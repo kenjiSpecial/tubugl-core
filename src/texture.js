@@ -39,6 +39,12 @@ export class Texture {
 		this._gl.bindTexture(TEXTURE_2D, this._texture);
 		return this;
 	}
+
+	unbind() {
+		this._gl.bindTexture(TEXTURE_2D, null);
+		return this;
+	}
+
 	fromImage(image, width, height) {
 		this._width = width ? width : image.width;
 		this._height = height ? height : image.height;

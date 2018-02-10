@@ -11,7 +11,7 @@ import {
 
 export class Uniform {
 	/**
-	 * Uniform class constructor
+	 * @description Uniform class constructor
 	 *
 	 * @param {WebGLRenderingContext} gl
 	 * @param {WebGLProgram} program
@@ -84,6 +84,9 @@ export class Uniform {
 				break;
 			case FLOAT_MAT4:
 				this._gl.uniformMatrix4fv(this.location, false, args[0]);
+				break;
+			case SAMPLER_2D:
+				this._gl.uniform1i(this.location, args[0]);
 				break;
 		}
 	}

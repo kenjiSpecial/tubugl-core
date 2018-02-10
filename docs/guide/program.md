@@ -40,5 +40,20 @@ gl.uniform3f(uColorUniform.location, 1.0, 0.0, 0.0);
 
 // update uniform
 program.uniform['uColor'].update(1.0, 0.0, 0.0);
-
 ```
+
+### set texture as uniform
+
+``` JavaScript
+texture.activeTexture().bind();
+
+program.setUniformTexture(texture, 'uTexture');
+```
+
+### enable attribute
+
+``` JavaScript
+// positionAttibute is the object made from ArrayBuffer
+positionAttibute.bind().attribPointer(program);
+```
+

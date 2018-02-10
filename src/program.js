@@ -79,49 +79,6 @@ export class Program {
 		this.uniform = {};
 		for (ii = 0; ii < uniformNumber; ii++) {
 			let uniformInfo = this._gl.getActiveUniform(this._program, ii);
-			// let uLocation = this._gl.getUniformLocation(this._program, uniform.name);
-
-			// let typeName;
-			// /**
-			//  * https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Constants
-			//  * */
-			// switch (uniform.type) {
-			// 	case FLOAT:
-			// 		typeName = 'float';
-			// 		break;
-			// 	case FLOAT_VEC2:
-			// 		typeName = 'vec2';
-			// 		break;
-			// 	case FLOAT_VEC3:
-			// 		typeName = 'vec3';
-			// 		break;
-			// 	case FLOAT_VEC4:
-			// 		typeName = 'vec4';
-			// 		break;
-			// 	case FLOAT_MAT2:
-			// 		typeName = 'mat2';
-			// 		break;
-			// 	case FLOAT_MAT3:
-			// 		typeName = 'mat3';
-			// 		break;
-			// 	case FLOAT_MAT4:
-			// 		typeName = 'mat4';
-			// 		break;
-			// 	case SAMPLER_2D:
-			// 		typeName = 'sampler2D';
-			// 		break; // TODO Do we need to some method or not
-			// }
-
-			// this.uniform[uniform.name] = {
-			// 	location: uLocation,
-			// 	type: uniform.type,
-			// 	typeName: typeName,
-			// 	size: uniform.size
-			// };
-
-			//new Uniform(this._gl, this._program, uniform);
-			// new Uniform()
-			// let uniform = new Uniform(this._gl, this._program, uniformInfo);
 			this.uniform[uniformInfo.name] = new Uniform(this._gl, this._program, uniformInfo);
 		}
 
@@ -178,9 +135,7 @@ export class Program {
 	 */
 	setUniformTexture(texture, uniformName) {
 		let { textureNum } = texture;
-		let uniform = this.getUniforms(uniformName);
-		// console.log(textureNum);
-		this._gl.uniform1i(uniform.location, textureNum);
+		this.uniform[uniformName].update(textureNum);
 	}
 
 	/**
