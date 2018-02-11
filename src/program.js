@@ -62,16 +62,19 @@ export class Program {
 	 */
 	initProgram(vertSrc, fragSrc, params = {}) {
 		/**
+		 * @description vertexShader
 		 * @private
 		 * @member {WebGLShader}
 		 */
 		this._vertexShader = webGLShader(this._gl, VERTEX_SHADER, vertSrc);
 		/**
+		 * @description fragmentShader
 		 * @private
 		 * @member {WebGLShader}
 		 */
 		this._fragmentShader = webGLShader(this._gl, FRAGMENT_SHADER, fragSrc);
 		/**
+		 * @description program
 		 * @private
 		 * @member {WebGLProgram}
 		 */
