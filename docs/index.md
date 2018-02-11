@@ -9,21 +9,21 @@
 
 ### test core functionalities
 
-## #00 -  test with program and arrayBuffer
+#### #00 -  test with program and arrayBuffer
 
-![](.assets/__image_snapshots__/index-spec-js-00-program-and-array-buffer-1-snap.png)
-
-[program.js][source-program] | [arrayBuffer][source-arrayBuffer] 
-
-## #01 - test with program, arrayBuffer, and indexArrayBuffer
-
-![](.assets/__image_snapshots__/index-spec-js-01-program-array-buffer-and-index-array-buffer-1-snap.png)
+![](./assets/__image_snapshots__/index-spec-js-00-program-and-array-buffer-1-snap.png)
 
 [program.js][source-program] | [arrayBuffer][source-arrayBuffer] 
 
-## #02 - test with program, arrayBuffer, indexArrayBuffer, texture
+#### #01 - test with program, arrayBuffer, and indexArrayBuffer
 
-![](.assets/__image_snapshots__/index-spec-js-02-program-array-buffer-index-array-buffer-texture-1-snap.png)
+![](./assets/__image_snapshots__/index-spec-js-01-program-array-buffer-and-index-array-buffer-1-snap.png)
+
+[program.js][source-program] | [arrayBuffer][source-arrayBuffer] 
+
+#### #02 - test with program, arrayBuffer, indexArrayBuffer, texture
+
+![](./assets/__image_snapshots__/index-spec-js-02-program-array-buffer-index-array-buffer-texture-1-snap.png)
 
 [program.js][source-program] | [arrayBuffer][source-arrayBuffer] | [indexArrayBuffer][source-arrayBuffer] | [texture][source-texture]
 
