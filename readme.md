@@ -3,7 +3,7 @@
 
 [tubugl](https://github.com/kenjiSpecial/tubugl) (personal micro webgl framework) core modules.
 
-## Contentsa
+## Contents
 [Framework API Document](https://kenjispecial.github.io/tubugl-core/api/)
 
 ### Program

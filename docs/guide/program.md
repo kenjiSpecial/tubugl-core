@@ -24,13 +24,6 @@ let program  = new Program( gl, vertexShaderSrc, fragmentShaderSrc )
 program.use();
 ```
 
-### use program
-
-``` JavaScript
-// use program
-program.use();
-```
-
 ### update uniform
 
 ``` JavaScript

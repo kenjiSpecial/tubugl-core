@@ -1,8 +1,11 @@
 ## tubugl core modules API
 
-API documents: https://kenjispecial.github.io/tubugl-core/api/
+[API documents](https://kenjispecial.github.io/tubugl-core/api/)
 
 ## tubugl core modules GUIDE
+
+- [Guide for Program](https://kenjispecial.github.io/tubugl-core/guide/program)
+- [Guide for ArrayBuffer and IndexArrayBuffer](https://kenjispecial.github.io/tubugl-core/guide/buffer)
 
 ### test core functionalities
 
