@@ -11,51 +11,51 @@
 
 #### #00 -  test with program and arrayBuffer
 
-![](./assets/test00.png)
+![](./assets/test00.png){:height="50%" width="50%"}
 
 [program.js][source-program] | [arrayBuffer][source-arrayBuffer] 
 
 #### #01 - test with program, arrayBuffer, and indexArrayBuffer
 
-![](./assets/__image_snapshots__/index-spec-js-01-program-array-buffer-and-index-array-buffer-1-snap.png)
+![](./assets/test01.png){:height="50%" width="50%"}
 
 [program.js][source-program] | [arrayBuffer][source-arrayBuffer] 
 
 #### #02 - test with program, arrayBuffer, indexArrayBuffer, texture
 
-![](./assets/__image_snapshots__/index-spec-js-02-program-array-buffer-index-array-buffer-texture-1-snap.png)
+![](./assets/test02.png){:height="50%" width="50%"}
 
 [program.js][source-program] | [arrayBuffer][source-arrayBuffer] | [indexArrayBuffer][source-arrayBuffer] | [texture][source-texture]
 
 #### #03 - test with draw function
 
-![](./assets/__image_snapshots__/index-spec-js-03-draw-function-1-snap.png)
+![](./assets/test03.png){:height="50%" width="50%"}
 
  [program.js][source-program] | [arrayBuffer][source-arrayBuffer] | [indexArrayBuffer][source-arrayBuffer] | [draw.js][source-draw]
 
 #### #04 - test with framebuffer
 
-![](./assets/__image_snapshots__/index-spec-js-04-framebuffer-1-snap.png)
+![](./assets/test04.png){:height="50%" width="50%"}
 
  [program.js][source-program] | [arrayBuffer][source-arrayBuffer] | [indexArrayBuffer][source-arrayBuffer] | [frameBuffer][source-frameBuffer]
 
 #### #05 - test with vao
 
-![](./assets/__image_snapshots__/index-spec-js-05-vao-webgl-2-1-snap.png)
+![](./assets/test04.png){:height="50%" width="50%"}
 
  [program.js][source-program] | [arrayBuffer][source-arrayBuffer] | [indexArrayBuffer][source-arrayBuffer] | [frameBuffer][source-frameBuffer] | [VAO][source-vao]
 
 
 #### #06 - test with transformfeedback
 
-![](./assets/__image_snapshots__/index-spec-js-06-program-2-and-transform-feedback-webgl-2-1-snap.png)
+![](./assets/test06.png){:height="50%" width="50%"}
 
  [program2.js][source-program2] | [arrayBuffer][source-arrayBuffer] [frameBuffer][source-frameBuffer] | [VAO][source-vao] | [transformFeedback][source-tranformFeedback]
  
 
-#### #06 - test for gpgpu
+#### #07 - test for gpgpu
 
-![](./assets/__image_snapshots__/index-spec-js-07-program-and-gpgpu-based-on-frame-buffer-1-snap.png)
+![](./assets/test07.png){:height="50%" width="50%"}
 
  [program.js][source-program] | [arrayBuffer][source-arrayBuffer] | [indexArrayBuffer][source-arrayBuffer] | [frameBuffer][source-frameBuffer]
 
