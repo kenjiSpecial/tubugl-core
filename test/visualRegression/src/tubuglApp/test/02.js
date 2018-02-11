@@ -172,8 +172,8 @@ export default class App {
 		this._obj.program.bind();
 
 		this._texture.activeTexture().bind();
-		//
 		this._obj.program.setUniformTexture(this._texture, 'uTexture');
+
 		this._obj.indexBuffer.bind();
 		this._obj.positionBuffer.bind().attribPointer(this._obj.program);
 		this._obj.uvBuffer.bind().attribPointer(this._obj.program);

@@ -1,9 +1,27 @@
 import { ARRAY_BUFFER, STATIC_DRAW, FLOAT } from 'tubugl-constants';
 
 export class ArrayBuffer {
+	/**
+	 *
+	 * @param {WebGLRenderingContext} gl
+	 * @param {Float32Array|Flaot64Array} data
+	 * @param {Object} params
+	 * @param {*} params.usage
+	 *
+	 * @constructor ArrayBuffer
+	 */
 	constructor(gl, data, params = {}) {
+		/**
+		 * @member {WebGLRenderingContext}
+		 */
 		this.gl = gl;
+		/**
+		 * @member {WebGLBuffer}
+		 */
 		this.buffer = this.gl.createBuffer();
+		/**
+		 * @member {Array}
+		 */
 		this.attribs = [];
 
 		try {
@@ -18,19 +36,41 @@ export class ArrayBuffer {
 		}
 	}
 
+	/**
+	 * @description bind the array buffer
+	 *
+	 * @returns {ArrayBuffer}
+	 */
 	bind() {
 		this.gl.bindBuffer(ARRAY_BUFFER, this.buffer);
 
 		return this;
 	}
 
+	/**
+	 * @description unbind the array buffer
+	 *
+	 * @returns {ArrayBuffer}
+	 *
+	 */
 	unbind() {
 		this.gl.bindBuffer(ARRAY_BUFFER, null);
 
 		return this;
 	}
 
+	/**
+	 * @description set data into arrayBuffer
+	 *
+	 * @param {Float32Array|Float64Array} array
+	 * @param {GLenum} usage
+	 *
+	 * @returns {ArrayBuffer}
+	 */
 	setData(array, usage = STATIC_DRAW) {
+		/**
+		 * @member {Float32Array|Float64Array}
+		 */
 		this.dataArray = array;
 
 		this.gl.bufferData(ARRAY_BUFFER, array, usage);
@@ -38,6 +78,18 @@ export class ArrayBuffer {
 		return this;
 	}
 
+	/**
+	 * set attribute
+	 *
+	 * @param {string} name name of attributes
+	 * @param {number} size size of attributes
+	 * @param {GLenum} type
+	 * @param {boolean} normalize
+	 * @param {number} stride
+	 * @param {number} offset
+	 *
+	 * @returns {ArrayBuffer}
+	 */
 	setAttribs(name, size, type = FLOAT, normalize = false, stride = 0, offset = 0) {
 		this.attribs.push({
 			name: name,
@@ -52,6 +104,8 @@ export class ArrayBuffer {
 	}
 
 	/**
+	 * enable attribute  program
+	 *
 	 * @param {Program} program
 	 * @returns {ArrayBuffer}
 	 */
@@ -72,6 +126,13 @@ export class ArrayBuffer {
 		return this;
 	}
 
+	/**
+	 * disable the vertex attribute
+	 *
+	 * @param {Program} program
+	 *
+	 * @returns {ArrayBuffer}
+	 */
 	disablePoiner(program) {
 		this.attribs.forEach(attrib => {
 			let location = program.getAttrib(attrib.name).location;

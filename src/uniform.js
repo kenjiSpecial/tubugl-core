@@ -9,6 +9,9 @@ import {
 	SAMPLER_2D
 } from 'tubugl-constants';
 
+/**
+ * Class representing a Uniform for a Program class
+ */
 export class Uniform {
 	/**
 	 * @description Uniform class constructor

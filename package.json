@@ -29,7 +29,7 @@
   "scripts": {
     "build": "rollup -c",
     "00": "parcel examples/00/index.html --no-hmr",
-    "jsdoc": "jsdoc src/program.js src/uniform.js -R readme.md -d docs/api -t node_modules/minami",
+    "jsdoc": "jsdoc src/program.js src/uniform.js  src/arrayBuffer.js src/indexArrayBuffer.js src/texture.js src/frameBuffer.js -R readme.md -d docs/api -t node_modules/minami",
     "docs": "python -m SimpleHTTPServer 8000"
   }
 }

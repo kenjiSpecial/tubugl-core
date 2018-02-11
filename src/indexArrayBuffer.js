@@ -1,6 +1,19 @@
 export class IndexArrayBuffer {
+	/**
+	 *
+	 * @param {WebGLRenderingContext} gl
+	 * @param {Uint16Array | Uint32Array} data
+	 *
+	 * @constructor IndexArrayBuffer
+	 */
 	constructor(gl, data) {
+		/**
+		 * @member {WebGLRenderingContext}
+		 */
 		this.gl = gl;
+		/**
+		 * @member {WebGLBuffer}
+		 */
 		this.buffer = this.gl.createBuffer();
 
 		try {
@@ -11,18 +24,38 @@ export class IndexArrayBuffer {
 			console.error(error);
 		}
 	}
-
+	/**
+	 *
+	 * update data for IndexArayBuffer
+	 *
+	 * @param {Uint16Array | Uint32Array} data
+	 *
+	 * @returns {IndexArrayBuffer}
+	 */
 	setData(data) {
+		/**
+		 * @member {Float32Array | Float64Array}
+		 */
 		this.dataArray = data;
 
 		this.bind();
 		this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, data, this.gl.STATIC_DRAW);
 		return this;
 	}
+	/**
+	 * bind the indexArrayBuffer
+	 *
+	 * @returns {IndexArrayBuffer}
+	 */
 	bind() {
 		this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.buffer);
 		return this;
 	}
+	/**
+	 * unbind the indexArrayBuffer
+	 *
+	 * @returns {IndexArrayBuffer}
+	 */
 	unbind() {
 		this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, null);
 		return this;

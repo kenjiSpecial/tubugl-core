@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>program.js - Documentation</title>
+    <title>arrayBuffer.js - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -29,7 +29,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">program.js</h1>
+    <h1 class="page-title">arrayBuffer.js</h1>
     
 
     
@@ -39,156 +39,148 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>import { webGLShader } from './utils/webglShader';
-import { Uniform } from './uniform';
-import {
-	FLOAT,
-	FLOAT_VEC2,
-	FLOAT_VEC3,
-	FLOAT_VEC4,
-	TEXTURE_2D,
-	SAMPLER_2D,
-	VERTEX_SHADER,
-	FRAGMENT_SHADER,
-	LINK_STATUS,
-	ACTIVE_UNIFORMS,
-	ACTIVE_ATTRIBUTES,
-	FLOAT_MAT2,
-	FLOAT_MAT3,
-	FLOAT_MAT4
-} from 'tubugl-constants';
+            <pre class="prettyprint source linenums"><code>import { ARRAY_BUFFER, STATIC_DRAW, FLOAT } from 'tubugl-constants';
 
-export class Program {
+export class ArrayBuffer {
 	/**
-	 * constructor
-	 * compile shaders and link them to gl context
 	 *
 	 * @param {WebGLRenderingContext} gl
-	 * @param {string} vertSrc
-	 * @param {string} fragSrc
+	 * @param {Float32Array|Flaot64Array} data
 	 * @param {Object} params
-	 * @param {booean} params.isDebug
+	 * @param {*} params.usage
 	 *
-	 * @constructor Program
+	 * @constructor ArrayBuffer
 	 */
-	constructor(gl, vertSrc, fragSrc, params = {}) {
-		this._isReady = false;
-		this._isDebgu = params.isDebug;
-
-		this._gl = gl;
-
-		if (vertSrc &amp;&amp; fragSrc) {
-			this.initProgram(vertSrc, fragSrc, params);
-		}
-	}
-
-	/**
-	 * crate the program and compile shader
-	 *
-	 * @param {string} vertSrc vertex hader
-	 * @param {string} fragSrc fragment shader src
-	 * @param {Object} params optinal paramters
-	 */
-	initProgram(vertSrc, fragSrc, params = {}) {
-		this._vertexShader = webGLShader(this._gl, VERTEX_SHADER, vertSrc);
-		this._fragmentShader = webGLShader(this._gl, FRAGMENT_SHADER, fragSrc);
-		this._program = this._gl.createProgram();
-		this._gl.attachShader(this._program, this._vertexShader);
-		this._gl.attachShader(this._program, this._fragmentShader);
-		this._gl.linkProgram(this._program);
+	constructor(gl, data, params = {}) {
+		/**
+		 * @member {WebGLRenderingContext}
+		 */
+		this.gl = gl;
+		/**
+		 * @member {WebGLBuffer}
+		 */
+		this.buffer = this.gl.createBuffer();
+		/**
+		 * @member {Array}
+		 */
+		this.attribs = [];
 
 		try {
-			let success = this._gl.getProgramParameter(this._program, LINK_STATUS);
-			if (!success) throw this._gl.getProgramInfoLog(this._program);
+			let success = data instanceof Float32Array || data instanceof Float64Array;
+			if (success) {
+				this.bind();
+				this.setData(data, params.usage);
+				this.unbind();
+			} else throw 'data should be  Float32Array or Flaot64Array';
 		} catch (error) {
-			console.error(`WebGLProgram: ${error}`);
+			console.error(error);
 		}
-
-		this._setProperties();
 	}
 
 	/**
-	 * set properties such as uniforms and attributes
-	 * @private
-	 */
-	_setProperties() {
-		let ii;
-
-		// uniforms
-		const uniformNumber = this._gl.getProgramParameter(this._program, ACTIVE_UNIFORMS);
-
-		this.uniform = {};
-		for (ii = 0; ii &lt; uniformNumber; ii++) {
-			let uniformInfo = this._gl.getActiveUniform(this._program, ii);
-			this.uniform[uniformInfo.name] = new Uniform(this._gl, this._program, uniformInfo);
-		}
-
-		//attributes
-		const attributreNumber = this._gl.getProgramParameter(this._program, ACTIVE_ATTRIBUTES);
-		this.attrib = {};
-		for (ii = 0; ii &lt; attributreNumber; ii++) {
-			let attrib = this._gl.getActiveAttrib(this._program, ii);
-			this.attrib[attrib.name] = {
-				location: this._gl.getAttribLocation(this._program, attrib.name),
-				type: attrib.type,
-				size: attrib.size
-			};
-		}
-
-		return this;
-	}
-
-	/**
-	 * use program, as same function as bind()
-	 */
-	use() {
-		return this.bind();
-	}
-
-	/**
-	 * use program, as same function as use()
+	 * @description bind the array buffer
+	 *
+	 * @returns {ArrayBuffer}
 	 */
 	bind() {
-		this._gl.useProgram(this._program);
+		this.gl.bindBuffer(ARRAY_BUFFER, this.buffer);
+
 		return this;
 	}
 
 	/**
-	 * get the value of the attribute of program(it will be remove)
+	 * @description unbind the array buffer
+	 *
+	 * @returns {ArrayBuffer}
+	 *
+	 */
+	unbind() {
+		this.gl.bindBuffer(ARRAY_BUFFER, null);
+
+		return this;
+	}
+
+	/**
+	 * @description set data into arrayBuffer
+	 *
+	 * @param {Float32Array|Float64Array} array
+	 * @param {GLenum} usage
+	 *
+	 * @returns {ArrayBuffer}
+	 */
+	setData(array, usage = STATIC_DRAW) {
+		/**
+		 * @member {Float32Array|Float64Array}
+		 */
+		this.dataArray = array;
+
+		this.gl.bufferData(ARRAY_BUFFER, array, usage);
+
+		return this;
+	}
+
+	/**
+	 * set attribute
 	 *
 	 * @param {string} name name of attributes
+	 * @param {number} size size of attributes
+	 * @param {GLenum} type
+	 * @param {boolean} normalize
+	 * @param {number} stride
+	 * @param {number} offset
+	 *
+	 * @returns {ArrayBuffer}
 	 */
-	getAttrib(name) {
-		return this.attrib[name];
+	setAttribs(name, size, type = FLOAT, normalize = false, stride = 0, offset = 0) {
+		this.attribs.push({
+			name: name,
+			size: size,
+			type: type,
+			normalize: normalize,
+			stride: stride,
+			offset: offset
+		});
+
+		return this;
 	}
 
 	/**
-	 * get the value of uniform of program(it will be removed)
-	 * @param {string} name name of uniforms
+	 * enable attribute  program
+	 *
+	 * @param {Program} program
+	 * @returns {ArrayBuffer}
 	 */
-	getUniforms(name) {
-		return this.uniform[name];
-	}
-	/**
-	 * set texture as uniform
-	 * @param {Texture} texture
-	 * @param {String} uniformName
-	 */
-	setUniformTexture(texture, uniformName) {
-		let { textureNum } = texture;
-		this.uniform[uniformName].update(textureNum);
+	attribPointer(program) {
+		this.attribs.forEach(attrib => {
+			let programAttr = program.getAttrib(attrib.name); // cached location from program
+			if (!programAttr) {
+				// console.warn(`attribute ${attrib.name} is not used`);
+			} else {
+				let location = programAttr.location;
+				let { size, type, normalize, stride, offset } = attrib;
+
+				this.gl.enableVertexAttribArray(location);
+				this.gl.vertexAttribPointer(location, size, type, normalize, stride, offset);
+			}
+		});
+
+		return this;
 	}
 
 	/**
-	 * dispose program
+	 * disable the vertex attribute
+	 *
+	 * @param {Program} program
+	 *
+	 * @returns {ArrayBuffer}
 	 */
-	dispose() {
-		if (this._gl === null) return;
+	disablePoiner(program) {
+		this.attribs.forEach(attrib => {
+			let location = program.getAttrib(attrib.name).location;
+			this.gl.disableVertexAttribArray(location);
+		});
 
-		this._gl.deleteProgram(this._program);
-		this._gl.deleteShader(this._vertexShader);
-		this._gl.deleteShader(this._fragmentShader);
-		this._gl = null;
+		return this;
 	}
 }
 </code></pre>

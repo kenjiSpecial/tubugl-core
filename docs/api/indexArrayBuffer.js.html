@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>program.js - Documentation</title>
+    <title>indexArrayBuffer.js - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -29,7 +29,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">program.js</h1>
+    <h1 class="page-title">indexArrayBuffer.js</h1>
     
 
     
@@ -39,156 +39,67 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>import { webGLShader } from './utils/webglShader';
-import { Uniform } from './uniform';
-import {
-	FLOAT,
-	FLOAT_VEC2,
-	FLOAT_VEC3,
-	FLOAT_VEC4,
-	TEXTURE_2D,
-	SAMPLER_2D,
-	VERTEX_SHADER,
-	FRAGMENT_SHADER,
-	LINK_STATUS,
-	ACTIVE_UNIFORMS,
-	ACTIVE_ATTRIBUTES,
-	FLOAT_MAT2,
-	FLOAT_MAT3,
-	FLOAT_MAT4
-} from 'tubugl-constants';
-
-export class Program {
+            <pre class="prettyprint source linenums"><code>export class IndexArrayBuffer {
 	/**
-	 * constructor
-	 * compile shaders and link them to gl context
 	 *
 	 * @param {WebGLRenderingContext} gl
-	 * @param {string} vertSrc
-	 * @param {string} fragSrc
-	 * @param {Object} params
-	 * @param {booean} params.isDebug
+	 * @param {Uint16Array | Uint32Array} data
 	 *
-	 * @constructor Program
+	 * @constructor IndexArrayBuffer
 	 */
-	constructor(gl, vertSrc, fragSrc, params = {}) {
-		this._isReady = false;
-		this._isDebgu = params.isDebug;
-
-		this._gl = gl;
-
-		if (vertSrc &amp;&amp; fragSrc) {
-			this.initProgram(vertSrc, fragSrc, params);
-		}
-	}
-
-	/**
-	 * crate the program and compile shader
-	 *
-	 * @param {string} vertSrc vertex hader
-	 * @param {string} fragSrc fragment shader src
-	 * @param {Object} params optinal paramters
-	 */
-	initProgram(vertSrc, fragSrc, params = {}) {
-		this._vertexShader = webGLShader(this._gl, VERTEX_SHADER, vertSrc);
-		this._fragmentShader = webGLShader(this._gl, FRAGMENT_SHADER, fragSrc);
-		this._program = this._gl.createProgram();
-		this._gl.attachShader(this._program, this._vertexShader);
-		this._gl.attachShader(this._program, this._fragmentShader);
-		this._gl.linkProgram(this._program);
+	constructor(gl, data) {
+		/**
+		 * @member {WebGLRenderingContext}
+		 */
+		this.gl = gl;
+		/**
+		 * @member {WebGLBuffer}
+		 */
+		this.buffer = this.gl.createBuffer();
 
 		try {
-			let success = this._gl.getProgramParameter(this._program, LINK_STATUS);
-			if (!success) throw this._gl.getProgramInfoLog(this._program);
+			let sucess = data instanceof Uint16Array || data instanceof Uint32Array;
+			if (sucess) this.setData(data);
+			else throw 'data should be Uint16Array or Uint32Array';
 		} catch (error) {
-			console.error(`WebGLProgram: ${error}`);
+			console.error(error);
 		}
-
-		this._setProperties();
 	}
-
 	/**
-	 * set properties such as uniforms and attributes
-	 * @private
+	 *
+	 * update data for IndexArayBuffer
+	 *
+	 * @param {Uint16Array | Uint32Array} data
+	 *
+	 * @returns {IndexArrayBuffer}
 	 */
-	_setProperties() {
-		let ii;
+	setData(data) {
+		/**
+		 * @member {Float32Array | Float64Array}
+		 */
+		this.dataArray = data;
 
-		// uniforms
-		const uniformNumber = this._gl.getProgramParameter(this._program, ACTIVE_UNIFORMS);
-
-		this.uniform = {};
-		for (ii = 0; ii &lt; uniformNumber; ii++) {
-			let uniformInfo = this._gl.getActiveUniform(this._program, ii);
-			this.uniform[uniformInfo.name] = new Uniform(this._gl, this._program, uniformInfo);
-		}
-
-		//attributes
-		const attributreNumber = this._gl.getProgramParameter(this._program, ACTIVE_ATTRIBUTES);
-		this.attrib = {};
-		for (ii = 0; ii &lt; attributreNumber; ii++) {
-			let attrib = this._gl.getActiveAttrib(this._program, ii);
-			this.attrib[attrib.name] = {
-				location: this._gl.getAttribLocation(this._program, attrib.name),
-				type: attrib.type,
-				size: attrib.size
-			};
-		}
-
+		this.bind();
+		this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, data, this.gl.STATIC_DRAW);
 		return this;
 	}
-
 	/**
-	 * use program, as same function as bind()
-	 */
-	use() {
-		return this.bind();
-	}
-
-	/**
-	 * use program, as same function as use()
+	 * bind the indexArrayBuffer
+	 *
+	 * @returns {IndexArrayBuffer}
 	 */
 	bind() {
-		this._gl.useProgram(this._program);
+		this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.buffer);
 		return this;
 	}
-
 	/**
-	 * get the value of the attribute of program(it will be remove)
+	 * unbind the indexArrayBuffer
 	 *
-	 * @param {string} name name of attributes
+	 * @returns {IndexArrayBuffer}
 	 */
-	getAttrib(name) {
-		return this.attrib[name];
-	}
-
-	/**
-	 * get the value of uniform of program(it will be removed)
-	 * @param {string} name name of uniforms
-	 */
-	getUniforms(name) {
-		return this.uniform[name];
-	}
-	/**
-	 * set texture as uniform
-	 * @param {Texture} texture
-	 * @param {String} uniformName
-	 */
-	setUniformTexture(texture, uniformName) {
-		let { textureNum } = texture;
-		this.uniform[uniformName].update(textureNum);
-	}
-
-	/**
-	 * dispose program
-	 */
-	dispose() {
-		if (this._gl === null) return;
-
-		this._gl.deleteProgram(this._program);
-		this._gl.deleteShader(this._vertexShader);
-		this._gl.deleteShader(this._fragmentShader);
-		this._gl = null;
+	unbind() {
+		this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, null);
+		return this;
 	}
 }
 </code></pre>

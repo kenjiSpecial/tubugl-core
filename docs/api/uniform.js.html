@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>program.js - Documentation</title>
+    <title>uniform.js - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -29,7 +29,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">program.js</h1>
+    <h1 class="page-title">uniform.js</h1>
     
 
     
@@ -39,156 +39,100 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>import { webGLShader } from './utils/webglShader';
-import { Uniform } from './uniform';
-import {
+            <pre class="prettyprint source linenums"><code>import {
 	FLOAT,
 	FLOAT_VEC2,
 	FLOAT_VEC3,
 	FLOAT_VEC4,
-	TEXTURE_2D,
-	SAMPLER_2D,
-	VERTEX_SHADER,
-	FRAGMENT_SHADER,
-	LINK_STATUS,
-	ACTIVE_UNIFORMS,
-	ACTIVE_ATTRIBUTES,
 	FLOAT_MAT2,
 	FLOAT_MAT3,
-	FLOAT_MAT4
+	FLOAT_MAT4,
+	SAMPLER_2D
 } from 'tubugl-constants';
 
-export class Program {
+/**
+ * Class representing a Uniform for a Program class
+ */
+export class Uniform {
 	/**
-	 * constructor
-	 * compile shaders and link them to gl context
+	 * @description Uniform class constructor
 	 *
 	 * @param {WebGLRenderingContext} gl
-	 * @param {string} vertSrc
-	 * @param {string} fragSrc
-	 * @param {Object} params
-	 * @param {booean} params.isDebug
+	 * @param {WebGLProgram} program
+	 * @param {WebGLActiveInfo} uniform information of unifrom getting from getActiveUniform
 	 *
-	 * @constructor Program
+	 * @constructor Uniform
 	 */
-	constructor(gl, vertSrc, fragSrc, params = {}) {
-		this._isReady = false;
-		this._isDebgu = params.isDebug;
-
+	constructor(gl, program, uniform) {
+		let uniformLocation = gl.getUniformLocation(program, uniform.name);
+		this.location = uniformLocation;
+		this.size = uniform.size;
 		this._gl = gl;
 
-		if (vertSrc &amp;&amp; fragSrc) {
-			this.initProgram(vertSrc, fragSrc, params);
+		let typeName;
+		switch (uniform.type) {
+			case FLOAT:
+				typeName = 'float';
+				break;
+			case FLOAT_VEC2:
+				typeName = 'vec2';
+				break;
+			case FLOAT_VEC3:
+				typeName = 'vec3';
+				break;
+			case FLOAT_VEC4:
+				typeName = 'vec4';
+				break;
+			case FLOAT_MAT2:
+				typeName = 'mat2';
+				break;
+			case FLOAT_MAT3:
+				typeName = 'mat3';
+				break;
+			case FLOAT_MAT4:
+				typeName = 'mat4';
+				break;
+			case SAMPLER_2D:
+				typeName = 'sampler2D';
+				break; // TODO Do we need to some method or not
 		}
-	}
 
+		this.typeName = typeName;
+		this.type = uniform.type;
+	}
 	/**
-	 * crate the program and compile shader
+	 * update unifroms
 	 *
-	 * @param {string} vertSrc vertex hader
-	 * @param {string} fragSrc fragment shader src
-	 * @param {Object} params optinal paramters
+	 * @param {Array} args
 	 */
-	initProgram(vertSrc, fragSrc, params = {}) {
-		this._vertexShader = webGLShader(this._gl, VERTEX_SHADER, vertSrc);
-		this._fragmentShader = webGLShader(this._gl, FRAGMENT_SHADER, fragSrc);
-		this._program = this._gl.createProgram();
-		this._gl.attachShader(this._program, this._vertexShader);
-		this._gl.attachShader(this._program, this._fragmentShader);
-		this._gl.linkProgram(this._program);
-
-		try {
-			let success = this._gl.getProgramParameter(this._program, LINK_STATUS);
-			if (!success) throw this._gl.getProgramInfoLog(this._program);
-		} catch (error) {
-			console.error(`WebGLProgram: ${error}`);
+	update(...args) {
+		// console.log(this.typeName);
+		switch (this.type) {
+			case FLOAT:
+				this._gl.uniform1f(this.location, args[0]);
+				break;
+			case FLOAT_VEC2:
+				this._gl.uniform2f(this.location, args[0], args[1]);
+				break;
+			case FLOAT_VEC3:
+				this._gl.uniform3f(this.location, args[0], args[1], args[2]);
+				break;
+			case FLOAT_VEC4:
+				this._gl.uniform4f(this.location, args[0], args[1], args[2], args[3]);
+				break;
+			case FLOAT_MAT2:
+				this._gl.uniformMatrix2fv(this.location, false, args[0]);
+				break;
+			case FLOAT_MAT3:
+				this._gl.uniformMatrix3fv(this.location, false, args[0]);
+				break;
+			case FLOAT_MAT4:
+				this._gl.uniformMatrix4fv(this.location, false, args[0]);
+				break;
+			case SAMPLER_2D:
+				this._gl.uniform1i(this.location, args[0]);
+				break;
 		}
-
-		this._setProperties();
-	}
-
-	/**
-	 * set properties such as uniforms and attributes
-	 * @private
-	 */
-	_setProperties() {
-		let ii;
-
-		// uniforms
-		const uniformNumber = this._gl.getProgramParameter(this._program, ACTIVE_UNIFORMS);
-
-		this.uniform = {};
-		for (ii = 0; ii &lt; uniformNumber; ii++) {
-			let uniformInfo = this._gl.getActiveUniform(this._program, ii);
-			this.uniform[uniformInfo.name] = new Uniform(this._gl, this._program, uniformInfo);
-		}
-
-		//attributes
-		const attributreNumber = this._gl.getProgramParameter(this._program, ACTIVE_ATTRIBUTES);
-		this.attrib = {};
-		for (ii = 0; ii &lt; attributreNumber; ii++) {
-			let attrib = this._gl.getActiveAttrib(this._program, ii);
-			this.attrib[attrib.name] = {
-				location: this._gl.getAttribLocation(this._program, attrib.name),
-				type: attrib.type,
-				size: attrib.size
-			};
-		}
-
-		return this;
-	}
-
-	/**
-	 * use program, as same function as bind()
-	 */
-	use() {
-		return this.bind();
-	}
-
-	/**
-	 * use program, as same function as use()
-	 */
-	bind() {
-		this._gl.useProgram(this._program);
-		return this;
-	}
-
-	/**
-	 * get the value of the attribute of program(it will be remove)
-	 *
-	 * @param {string} name name of attributes
-	 */
-	getAttrib(name) {
-		return this.attrib[name];
-	}
-
-	/**
-	 * get the value of uniform of program(it will be removed)
-	 * @param {string} name name of uniforms
-	 */
-	getUniforms(name) {
-		return this.uniform[name];
-	}
-	/**
-	 * set texture as uniform
-	 * @param {Texture} texture
-	 * @param {String} uniformName
-	 */
-	setUniformTexture(texture, uniformName) {
-		let { textureNum } = texture;
-		this.uniform[uniformName].update(textureNum);
-	}
-
-	/**
-	 * dispose program
-	 */
-	dispose() {
-		if (this._gl === null) return;
-
-		this._gl.deleteProgram(this._program);
-		this._gl.deleteShader(this._vertexShader);
-		this._gl.deleteShader(this._fragmentShader);
-		this._gl = null;
 	}
 }
 </code></pre>

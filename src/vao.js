@@ -2,6 +2,9 @@
  * VertexArray for only webgl2
  */
 export class VAO {
+	/**
+	 * @param {WebGLRenderingContext} gl
+	 */
 	constructor(gl) {
 		this._gl = gl;
 		this._vao = gl.createVertexArray();
@@ -13,9 +16,9 @@ export class VAO {
 
 		return this;
 	}
-	unbind(){
+	unbind() {
 		this._gl.bindVertexArray(null);
-		
+
 		return this;
 	}
 	updateArrayBuffer(program, arrayBuffer, name) {
