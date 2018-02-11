@@ -8,7 +8,7 @@
   "libName": "Tubu",
   "license": "MIT",
   "dependencies": {
-    "tubugl-constants": "^1.0.3"
+    "tubugl-constants": "^1.1.0"
   },
   "devDependencies": {
     "babel-plugin-external-helpers": "^6.22.0",

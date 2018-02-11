@@ -54,6 +54,7 @@ source: https://github.com/kenjiSpecial/tubugl-core/tree/master/test/visualRegre
 
 ## TODO
 
-- [ ] update version
 - [ ] add test for build(amd, cjs, esm)
-- [ ] add api doc.md in docs like nano.gl
+- [ ] update pace from react static(there are some issue to build from react static) 
+- [x] update version
+- [x] add api doc.md in docs like nano.gl
