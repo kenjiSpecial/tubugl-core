@@ -11,7 +11,7 @@
 
 #### #00 -  test with program and arrayBuffer
 
-![](./assets/test-00.png)
+![](./assets/test00.png)
 
 [program.js][source-program] | [arrayBuffer][source-arrayBuffer] 
 
@@ -31,7 +31,7 @@
 
 ![](./assets/__image_snapshots__/index-spec-js-03-draw-function-1-snap.png)
 
- [program.js][source-program] | [arrayBuffer][source-arrayBuffer] | [indexArrayBuffer][source-arrayBuffer] | [draw.js][source-draw]]
+ [program.js][source-program] | [arrayBuffer][source-arrayBuffer] | [indexArrayBuffer][source-arrayBuffer] | [draw.js][source-draw]
 
 #### #04 - test with framebuffer
 
@@ -43,14 +43,14 @@
 
 ![](./assets/__image_snapshots__/index-spec-js-05-vao-webgl-2-1-snap.png)
 
- [program.js][source-program] | [arrayBuffer][source-arrayBuffer] | [indexArrayBuffer][source-arrayBuffer] | [frameBuffer][source-frameBuffera] | [VAO][source-vao]
+ [program.js][source-program] | [arrayBuffer][source-arrayBuffer] | [indexArrayBuffer][source-arrayBuffer] | [frameBuffer][source-frameBuffer] | [VAO][source-vao]
 
 
 #### #06 - test with transformfeedback
 
 ![](./assets/__image_snapshots__/index-spec-js-06-program-2-and-transform-feedback-webgl-2-1-snap.png)
 
- [program2.js][source-program2] | [arrayBuffer][source-arrayBuffer] [frameBuffer][source-frameBuffera] | [VAO][source-vao] | [transformFeedback][source-tranformFeedback]
+ [program2.js][source-program2] | [arrayBuffer][source-arrayBuffer] [frameBuffer][source-frameBuffer] | [VAO][source-vao] | [transformFeedback][source-tranformFeedback]
  
 
 #### #06 - test for gpgpu
