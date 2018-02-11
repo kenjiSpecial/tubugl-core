@@ -31,9 +31,21 @@ export class Program {
 	 * @constructor Program
 	 */
 	constructor(gl, vertSrc, fragSrc, params = {}) {
+		/**
+		 * @private
+		 * @member {boolean}
+		 */
 		this._isReady = false;
+		/**
+		 * @private
+		 * @member {boolean}
+		 */
 		this._isDebgu = params.isDebug;
 
+		/**
+		 * @private
+		 * @member {WebGLRenderingContext}
+		 */
 		this._gl = gl;
 
 		if (vertSrc && fragSrc) {
@@ -49,8 +61,20 @@ export class Program {
 	 * @param {Object} params optinal paramters
 	 */
 	initProgram(vertSrc, fragSrc, params = {}) {
+		/**
+		 * @private
+		 * @member {WebGLShader}
+		 */
 		this._vertexShader = webGLShader(this._gl, VERTEX_SHADER, vertSrc);
+		/**
+		 * @private
+		 * @member {WebGLShader}
+		 */
 		this._fragmentShader = webGLShader(this._gl, FRAGMENT_SHADER, fragSrc);
+		/**
+		 * @private
+		 * @member {WebGLProgram}
+		 */
 		this._program = this._gl.createProgram();
 		this._gl.attachShader(this._program, this._vertexShader);
 		this._gl.attachShader(this._program, this._fragmentShader);
@@ -76,6 +100,9 @@ export class Program {
 		// uniforms
 		const uniformNumber = this._gl.getProgramParameter(this._program, ACTIVE_UNIFORMS);
 
+		/**
+		 * @member {object}
+		 */
 		this.uniform = {};
 		for (ii = 0; ii < uniformNumber; ii++) {
 			let uniformInfo = this._gl.getActiveUniform(this._program, ii);
@@ -84,6 +111,9 @@ export class Program {
 
 		//attributes
 		const attributreNumber = this._gl.getProgramParameter(this._program, ACTIVE_ATTRIBUTES);
+		/**
+		 * @member {object}
+		 */
 		this.attrib = {};
 		for (ii = 0; ii < attributreNumber; ii++) {
 			let attrib = this._gl.getActiveAttrib(this._program, ii);
