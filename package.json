@@ -1,6 +1,6 @@
 {
   "name": "tubugl-core",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "description": "core parts of webgl module based framework ",
   "cjs": "build/tubu.cjs.js",
   "module": "build/tubu.esm.js",
@@ -8,7 +8,7 @@
   "libName": "Tubu",
   "license": "MIT",
   "dependencies": {
-    "tubugl-constants": "^1.1.0"
+    "tubugl-constants": "^1.1.1"
   },
   "devDependencies": {
     "babel-plugin-external-helpers": "^6.22.0",

@@ -22,8 +22,8 @@ export default [
 		},
 		plugins: [
 			babel(babelrc()),
-			resolve(), // so Rollup can find `ms`
-			commonjs(), // so Rollup can convert `ms` to an ES module
+			// resolve(), // so Rollup can find `ms`
+			commonjs(),
 			replace({
 				TUBUGL_VERSOIN: pkg.version
 			})
