@@ -13,24 +13,22 @@ In program class, parogram is created, shaders are compiled, and they are liked 
 
 ###  ArrayBuffer
 
-[arrayBuffer.js](https://github.com/kenjiSpecial/tubugl-core/blob/master/src/arrayBuffer.js) | [guide]() | [docs]()
+[arrayBuffer.js](https://github.com/kenjiSpecial/tubugl-core/blob/master/src/arrayBuffer.js) | [guide](https://kenjispecial.github.io/tubugl-core/guide/buffer) | [docs](https://kenjispecial.github.io/tubugl-core/api/ArrayBuffer.html)
 
 ### IndexArrayBuffer
 
-[indexArrayBuffer.js](https://github.com/kenjiSpecial/tubugl-core/blob/master/src/indexArrayBuffer.js) | [guide]() | [docs]()
+[indexArrayBuffer.js](https://github.com/kenjiSpecial/tubugl-core/blob/master/src/indexArrayBuffer.js) | [guide](https://kenjispecial.github.io/tubugl-core/guide/buffer) | [docs](https://kenjispecial.github.io/tubugl-core/api/FrameBuffer.html)
 
 ### Texture
 
-[texture.js](https://github.com/kenjiSpecial/tubugl-core/blob/master/src/texture.js) | [guide]() | [docs]()
+[texture.js](https://github.com/kenjiSpecial/tubugl-core/blob/master/src/texture.js) | [docs](https://kenjispecial.github.io/tubugl-core/api/Texture.html)
 
 ### FrameBuffer
 
-[FrameBuffer.js](https://github.com/kenjiSpecial/tubugl-core/blob/master/src/frameBuffer.js) | [guide]() | [docs]()
+[FrameBuffer.js](https://github.com/kenjiSpecial/tubugl-core/blob/master/src/frameBuffer.js) | [docs](https://kenjispecial.github.io/tubugl-core/api/FrameBuffer.html)
 
 
  
-
-
 ## functionality test
 
 https://kenjispecial.github.io/tubugl-core/
