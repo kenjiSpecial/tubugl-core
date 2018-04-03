@@ -7,16 +7,19 @@ const TweenMax = require('gsap');
 const dat = require('../../vendors/dat.gui/dat.gui');
 const Stats = require('../../vendors/stats.js/stats');
 
+import { mat4 } from 'gl-matrix';
+
 const vertexShaderSrc = `// an attribute will receive data from a buffer
   attribute vec4 a_position;
-  uniform float uTheta;
+
+  uniform mat4 uMat;
 
   // all shaders have a main function
   void main() {
 
     // gl_Position is a special variable a vertex shader
     // is responsible for setting
-    gl_Position = a_position + vec4(0.3 * cos(uTheta), 0.3 * sin(uTheta), 0.0, 0.0);
+    gl_Position = uMat * a_position ;
   }`;
 
 function fragmentShaderSrc(colorR, colorG, colorB) {
@@ -24,11 +27,12 @@ function fragmentShaderSrc(colorR, colorG, colorB) {
   // fragment shaders don't have a default precision so we need
   // to pick one. mediump is a good default
   precision mediump float;
+  uniform float uColorB;
 
   void main() {
     // gl_FragColor is a special variable a fragment shader
     // is responsible for setting
-    gl_FragColor = vec4(${colorR}, ${colorG}, ${colorB}, 1); // return redish-purple
+    gl_FragColor = vec4(${colorR}, ${colorG}, uColorB, 1); // return redish-purple
   }
 `;
 }
@@ -86,9 +90,15 @@ export default class App {
 		this._arrayBuffer = new ArrayBuffer(this.gl, new Float32Array(positions));
 		this._arrayBuffer.setAttribs('a_position', 2, this.gl.FLOAT, false, 0, 0);
 
+		let uMat0 = mat4.create();
+		mat4.scale(uMat0, uMat0, [1, 1, 1]);
 		this._obj = {
 			program: this._program,
 			positionBuffer: this._arrayBuffer,
+			uniforms: {
+				uColorB: { value: 0.0 },
+				uMat: { value: uMat0 }
+			},
 			count: 3
 		};
 
@@ -100,6 +110,10 @@ export default class App {
 		this._obj1 = {
 			program: this._program1,
 			positionBuffer: this._arrayBuffer2,
+			uniforms: {
+				uColorB: { value: 0 },
+				uMat: { value: uMat0 }
+			},
 			count: 3
 		};
 	}
@@ -133,12 +147,26 @@ export default class App {
 		this.gl.clearColor(0, 0, 0, 1);
 		this.gl.clear(this.gl.COLOR_BUFFER_BIT);
 
-		this._obj.program.bind();
+		this._obj.program.use();
 		this._obj.positionBuffer.bind().attribPointer(this._obj.program);
+		this._obj.program.uniform['uColorB'].update(this._obj.uniforms.uColorB.value);
+		this._obj.program.uniform['uMat'].update(this._obj.uniforms.uMat.value);
 		draw.array(this.gl, this._obj.count);
 
-		this._obj1.program.bind();
+		this._obj1.program.use();
 		this._obj1.positionBuffer.bind().attribPointer(this._obj1.program);
+
+		this.gl.uniform1f(
+			this._obj1.program.uniform['uColorB'].location,
+			this._obj1.uniforms.uColorB.value
+		);
+
+		this.gl.uniformMatrix4fv(
+			this._obj1.program.uniform['uMat'].location,
+			false,
+			this._obj1.uniforms.uMat.value
+		);
+
 		draw.array(this.gl, this._obj.count);
 	}
 

@@ -103,32 +103,163 @@ var possibleConstructorReturn = function (self, call) {
   return call && (typeof call === "object" || typeof call === "function") ? call : self;
 };
 
+/**
+ * Class representing a Uniform for a Program class
+ */
+var Uniform = function () {
+	/**
+  * @description Uniform class constructor
+  *
+  * @param {WebGLRenderingContext} gl
+  * @param {WebGLProgram} program
+  * @param {WebGLActiveInfo} uniform information of unifrom getting from getActiveUniform
+  *
+  * @constructor Uniform
+  */
+	function Uniform(gl, program, uniform) {
+		classCallCheck(this, Uniform);
+
+		var uniformLocation = gl.getUniformLocation(program, uniform.name);
+		this.location = uniformLocation;
+		this.size = uniform.size;
+		this._gl = gl;
+
+		var typeName = void 0;
+		switch (uniform.type) {
+			case tubuglConstants.FLOAT:
+				typeName = 'float';
+				break;
+			case tubuglConstants.FLOAT_VEC2:
+				typeName = 'vec2';
+				break;
+			case tubuglConstants.FLOAT_VEC3:
+				typeName = 'vec3';
+				break;
+			case tubuglConstants.FLOAT_VEC4:
+				typeName = 'vec4';
+				break;
+			case tubuglConstants.FLOAT_MAT2:
+				typeName = 'mat2';
+				break;
+			case tubuglConstants.FLOAT_MAT3:
+				typeName = 'mat3';
+				break;
+			case tubuglConstants.FLOAT_MAT4:
+				typeName = 'mat4';
+				break;
+			case tubuglConstants.SAMPLER_2D:
+				typeName = 'sampler2D';
+				break; // TODO Do we need to some method or not
+		}
+
+		this.typeName = typeName;
+		this.type = uniform.type;
+	}
+	/**
+  * update unifroms
+  *
+  * @param {Array} args
+  */
+
+
+	createClass(Uniform, [{
+		key: 'update',
+		value: function update() {
+			// console.log(this.typeName);
+			switch (this.type) {
+				case tubuglConstants.FLOAT:
+					this._gl.uniform1f(this.location, arguments.length <= 0 ? undefined : arguments[0]);
+					break;
+				case tubuglConstants.FLOAT_VEC2:
+					this._gl.uniform2f(this.location, arguments.length <= 0 ? undefined : arguments[0], arguments.length <= 1 ? undefined : arguments[1]);
+					break;
+				case tubuglConstants.FLOAT_VEC3:
+					this._gl.uniform3f(this.location, arguments.length <= 0 ? undefined : arguments[0], arguments.length <= 1 ? undefined : arguments[1], arguments.length <= 2 ? undefined : arguments[2]);
+					break;
+				case tubuglConstants.FLOAT_VEC4:
+					this._gl.uniform4f(this.location, arguments.length <= 0 ? undefined : arguments[0], arguments.length <= 1 ? undefined : arguments[1], arguments.length <= 2 ? undefined : arguments[2], arguments.length <= 3 ? undefined : arguments[3]);
+					break;
+				case tubuglConstants.FLOAT_MAT2:
+					this._gl.uniformMatrix2fv(this.location, false, arguments.length <= 0 ? undefined : arguments[0]);
+					break;
+				case tubuglConstants.FLOAT_MAT3:
+					this._gl.uniformMatrix3fv(this.location, false, arguments.length <= 0 ? undefined : arguments[0]);
+					break;
+				case tubuglConstants.FLOAT_MAT4:
+					this._gl.uniformMatrix4fv(this.location, false, arguments.length <= 0 ? undefined : arguments[0]);
+					break;
+				case tubuglConstants.SAMPLER_2D:
+					this._gl.uniform1i(this.location, arguments.length <= 0 ? undefined : arguments[0]);
+					break;
+			}
+		}
+	}]);
+	return Uniform;
+}();
+
 var Program = function () {
 	/**
+  * constructor
+  * compile shaders and link them to gl context
   *
-  * @param gl
-  * @param vertSrc
-  * @param fragSrc
-  * @param params
+  * @param {WebGLRenderingContext} gl
+  * @param {string} vertSrc
+  * @param {string} fragSrc
+  * @param {Object} params
+  * @param {booean} params.isDebug
+  *
+  * @constructor Program
   */
 	function Program(gl, vertSrc, fragSrc) {
 		var params = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
 		classCallCheck(this, Program);
 
+		/**
+   * @private
+   * @member {boolean}
+   */
 		this._isReady = false;
+		/**
+   * @private
+   * @member {boolean}
+   */
 		this._isDebgu = params.isDebug;
 
+		/**
+   * @private
+   * @member {WebGLRenderingContext}
+   */
 		this._gl = gl;
 
-		this._initProgram(vertSrc, fragSrc, params);
-		this._setProperties();
+		if (vertSrc && fragSrc) {
+			this.initProgram(vertSrc, fragSrc, params);
+		}
 	}
 
+	/**
+  * crate the program and compile shader
+  *
+  * @param {string} vertSrc vertex hader
+  * @param {string} fragSrc fragment shader src
+  * @param {Object} params optinal paramters
+  */
+
+
 	createClass(Program, [{
-		key: '_initProgram',
-		value: function _initProgram(vertSrc, fragSrc, params) {
+		key: 'initProgram',
+		value: function initProgram(vertSrc, fragSrc) {
 			this._vertexShader = webGLShader(this._gl, tubuglConstants.VERTEX_SHADER, vertSrc);
+			/**
+    * @description fragmentShader
+    * @private
+    * @member {WebGLShader}
+    */
 			this._fragmentShader = webGLShader(this._gl, tubuglConstants.FRAGMENT_SHADER, fragSrc);
+			/**
+    * @description program
+    * @private
+    * @member {WebGLProgram}
+    */
 			this._program = this._gl.createProgram();
 			this._gl.attachShader(this._program, this._vertexShader);
 			this._gl.attachShader(this._program, this._fragmentShader);
@@ -140,6 +271,8 @@ var Program = function () {
 			} catch (error) {
 				console.error('WebGLProgram: ' + error);
 			}
+
+			this._setProperties();
 		}
 
 		/**
@@ -155,56 +288,24 @@ var Program = function () {
 			// uniforms
 			var uniformNumber = this._gl.getProgramParameter(this._program, tubuglConstants.ACTIVE_UNIFORMS);
 
-			this._uniform = {};
+			/**
+    * @member {object}
+    */
+			this.uniform = {};
 			for (ii = 0; ii < uniformNumber; ii++) {
-				var uniform = this._gl.getActiveUniform(this._program, ii);
-				var uLocation = this._gl.getUniformLocation(this._program, uniform.name);
-
-				var typeName = void 0;
-				/**
-     * https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Constants
-     * */
-				switch (uniform.type) {
-					case tubuglConstants.FLOAT:
-						typeName = 'float';
-						break;
-					case tubuglConstants.FLOAT_VEC2:
-						typeName = 'vec2';
-						break;
-					case tubuglConstants.FLOAT_VEC3:
-						typeName = 'vec3';
-						break;
-					case tubuglConstants.FLOAT_VEC4:
-						typeName = 'vec4';
-						break;
-					case tubuglConstants.FLOAT_MAT2:
-						typeName = 'mat2';
-						break;
-					case tubuglConstants.FLOAT_MAT3:
-						typeName = 'mat3';
-						break;
-					case tubuglConstants.FLOAT_MAT4:
-						typeName = 'mat4';
-						break;
-					case tubuglConstants.SAMPLER_2D:
-						typeName = 'sampler2D';
-						break; // TODO Do we need to some method or not
-				}
-
-				this._uniform[uniform.name] = {
-					location: uLocation,
-					type: uniform.type,
-					typeName: typeName,
-					size: uniform.size
-				};
+				var uniformInfo = this._gl.getActiveUniform(this._program, ii);
+				this.uniform[uniformInfo.name] = new Uniform(this._gl, this._program, uniformInfo);
 			}
 
 			//attributes
 			var attributreNumber = this._gl.getProgramParameter(this._program, tubuglConstants.ACTIVE_ATTRIBUTES);
-			this._attrib = {};
+			/**
+    * @member {object}
+    */
+			this.attrib = {};
 			for (ii = 0; ii < attributreNumber; ii++) {
 				var attrib = this._gl.getActiveAttrib(this._program, ii);
-				this._attrib[attrib.name] = {
+				this.attrib[attrib.name] = {
 					location: this._gl.getAttribLocation(this._program, attrib.name),
 					type: attrib.type,
 					size: attrib.size
@@ -213,26 +314,49 @@ var Program = function () {
 
 			return this;
 		}
+
+		/**
+   * use program, as same function as bind()
+   */
+
 	}, {
 		key: 'use',
 		value: function use() {
 			return this.bind();
 		}
+
+		/**
+   * use program, as same function as use()
+   */
+
 	}, {
 		key: 'bind',
 		value: function bind() {
 			this._gl.useProgram(this._program);
 			return this;
 		}
+
+		/**
+   * get the value of the attribute of program(it will be remove)
+   *
+   * @param {string} name name of attributes
+   */
+
 	}, {
 		key: 'getAttrib',
 		value: function getAttrib(name) {
-			return this._attrib[name];
+			return this.attrib[name];
 		}
+
+		/**
+   * get the value of uniform of program(it will be removed)
+   * @param {string} name name of uniforms
+   */
+
 	}, {
 		key: 'getUniforms',
 		value: function getUniforms(name) {
-			return this._uniform[name];
+			return this.uniform[name];
 		}
 		/**
    * set texture as uniform
@@ -245,10 +369,13 @@ var Program = function () {
 		value: function setUniformTexture(texture, uniformName) {
 			var textureNum = texture.textureNum;
 
-			var uniform = this.getUniforms(uniformName);
-			// console.log(textureNum);
-			this._gl.uniform1i(uniform.location, textureNum);
+			this.uniform[uniformName].update(textureNum);
 		}
+
+		/**
+   * dispose program
+   */
+
 	}, {
 		key: 'dispose',
 		value: function dispose() {
@@ -319,12 +446,30 @@ var Program2 = function (_Program) {
 }(Program);
 
 var ArrayBuffer = function () {
+	/**
+  *
+  * @param {WebGLRenderingContext} gl
+  * @param {Float32Array|Flaot64Array} data
+  * @param {Object} params
+  * @param {*} params.usage
+  *
+  * @constructor ArrayBuffer
+  */
 	function ArrayBuffer(gl, data) {
 		var params = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 		classCallCheck(this, ArrayBuffer);
 
+		/**
+   * @member {WebGLRenderingContext}
+   */
 		this.gl = gl;
+		/**
+   * @member {WebGLBuffer}
+   */
 		this.buffer = this.gl.createBuffer();
+		/**
+   * @member {Array}
+   */
 		this.attribs = [];
 
 		try {
@@ -339,6 +484,13 @@ var ArrayBuffer = function () {
 		}
 	}
 
+	/**
+  * @description bind the array buffer
+  *
+  * @returns {ArrayBuffer}
+  */
+
+
 	createClass(ArrayBuffer, [{
 		key: 'bind',
 		value: function bind() {
@@ -346,6 +498,14 @@ var ArrayBuffer = function () {
 
 			return this;
 		}
+
+		/**
+   * @description unbind the array buffer
+   *
+   * @returns {ArrayBuffer}
+   *
+   */
+
 	}, {
 		key: 'unbind',
 		value: function unbind() {
@@ -353,17 +513,44 @@ var ArrayBuffer = function () {
 
 			return this;
 		}
+
+		/**
+   * @description set data into arrayBuffer
+   *
+   * @param {Float32Array|Float64Array} array
+   * @param {GLenum} usage
+   *
+   * @returns {ArrayBuffer}
+   */
+
 	}, {
 		key: 'setData',
 		value: function setData(array) {
 			var usage = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : tubuglConstants.STATIC_DRAW;
 
+			/**
+    * @member {Float32Array|Float64Array}
+    */
 			this.dataArray = array;
 
 			this.gl.bufferData(tubuglConstants.ARRAY_BUFFER, array, usage);
 
 			return this;
 		}
+
+		/**
+   * set attribute
+   *
+   * @param {string} name name of attributes
+   * @param {number} size size of attributes
+   * @param {GLenum} type
+   * @param {boolean} normalize
+   * @param {number} stride
+   * @param {number} offset
+   *
+   * @returns {ArrayBuffer}
+   */
+
 	}, {
 		key: 'setAttribs',
 		value: function setAttribs(name, size) {
@@ -385,6 +572,8 @@ var ArrayBuffer = function () {
 		}
 
 		/**
+   * enable attribute  program
+   *
    * @param {Program} program
    * @returns {ArrayBuffer}
    */
@@ -414,6 +603,15 @@ var ArrayBuffer = function () {
 
 			return this;
 		}
+
+		/**
+   * disable the vertex attribute
+   *
+   * @param {Program} program
+   *
+   * @returns {ArrayBuffer}
+   */
+
 	}, {
 		key: 'disablePoiner',
 		value: function disablePoiner(program) {
@@ -431,10 +629,23 @@ var ArrayBuffer = function () {
 }();
 
 var IndexArrayBuffer = function () {
+	/**
+  *
+  * @param {WebGLRenderingContext} gl
+  * @param {Uint16Array | Uint32Array} data
+  *
+  * @constructor IndexArrayBuffer
+  */
 	function IndexArrayBuffer(gl, data) {
 		classCallCheck(this, IndexArrayBuffer);
 
+		/**
+   * @member {WebGLRenderingContext}
+   */
 		this.gl = gl;
+		/**
+   * @member {WebGLBuffer}
+   */
 		this.buffer = this.gl.createBuffer();
 
 		try {
@@ -444,22 +655,46 @@ var IndexArrayBuffer = function () {
 			console.error(error);
 		}
 	}
+	/**
+  *
+  * update data for IndexArayBuffer
+  *
+  * @param {Uint16Array | Uint32Array} data
+  *
+  * @returns {IndexArrayBuffer}
+  */
+
 
 	createClass(IndexArrayBuffer, [{
 		key: 'setData',
 		value: function setData(data) {
+			/**
+    * @member {Float32Array | Float64Array}
+    */
 			this.dataArray = data;
 
 			this.bind();
 			this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, data, this.gl.STATIC_DRAW);
 			return this;
 		}
+		/**
+   * bind the indexArrayBuffer
+   *
+   * @returns {IndexArrayBuffer}
+   */
+
 	}, {
 		key: 'bind',
 		value: function bind() {
 			this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.buffer);
 			return this;
 		}
+		/**
+   * unbind the indexArrayBuffer
+   *
+   * @returns {IndexArrayBuffer}
+   */
+
 	}, {
 		key: 'unbind',
 		value: function unbind() {
@@ -472,7 +707,19 @@ var IndexArrayBuffer = function () {
 
 var textureNum = 0;
 
+/**
+ * Class representing a Texture
+ */
+
 var Texture = function () {
+	/**
+  *
+  * @param {WebGLRenderingContext} gl
+  * @param {GLenum} format
+  * @param {GLenum} internalFormat
+  * @param {GLenum} type
+  * @param {GLenum} unit
+  */
 	function Texture(gl) {
 		var format = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : tubuglConstants.RGB;
 		var internalFormat = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : tubuglConstants.RGB;
@@ -485,8 +732,12 @@ var Texture = function () {
 			return;
 		}
 
+		/**
+   * @member WebGLTexture */
 		this._texture = this._gl.createTexture();
+		/** @member GLenum */
 		this.textureNum = textureNum;
+		/** @member GLenum */
 		this.unit = tubuglConstants.TEXTURE0 + textureNum;
 
 		this.setFormat(format, internalFormat, type);
@@ -496,18 +747,54 @@ var Texture = function () {
 		return this;
 	}
 
+	/**
+  * @description active texture
+  * @returns {Texture}
+  */
+
+
 	createClass(Texture, [{
 		key: 'activeTexture',
 		value: function activeTexture() {
 			this._gl.activeTexture(this.unit);
 			return this;
 		}
+
+		/**
+   * @description bind texture
+   *
+   * @returns {Texture}
+   */
+
 	}, {
 		key: 'bind',
 		value: function bind() {
 			this._gl.bindTexture(tubuglConstants.TEXTURE_2D, this._texture);
 			return this;
 		}
+
+		/**
+   * @description unbind texture
+   * @returns Texture
+   */
+
+	}, {
+		key: 'unbind',
+		value: function unbind() {
+			this._gl.bindTexture(tubuglConstants.TEXTURE_2D, null);
+			return this;
+		}
+
+		/**
+   * @description update data fro texture with image
+   *
+   * @param {Image} image
+   * @param {number} width
+   * @param {number} height
+   *
+   * @returns Texture
+   */
+
 	}, {
 		key: 'fromImage',
 		value: function fromImage(image, width, height) {
@@ -518,6 +805,16 @@ var Texture = function () {
 
 			return this;
 		}
+
+		/**
+   * @description update texture with width and height and emptyData
+   *
+   * @param {number} width
+   * @param {number} height
+   *
+   * @returns {Texture}
+   */
+
 	}, {
 		key: 'fromSize',
 		value: function fromSize(width, height) {
@@ -528,6 +825,17 @@ var Texture = function () {
 
 			return this;
 		}
+
+		/**
+   * @description update texture from dataArray
+   *
+   * @param {number} width
+   * @param {number} height
+   * @param {Float32Array|Float64Array} dataArray
+   *
+   * @returns {Texture}
+   */
+
 	}, {
 		key: 'fromData',
 		value: function fromData(width, height, dataArray) {
@@ -537,18 +845,41 @@ var Texture = function () {
 			this._gl.texImage2D(tubuglConstants.TEXTURE_2D, 0, this._internalFormt, this._width, this._height, 0, this._format, this._type, dataArray);
 			return this;
 		}
+
+		/**
+   * @description flip the texture
+   */
+
 	}, {
 		key: 'setFlip',
 		value: function setFlip() {
 			this.setPixelStore(tubuglConstants.UNPACK_FLIP_Y_WEBGL, true);
 			return this;
 		}
+
+		/**
+   * @description specify the pixel storage mode
+   *
+   * @param {GLenum} pname
+   * @param {object} params
+   */
+
 	}, {
 		key: 'setPixelStore',
 		value: function setPixelStore(pname, params) {
 			this._gl.pixelStorei(pname, params);
 			return this;
 		}
+
+		/**
+   *
+   * @description update format for texture
+   *
+   * @param {GLenum} format
+   * @param {GLenum} internalFormat
+   * @param {Glenum} type
+   */
+
 	}, {
 		key: 'setFormat',
 		value: function setFormat(format, internalFormat, type) {
@@ -558,14 +889,10 @@ var Texture = function () {
 
 			return this;
 		}
-
 		/**
+   * @description confirm texture is active
    *
-   * usage:
-   * let activeTextureNum = this.gl.getParameter(this.gl.ACTIVE_TEXTURE);
-   * console.log(this._texture.isActiveTexture(activeTextureNum));
-   *
-   * @param unit
+   * @param {GLenum} unit
    * @returns {boolean}
    */
 
@@ -580,7 +907,9 @@ var Texture = function () {
    * https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/getTexParameter
    * https://webglfundamentals.org/webgl/lessons/webgl-3d-textures.html
    *
-   * @param filter
+   * @param {GLenum} filter
+   *
+   * @returns {Texture}
    */
 
 	}, {
@@ -593,6 +922,15 @@ var Texture = function () {
 
 			return this;
 		}
+
+		/**
+   * set mag filter to texture
+   *
+   * @param {GLenum} filter
+   *
+   * @returns {Texture}
+   */
+
 	}, {
 		key: 'setMagFilter',
 		value: function setMagFilter() {
@@ -602,6 +940,15 @@ var Texture = function () {
 
 			return this;
 		}
+
+		/**
+   * set min filter to texture
+   *
+   * @param {GLenum} filter
+   *
+   * @returns {Texture}
+   */
+
 	}, {
 		key: 'setMinFilter',
 		value: function setMinFilter() {
@@ -611,6 +958,11 @@ var Texture = function () {
 
 			return this;
 		}
+
+		/**
+   * @description set the wrap mode in texture
+   */
+
 	}, {
 		key: 'wrap',
 		value: function wrap() {
@@ -621,6 +973,13 @@ var Texture = function () {
 
 			return this;
 		}
+
+		/**
+   * generate mipmap for texture
+   *
+   * @returns {Texture}
+   */
+
 	}, {
 		key: 'generateMipmap',
 		value: function generateMipmap() {
@@ -628,8 +987,10 @@ var Texture = function () {
 
 			return this;
 		}
+
 		/**
-   * return webglTexture
+   * @description get webgl texture
+   * @returns {Texture}
    */
 
 	}, {
@@ -637,6 +998,9 @@ var Texture = function () {
 		value: function getTexture() {
 			return this._texture;
 		}
+
+		/** @description delete the texture */
+
 	}, {
 		key: 'delete',
 		value: function _delete() {
@@ -647,109 +1011,188 @@ var Texture = function () {
 	return Texture;
 }();
 
+/**
+ * Class representing a Framebuffer
+ */
 var FrameBuffer = function () {
-    /**
-     *
-     * @param {webglContext} gl
-     * @param {{internalFormat: GLenum, format, GLenum, type: GLenum }} params
-     * @param {number} width
-     * @param {number} height
-     */
-    function FrameBuffer(gl, params) {
-        var width = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 256;
-        var height = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 256;
-        classCallCheck(this, FrameBuffer);
+	/**
+  *
+  * @param {webglContext} gl
+  * @param {object} params
+  * @param {GLenum} params.format
+  * @param {GLenum} params.internalFormat
+  * @param {GLenum} params.type
+  * @param {number} width
+  * @param {number} height
+  */
+	function FrameBuffer(gl, params) {
+		var width = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 256;
+		var height = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 256;
+		classCallCheck(this, FrameBuffer);
 
-        if (typeof params == 'number') {
-            console.error('Framebuffer api has been updated. make sure Framebuffer code');
-        } else {
-            params.internalFormat = params.internalFormat ? params.internalFormat : tubuglConstants.RGBA;
-            params.format = params.format ? params.format : tubuglConstants.RGBA;
+		if (typeof params == 'number') {
+			console.error('Framebuffer api has been updated. make sure Framebuffer code');
+		} else {
+			params.internalFormat = params.internalFormat ? params.internalFormat : tubuglConstants.RGBA;
+			params.format = params.format ? params.format : tubuglConstants.RGBA;
 
-            params.type = params.type ? params.type : tubuglConstants.UNSIGNED_BYTE;
-        }
+			params.type = params.type ? params.type : tubuglConstants.UNSIGNED_BYTE;
+		}
 
-        this._gl = gl;
-        this._width = width;
-        this._height = height;
+		/**
+   * @member {WebGLRenderingContext}
+   */
+		this._gl = gl;
+		/**
+   * @member {number}
+   */
+		this._width = width;
+		/**
+   * @member {number}
+   */
+		this._height = height;
+		/**
+   * @member {texture}
+   */
+		this.texture = this._makeTexture(params);
+		/**
+   * @member WebGLFramebuffer
+   */
+		this._frameBuffer = this._gl.createFramebuffer();
+		this._gl.bindFramebuffer(tubuglConstants.FRAMEBUFFER, this._frameBuffer);
 
-        this.texture = this._makeTexture(params);
-        this._frameBuffer = this._gl.createFramebuffer();
-        this._gl.bindFramebuffer(tubuglConstants.FRAMEBUFFER, this._frameBuffer);
+		this._gl.framebufferTexture2D(tubuglConstants.FRAMEBUFFER, tubuglConstants.COLOR_ATTACHMENT0, tubuglConstants.TEXTURE_2D, this.texture.getTexture(), 0);
+	}
 
-        this._gl.framebufferTexture2D(tubuglConstants.FRAMEBUFFER, tubuglConstants.COLOR_ATTACHMENT0, tubuglConstants.TEXTURE_2D, this.texture.getTexture(), 0);
-    }
+	/**
+  * @description make depth buffer for framebuffer
+  *
+  * @returns {FrameBuffer}
+  */
 
-    createClass(FrameBuffer, [{
-        key: 'makeDepthBUffer',
-        value: function makeDepthBUffer() {
-            /**
-             * https://webglfundamentals.org/webgl/lessons/webgl-render-to-texture.html
-             */
-            // create a depth renderbuffer
-            var depthBuffer = this._gl.createRenderbuffer();
-            this._gl.bindRenderbuffer(tubuglConstants.RENDERBUFFER, depthBuffer);
 
-            // make a depth buffer and the same size as the targetTexture
-            this._gl.renderbufferStorage(tubuglConstants.RENDERBUFFER, tubuglConstants.DEPTH_COMPONENT16, this._width, this._height);
-            this._gl.framebufferRenderbuffer(tubuglConstants.FRAMEBUFFER, tubuglConstants.DEPTH_ATTACHMENT, tubuglConstants.RENDERBUFFER, depthBuffer);
+	createClass(FrameBuffer, [{
+		key: 'makeDepthBUffer',
+		value: function makeDepthBUffer() {
+			/**
+    * https://webglfundamentals.org/webgl/lessons/webgl-render-to-texture.html
+    */
+			// create a depth renderbuffer
+			var depthBuffer = this._gl.createRenderbuffer();
+			this._gl.bindRenderbuffer(tubuglConstants.RENDERBUFFER, depthBuffer);
 
-            return this;
-        }
-    }, {
-        key: 'bind',
-        value: function bind() {
-            this._gl.bindFramebuffer(tubuglConstants.FRAMEBUFFER, this._frameBuffer);
+			// make a depth buffer and the same size as the targetTexture
+			this._gl.renderbufferStorage(tubuglConstants.RENDERBUFFER, tubuglConstants.DEPTH_COMPONENT16, this._width, this._height);
+			this._gl.framebufferRenderbuffer(tubuglConstants.FRAMEBUFFER, tubuglConstants.DEPTH_ATTACHMENT, tubuglConstants.RENDERBUFFER, depthBuffer);
 
-            return this;
-        }
-    }, {
-        key: 'updateViewport',
-        value: function updateViewport() {
-            this._gl.viewport(0, 0, this._width, this._height);
+			return this;
+		}
 
-            return this;
-        }
-    }, {
-        key: 'unbind',
-        value: function unbind() {
-            this._gl.bindFramebuffer(tubuglConstants.FRAMEBUFFER, null);
-            return this;
-        }
-    }, {
-        key: 'updateSize',
-        value: function updateSize(width, height) {
-            this._width = width;
-            this._height = height;
+		/**
+   * @description bind framebuffer
+   *
+   * @returns {FrameBuffer}
+   */
 
-            this.texture.bind().fromSize(this._width, this._height);
+	}, {
+		key: 'bind',
+		value: function bind() {
+			this._gl.bindFramebuffer(tubuglConstants.FRAMEBUFFER, this._frameBuffer);
 
-            if (this.depthBuffer) {
-                this._gl.bindRenderbuffer(tubuglConstants.RENDERBUFFER, this.depthBuffer);
-                this._gl.renderbufferStorage(tubuglConstants.RENDERBUFFER, tubuglConstants.DEPTH_COMPONENT16, this._width, this._height);
-            }
-        }
-    }, {
-        key: '_makeTexture',
-        value: function _makeTexture(params) {
-            var texture = new Texture(this._gl, params.internalFormat, params.format, params.type);
-            texture.bind().setFilter(tubuglConstants.NEAREST) //https://evanw.github.io/lightgl.js/docs/texture.html
-            .wrap(tubuglConstants.CLAMP_TO_EDGE).fromData(this._width, this._height, params.dataArray);
+			return this;
+		}
 
-            return texture;
-        }
-    }, {
-        key: 'reset',
-        value: function reset() {
-            this.texture.bind().fromSize(this._width, this._height);
-        }
-    }, {
-        key: 'delete',
-        value: function _delete() {
-            this.texture.delete();
-        }
-    }]);
-    return FrameBuffer;
+		/**
+   * @description update view point for framebuffer
+   *
+   * @returns {FrameBuffer}
+   */
+
+	}, {
+		key: 'updateViewport',
+		value: function updateViewport() {
+			this._gl.viewport(0, 0, this._width, this._height);
+
+			return this;
+		}
+
+		/**
+   * @description unbind framebuffer, make framebuffer null
+   *
+   * @returns FrameBuffer
+   */
+
+	}, {
+		key: 'unbind',
+		value: function unbind() {
+			this._gl.bindFramebuffer(tubuglConstants.FRAMEBUFFER, null);
+			return this;
+		}
+
+		/**
+   * @description update size of framebuffer and texture
+   *
+   * @param {number} width
+   * @param {number} height
+   *
+   * @returns FrameBuffer
+   */
+
+	}, {
+		key: 'updateSize',
+		value: function updateSize(width, height) {
+			this._width = width;
+			this._height = height;
+
+			this.texture.bind().fromSize(this._width, this._height);
+
+			if (this.depthBuffer) {
+				this._gl.bindRenderbuffer(tubuglConstants.RENDERBUFFER, this.depthBuffer);
+				this._gl.renderbufferStorage(tubuglConstants.RENDERBUFFER, tubuglConstants.DEPTH_COMPONENT16, this._width, this._height);
+			}
+		}
+
+		/**
+   *
+   * @private
+   *
+   * @param {Object} params
+   * @param {*} params.dataArray
+   *
+   * @returns Texture
+   */
+
+	}, {
+		key: '_makeTexture',
+		value: function _makeTexture(params) {
+			var texture = new Texture(this._gl, params.internalFormat, params.format, params.type);
+			texture.bind().setFilter(tubuglConstants.NEAREST) //https://evanw.github.io/lightgl.js/docs/texture.html
+			.wrap(tubuglConstants.CLAMP_TO_EDGE).fromData(this._width, this._height, params.dataArray);
+
+			return texture;
+		}
+
+		/**
+   * @description reset texture
+   */
+
+	}, {
+		key: 'reset',
+		value: function reset() {
+			this.texture.bind().fromSize(this._width, this._height);
+		}
+
+		/**
+   * @description delete texture
+   */
+
+	}, {
+		key: 'delete',
+		value: function _delete() {
+			this.texture.delete();
+		}
+	}]);
+	return FrameBuffer;
 }();
 
 /**
@@ -831,6 +1274,9 @@ var TransformFeedback = function () {
  * VertexArray for only webgl2
  */
 var VAO = function () {
+	/**
+  * @param {WebGLRenderingContext} gl
+  */
 	function VAO(gl) {
 		classCallCheck(this, VAO);
 
@@ -923,7 +1369,7 @@ var DrawCall = function () {
 	return DrawCall;
 }();
 
-console.log('[tubugl] version: 1.2.0, %o', 'https://github.com/kenjiSpecial/tubugl');
+console.log('[tubugl] version: 1.3.1, %o', 'https://github.com/kenjiSpecial/tubugl');
 
 exports.Program = Program;
 exports.Program2 = Program2;

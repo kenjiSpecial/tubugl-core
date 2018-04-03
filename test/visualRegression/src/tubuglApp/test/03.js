@@ -2,7 +2,7 @@
  * test for draw function
  */
 
-import { Program, ArrayBuffer, IndexArrayBuffer, Texture, draw } from 'tubuGL';
+import { Program, ArrayBuffer, IndexArrayBuffer, draw } from 'tubuGL';
 
 const TweenMax = require('gsap');
 const dat = require('../../vendors/dat.gui/dat.gui');

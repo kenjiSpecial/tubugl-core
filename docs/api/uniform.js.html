@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>uniform.js - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <li class="nav-link nav-home-link"><a href="index.html">Home</a></li><li class="nav-heading">Classes</li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="ArrayBuffer.html">ArrayBuffer</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="ArrayBuffer.html#attribPointer">attribPointer</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="ArrayBuffer.html#bind">bind</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="ArrayBuffer.html#disablePoiner">disablePoiner</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="ArrayBuffer.html#setAttribs">setAttribs</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="ArrayBuffer.html#setData">setData</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="ArrayBuffer.html#unbind">unbind</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="FrameBuffer.html">FrameBuffer</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="FrameBuffer.html#bind">bind</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="FrameBuffer.html#delete">delete</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="FrameBuffer.html#makeDepthBUffer">makeDepthBUffer</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="FrameBuffer.html#reset">reset</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="FrameBuffer.html#unbind">unbind</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="FrameBuffer.html#updateSize">updateSize</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="FrameBuffer.html#updateViewport">updateViewport</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="IndexArrayBuffer.html">IndexArrayBuffer</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="IndexArrayBuffer.html#bind">bind</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="IndexArrayBuffer.html#setData">setData</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="IndexArrayBuffer.html#unbind">unbind</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="Program.html">Program</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Program.html#bind">bind</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Program.html#dispose">dispose</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Program.html#getAttrib">getAttrib</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Program.html#getUniforms">getUniforms</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Program.html#initProgram">initProgram</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Program.html#setUniformTexture">setUniformTexture</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Program.html#use">use</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="Texture.html">Texture</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Texture.html#activeTexture">activeTexture</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Texture.html#bind">bind</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Texture.html#delete">delete</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Texture.html#fromData">fromData</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Texture.html#fromImage">fromImage</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Texture.html#fromSize">fromSize</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Texture.html#generateMipmap">generateMipmap</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Texture.html#getTexture">getTexture</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Texture.html#isActiveTexture">isActiveTexture</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Texture.html#setFilter">setFilter</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Texture.html#setFlip">setFlip</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Texture.html#setFormat">setFormat</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Texture.html#setMagFilter">setMagFilter</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Texture.html#setMinFilter">setMinFilter</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Texture.html#setPixelStore">setPixelStore</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Texture.html#unbind">unbind</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Texture.html#wrap">wrap</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="Uniform.html">Uniform</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Uniform.html#update">update</a></span></li><li class="nav-heading"><a href="global.html">Globals</a></li><li class="nav-item"><span class="nav-item-type type-member">M</span><span class="nav-item-name"><a href="global.html#GLenum">GLenum</a></span></li><li class="nav-item"><span class="nav-item-type type-member">M</span><span class="nav-item-name"><a href="global.html#WebGLFramebuffer">WebGLFramebuffer</a></span></li><li class="nav-item"><span class="nav-item-type type-member">M</span><span class="nav-item-name"><a href="global.html#WebGLTexture">WebGLTexture</a></span></li>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">uniform.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import {
+	FLOAT,
+	FLOAT_VEC2,
+	FLOAT_VEC3,
+	FLOAT_VEC4,
+	FLOAT_MAT2,
+	FLOAT_MAT3,
+	FLOAT_MAT4,
+	SAMPLER_2D
+} from 'tubugl-constants';
+
+/**
+ * Class representing a Uniform for a Program class
+ */
+export class Uniform {
+	/**
+	 * @description Uniform class constructor
+	 *
+	 * @param {WebGLRenderingContext} gl
+	 * @param {WebGLProgram} program
+	 * @param {WebGLActiveInfo} uniform information of unifrom getting from getActiveUniform
+	 *
+	 * @constructor Uniform
+	 */
+	constructor(gl, program, uniform) {
+		let uniformLocation = gl.getUniformLocation(program, uniform.name);
+		this.location = uniformLocation;
+		this.size = uniform.size;
+		this._gl = gl;
+
+		let typeName;
+		switch (uniform.type) {
+			case FLOAT:
+				typeName = 'float';
+				break;
+			case FLOAT_VEC2:
+				typeName = 'vec2';
+				break;
+			case FLOAT_VEC3:
+				typeName = 'vec3';
+				break;
+			case FLOAT_VEC4:
+				typeName = 'vec4';
+				break;
+			case FLOAT_MAT2:
+				typeName = 'mat2';
+				break;
+			case FLOAT_MAT3:
+				typeName = 'mat3';
+				break;
+			case FLOAT_MAT4:
+				typeName = 'mat4';
+				break;
+			case SAMPLER_2D:
+				typeName = 'sampler2D';
+				break; // TODO Do we need to some method or not
+		}
+
+		this.typeName = typeName;
+		this.type = uniform.type;
+	}
+	/**
+	 * update unifroms
+	 *
+	 * @param {Array} args
+	 */
+	update(...args) {
+		// console.log(this.typeName);
+		switch (this.type) {
+			case FLOAT:
+				this._gl.uniform1f(this.location, args[0]);
+				break;
+			case FLOAT_VEC2:
+				this._gl.uniform2f(this.location, args[0], args[1]);
+				break;
+			case FLOAT_VEC3:
+				this._gl.uniform3f(this.location, args[0], args[1], args[2]);
+				break;
+			case FLOAT_VEC4:
+				this._gl.uniform4f(this.location, args[0], args[1], args[2], args[3]);
+				break;
+			case FLOAT_MAT2:
+				this._gl.uniformMatrix2fv(this.location, false, args[0]);
+				break;
+			case FLOAT_MAT3:
+				this._gl.uniformMatrix3fv(this.location, false, args[0]);
+				break;
+			case FLOAT_MAT4:
+				this._gl.uniformMatrix4fv(this.location, false, args[0]);
+				break;
+			case SAMPLER_2D:
+				this._gl.uniform1i(this.location, args[0]);
+				break;
+		}
+	}
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sun Feb 11 2018 11:03:23 GMT+0100 (W. Europe Standard Time) using the Minami theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>

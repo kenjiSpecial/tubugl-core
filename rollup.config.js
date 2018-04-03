@@ -14,7 +14,7 @@ console.log('library name' + pkg.libName + ', version: ' + pkg.version);
 export default [
 	// browser-friendly UMD build
 	{
-		input: 'index.js',
+		input: './src/index.js',
 		output: {
 			name: pkg.libName,
 			file: pkg.main,
@@ -22,15 +22,15 @@ export default [
 		},
 		plugins: [
 			babel(babelrc()),
-			resolve(), // so Rollup can find `ms`
-			commonjs(), // so Rollup can convert `ms` to an ES module
+			// resolve(), // so Rollup can find `ms`
+			commonjs(),
 			replace({
 				TUBUGL_VERSOIN: pkg.version
 			})
 		]
 	},
 	{
-		input: 'index.js',
+		input: './src/index.js',
 		output: [{ file: pkg.cjs, format: 'cjs' }],
 		plugins: [
 			babel(babelrc()),
@@ -40,7 +40,7 @@ export default [
 		]
 	},
 	{
-		input: 'index.js',
+		input: './src/index.js',
 		output: [{ file: pkg.module, format: 'es' }],
 		plugins: [
 			replace({
