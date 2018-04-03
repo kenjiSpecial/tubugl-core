@@ -31,8 +31,8 @@ export class Texture {
 
 		return this;
 	}
-	activeTexture() {
-		this._gl.activeTexture(this.unit);
+	activeTexture(unit = 0) {
+		this._gl.activeTexture( this._gl.TEXTURE0 + (0|unit) );
 		return this;
 	}
 	bind() {
