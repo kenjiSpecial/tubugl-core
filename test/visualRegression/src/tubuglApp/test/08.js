@@ -3,7 +3,8 @@
  */
 
 import { Program, ArrayBuffer, IndexArrayBuffer, FrameBuffer, Texture } from 'tubuGL';
-import { FLOAT, UNPACK_FLIP_Y_WEBGL } from 'tubugl-constants';
+import { FLOAT, UNPACK_FLIP_Y_WEBGL, RGBA, NEAREST } from 'tubugl-constants';
+import { CLAMP_TO_EDGE } from 'tubugl-constants';
 
 const TweenMax = require('gsap');
 const dat = require('../../vendors/dat.gui/dat.gui');
@@ -23,7 +24,9 @@ varying vec2 vUv;
 varying vec2 vId;
 
 void main() {
-    gl_Position = a_position;
+	vec4 texColor = texture2D(uInitPosTexture, id);
+	gl_Position = position + vec4(texColor.x/100., texColor.y, 0., 0.);
+	gl_PointSize = 10.0;
 	vUv = vec2(uv.x, 1.0-uv.x); 
 	vId = id;
 }`;
@@ -35,7 +38,7 @@ varying vec2 vUv;
 varying vec2 vId;
 
 void main(){
-    gl_FragColor = vec4(vUv, 0.0, 1.0);
+    gl_FragColor = vec4(vId/2. + vec2(0.5), 0.0, 1.0);
 }
 `;
 
@@ -91,43 +94,61 @@ export default class App {
 
 	makeProgram() {
 		this._program = new Program(this.gl, vertexShader, fragmentShader);
-		let particleNum = size * size;
+		let particleNum = (size + 1) * (size + 1);
 		let positions = [];
+		let ids = [];
 
 		for (let ii = 0; ii < particleNum; ii++) {
-			for (let jj = 0; jj < 4; jj++) {
-				positions[16 * ii + 4 * jj + 0] = (jj % 2 - 1) * 10;
-				positions[16 * ii + 4 * jj + 1] = (parseInt(jj / 2) - 1) * 10;
-				positions[16 * ii + 4 * jj + 2] = 0.0;
-				positions[16 * ii + 4 * jj + 3] = 0.0;
-			}
+			positions[4 * ii + 0] = 0.0; //jj % 2 - 1;
+			positions[4 * ii + 1] = 0.0; //parseInt(jj / 2) - 1;
+			positions[4 * ii + 2] = 0.0;
+			positions[4 * ii + 3] = 1.0;
+
+			ids.push(parseInt(ii / (size + 1)) / size);
+			ids.push((ii % (size + 1)) / size);
 		}
 
+		console.log(ids);
 		positions = new Float32Array(positions);
 		let positionBuffer = new ArrayBuffer(this.gl, positions);
 		positionBuffer.setAttribs('position', 4);
 
+		ids = new Float32Array(ids);
+		let idBuffer = new ArrayBuffer(this.gl, ids);
+		idBuffer.setAttribs('id', 2);
+
 		this._obj = {
 			program: this._program,
 			positionBuffer: positionBuffer,
+			idBuffer: idBuffer,
 			count: particleNum
 		};
 	}
 
 	makeTexture() {
-		this._texture = new Texture(this.gl);
+		this._texture = new Texture(this.gl, RGBA, RGBA, FLOAT);
+
+		let dataArr = [];
+		for (let ii = 0; ii < (size + 1) * (size + 1); ii++) {
+			// let id = ii;
+			let xx = (ii % (size + 1)) / size - 0.5;
+			let yy = parseInt(ii / (size + 1)) / size - 0.5;
+
+			dataArr.push(xx * 100, yy, 0, 0);
+		}
+		console.log(dataArr);
+
+		this._texture
+			.bind()
+			.setFilter(NEAREST)
+			.wrap(CLAMP_TO_EDGE)
+			.fromData(size + 1, size + 1, new Float32Array(dataArr));
 	}
 
 	start() {
 		this._isPlay = true;
 
-		if (isDebug) {
-			TweenMax.ticker.addEventListener('tick', this.update, this);
-		} else {
-			for (let ii = 0; ii < 10; ii++) {
-				this.update();
-			}
-		}
+		TweenMax.ticker.addEventListener('tick', this.update, this);
 	}
 
 	stop() {
@@ -151,6 +172,9 @@ export default class App {
 		this._obj.program.setUniformTexture(this._texture, 'uInitPosTexture');
 
 		this._obj.positionBuffer.bind().attribPointer(this._obj.program);
+		this._obj.idBuffer.bind().attribPointer(this._obj.program);
+
+		// console.log(this._obj.count);
 		this.gl.drawArrays(this.gl.POINTS, 0, this._obj.count);
 	}
 
