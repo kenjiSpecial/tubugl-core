@@ -9,6 +9,7 @@ import App4 from '../tubuglApp/test/04';
 import App5 from '../tubuglApp/test/05';
 import App6 from '../tubuglApp/test/06';
 import App7 from '../tubuglApp/test/07';
+import App8 from '../tubuglApp/test/08';
 
 export default class TubuGlApp extends React.Component {
 	constructor(props) {
@@ -51,6 +52,9 @@ export default class TubuGlApp extends React.Component {
 				break;
 			case '7':
 				App = App7;
+				break;
+			case '8':
+				App = App8;
 				break;
 		}
 

@@ -148,6 +148,19 @@ export default () => (
 					/>
 				)}
 			/>
+			<Route
+				exact
+				path="/test/08"
+				render={props => (
+					<TestApp
+						globalStore={{
+							appId: '8',
+							description: 'float/half flaot'
+						}}
+						{...props}
+					/>
+				)}
+			/>
 		</Switch>
 	</Router>
 );
