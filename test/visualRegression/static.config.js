@@ -16,6 +16,7 @@ export default {
 		</Html>
 	),
 	webpack: (config, { defaultLoaders }) => {
+		console.log('static.config webpack');
 		config.resolve.alias = {
 			tubuGL$: path.resolve(__dirname, '../../src/index.js'),
 			'tubugl-constants$': path.resolve(__dirname, '../../node_modules/tubugl-constants')

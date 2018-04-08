@@ -1,4 +1,4 @@
-import { FLOAT, FLOAT_VEC2, FLOAT_VEC3, FLOAT_VEC4, FLOAT_MAT2, FLOAT_MAT3, FLOAT_MAT4, SAMPLER_2D, TEXTURE_2D, VERTEX_SHADER, FRAGMENT_SHADER, LINK_STATUS, ACTIVE_UNIFORMS, ACTIVE_ATTRIBUTES, SEPARATE_ATTRIBS, ARRAY_BUFFER, STATIC_DRAW, RGB, UNSIGNED_BYTE, TEXTURE0, LINEAR, NEAREST, TEXTURE_MIN_FILTER, TEXTURE_MAG_FILTER, UNPACK_FLIP_Y_WEBGL, TEXTURE_WRAP_T, TEXTURE_WRAP_S, CLAMP_TO_EDGE, FRAMEBUFFER, COLOR_ATTACHMENT0, RENDERBUFFER, DEPTH_COMPONENT16, DEPTH_ATTACHMENT, RGBA, TRANSFORM_FEEDBACK, TRANSFORM_FEEDBACK_BUFFER, TRIANGLES, POINTS, LINES, UNSIGNED_SHORT } from 'tubugl-constants';
+import { FLOAT, FLOAT_VEC2, FLOAT_VEC3, FLOAT_VEC4, FLOAT_MAT2, FLOAT_MAT3, FLOAT_MAT4, SAMPLER_2D, VERTEX_SHADER, FRAGMENT_SHADER, LINK_STATUS, ACTIVE_UNIFORMS, ACTIVE_ATTRIBUTES, SEPARATE_ATTRIBS, ARRAY_BUFFER, STATIC_DRAW, TEXTURE_2D, RGB, UNSIGNED_BYTE, LINEAR, NEAREST, TEXTURE_MIN_FILTER, TEXTURE_MAG_FILTER, UNPACK_FLIP_Y_WEBGL, TEXTURE_WRAP_T, TEXTURE_WRAP_S, CLAMP_TO_EDGE, FRAMEBUFFER, COLOR_ATTACHMENT0, RENDERBUFFER, DEPTH_COMPONENT16, DEPTH_ATTACHMENT, RGBA, TRANSFORM_FEEDBACK, TRANSFORM_FEEDBACK_BUFFER, TRIANGLES, POINTS, LINES, UNSIGNED_SHORT } from 'tubugl-constants';
 
 /**
  * compile shader based on three.js
@@ -42,253 +42,265 @@ function webGLShader(gl, type, shaderSource) {
  * Class representing a Uniform for a Program class
  */
 class Uniform {
-	/**
-	 * @description Uniform class constructor
-	 *
-	 * @param {WebGLRenderingContext} gl
-	 * @param {WebGLProgram} program
-	 * @param {WebGLActiveInfo} uniform information of unifrom getting from getActiveUniform
-	 *
-	 * @constructor Uniform
-	 */
-	constructor(gl, program, uniform) {
-		let uniformLocation = gl.getUniformLocation(program, uniform.name);
-		this.location = uniformLocation;
-		this.size = uniform.size;
-		this._gl = gl;
+    /**
+     * @description Uniform class constructor
+     *
+     * @param {WebGLRenderingContext} gl
+     * @param {WebGLProgram} program
+     * @param {WebGLActiveInfo} uniform information of unifrom getting from getActiveUniform
+     * @param {Object} context
+     * @param {Number} context.textIndex
+     *
+     * @constructor Uniform
+     */
+    constructor(gl, program, uniform, context) {
+            let uniformLocation = gl.getUniformLocation(program, uniform.name);
+            this.location = uniformLocation;
+            this.size = uniform.size;
+            this._gl = gl;
 
-		let typeName;
-		switch (uniform.type) {
-			case FLOAT:
-				typeName = 'float';
-				break;
-			case FLOAT_VEC2:
-				typeName = 'vec2';
-				break;
-			case FLOAT_VEC3:
-				typeName = 'vec3';
-				break;
-			case FLOAT_VEC4:
-				typeName = 'vec4';
-				break;
-			case FLOAT_MAT2:
-				typeName = 'mat2';
-				break;
-			case FLOAT_MAT3:
-				typeName = 'mat3';
-				break;
-			case FLOAT_MAT4:
-				typeName = 'mat4';
-				break;
-			case SAMPLER_2D:
-				typeName = 'sampler2D';
-				break; // TODO Do we need to some method or not
-		}
+            let typeName;
+            switch (uniform.type) {
+                case FLOAT:
+                    typeName = 'float';
+                    break;
+                case FLOAT_VEC2:
+                    typeName = 'vec2';
+                    break;
+                case FLOAT_VEC3:
+                    typeName = 'vec3';
+                    break;
+                case FLOAT_VEC4:
+                    typeName = 'vec4';
+                    break;
+                case FLOAT_MAT2:
+                    typeName = 'mat2';
+                    break;
+                case FLOAT_MAT3:
+                    typeName = 'mat3';
+                    break;
+                case FLOAT_MAT4:
+                    typeName = 'mat4';
+                    break;
+                case SAMPLER_2D:
+                    typeName = 'sampler2D';
+					this.unit = context.texIndex ++;
+                    break; // TODO Do we need to some method or not
+            }
 
-		this.typeName = typeName;
-		this.type = uniform.type;
-	}
-	/**
-	 * update unifroms
-	 *
-	 * @param {Array} args
-	 */
-	update(...args) {
-		// console.log(this.typeName);
-		switch (this.type) {
-			case FLOAT:
-				this._gl.uniform1f(this.location, args[0]);
-				break;
-			case FLOAT_VEC2:
-				this._gl.uniform2f(this.location, args[0], args[1]);
-				break;
-			case FLOAT_VEC3:
-				this._gl.uniform3f(this.location, args[0], args[1], args[2]);
-				break;
-			case FLOAT_VEC4:
-				this._gl.uniform4f(this.location, args[0], args[1], args[2], args[3]);
-				break;
-			case FLOAT_MAT2:
-				this._gl.uniformMatrix2fv(this.location, false, args[0]);
-				break;
-			case FLOAT_MAT3:
-				this._gl.uniformMatrix3fv(this.location, false, args[0]);
-				break;
-			case FLOAT_MAT4:
-				this._gl.uniformMatrix4fv(this.location, false, args[0]);
-				break;
-			case SAMPLER_2D:
-				this._gl.uniform1i(this.location, args[0]);
-				break;
-		}
-	}
+
+            this.typeName = typeName;
+            this.type = uniform.type;
+
+        }
+        /**
+         * update unifroms
+         *
+         * @param {Array} args
+         */
+    update(...args) {
+        // console.log(this.typeName);
+        switch (this.type) {
+            case FLOAT:
+                this._gl.uniform1f(this.location, args[0]);
+                break;
+            case FLOAT_VEC2:
+                this._gl.uniform2f(this.location, args[0], args[1]);
+                break;
+            case FLOAT_VEC3:
+                this._gl.uniform3f(this.location, args[0], args[1], args[2]);
+                break;
+            case FLOAT_VEC4:
+                this._gl.uniform4f(this.location, args[0], args[1], args[2], args[3]);
+                break;
+            case FLOAT_MAT2:
+                this._gl.uniformMatrix2fv(this.location, false, args[0]);
+                break;
+            case FLOAT_MAT3:
+                this._gl.uniformMatrix3fv(this.location, false, args[0]);
+                break;
+            case FLOAT_MAT4:
+                this._gl.uniformMatrix4fv(this.location, false, args[0]);
+                break;
+            case SAMPLER_2D:
+                this._gl.uniform1i(this.location, args[0]);
+                break;
+        }
+    }
 }
 
 class Program {
-	/**
-	 * constructor
-	 * compile shaders and link them to gl context
-	 *
-	 * @param {WebGLRenderingContext} gl
-	 * @param {string} vertSrc
-	 * @param {string} fragSrc
-	 * @param {Object} params
-	 * @param {booean} params.isDebug
-	 *
-	 * @constructor Program
-	 */
-	constructor(gl, vertSrc, fragSrc, params = {}) {
-		/**
-		 * @private
-		 * @member {boolean}
-		 */
-		this._isReady = false;
-		/**
-		 * @private
-		 * @member {boolean}
-		 */
-		this._isDebgu = params.isDebug;
+    /**
+     * constructor
+     * compile shaders and link them to gl context
+     *
+     * @param {WebGLRenderingContext} gl
+     * @param {string} vertSrc
+     * @param {string} fragSrc
+     * @param {Object} params
+     * @param {booean} params.isDebug
+     *
+     * @constructor Program
+     */
+    constructor(gl, vertSrc, fragSrc, params = {}) {
+        /**
+         * @private
+         * @member {boolean}
+         */
+        this._isReady = false;
+        /**
+         * @private
+         * @member {boolean}
+         */
+        this._isDebgu = params.isDebug;
 
-		/**
-		 * @private
-		 * @member {WebGLRenderingContext}
-		 */
-		this._gl = gl;
+        /**
+         * @private
+         * @member {WebGLRenderingContext}
+         */
+        this._gl = gl;
 
-		if (vertSrc && fragSrc) {
-			this.initProgram(vertSrc, fragSrc, params);
-		}
-	}
+        if (vertSrc && fragSrc) {
+            this.initProgram(vertSrc, fragSrc);
+        }
+    }
 
-	/**
-	 * crate the program and compile shader
-	 *
-	 * @param {string} vertSrc vertex hader
-	 * @param {string} fragSrc fragment shader src
-	 * @param {Object} params optinal paramters
-	 */
-	initProgram(vertSrc, fragSrc, params = {}) {
-		/**
-		 * @description vertexShader
-		 * @private
-		 * @member {WebGLShader}
-		 */
-		this._vertexShader = webGLShader(this._gl, VERTEX_SHADER, vertSrc);
-		/**
-		 * @description fragmentShader
-		 * @private
-		 * @member {WebGLShader}
-		 */
-		this._fragmentShader = webGLShader(this._gl, FRAGMENT_SHADER, fragSrc);
-		/**
-		 * @description program
-		 * @private
-		 * @member {WebGLProgram}
-		 */
-		this._program = this._gl.createProgram();
-		this._gl.attachShader(this._program, this._vertexShader);
-		this._gl.attachShader(this._program, this._fragmentShader);
-		this._gl.linkProgram(this._program);
+    /**
+     * crate the program and compile shader
+     *
+     * @param {string} vertSrc vertex hader
+     * @param {string} fragSrc fragment shader src
+     */
+    initProgram(vertSrc, fragSrc) {
+        /**
+         * @description vertexShader
+         * @private
+         * @member {WebGLShader}
+         */
+        this._vertexShader = webGLShader(this._gl, VERTEX_SHADER, vertSrc);
+        /**
+         * @description fragmentShader
+         * @private
+         * @member {WebGLShader}
+         */
+        this._fragmentShader = webGLShader(this._gl, FRAGMENT_SHADER, fragSrc);
+        /**
+         * @description program
+         * @private
+         * @member {WebGLProgram}
+         */
+        this._program = this._gl.createProgram();
+        this._gl.attachShader(this._program, this._vertexShader);
+        this._gl.attachShader(this._program, this._fragmentShader);
+        this._gl.linkProgram(this._program);
 
-		try {
-			let success = this._gl.getProgramParameter(this._program, LINK_STATUS);
-			if (!success) throw this._gl.getProgramInfoLog(this._program);
-		} catch (error) {
-			console.error(`WebGLProgram: ${error}`);
-		}
+        try {
+            let success = this._gl.getProgramParameter(this._program, LINK_STATUS);
+            if (!success) throw this._gl.getProgramInfoLog(this._program);
+        } catch (error) {
+            console.error(`WebGLProgram: ${error}`);
+        }
 
-		this._setProperties();
-	}
+        this._setProperties();
+    }
 
-	/**
-	 * set properties such as uniforms and attributes
-	 * @private
-	 */
-	_setProperties() {
-		let ii;
+    /**
+     * set properties such as uniforms and attributes
+     * @private
+     */
+    _setProperties() {
+        let ii;
+        let context = { texIndex: 0 };
 
-		// uniforms
-		const uniformNumber = this._gl.getProgramParameter(this._program, ACTIVE_UNIFORMS);
+        // ============
+        //   uniforms
+        // ============
+	
+        const uniformNumber = this._gl.getProgramParameter(this._program, ACTIVE_UNIFORMS);
 
-		/**
-		 * @member {object}
-		 */
-		this.uniform = {};
-		for (ii = 0; ii < uniformNumber; ii++) {
-			let uniformInfo = this._gl.getActiveUniform(this._program, ii);
-			this.uniform[uniformInfo.name] = new Uniform(this._gl, this._program, uniformInfo);
-		}
+        /**
+         * @member {object}
+         */
+        this.uniform = {};
+        for (ii = 0; ii < uniformNumber; ii++) {
+            let uniformInfo = this._gl.getActiveUniform(this._program, ii);
+            this.uniform[uniformInfo.name] = new Uniform(this._gl, this._program, uniformInfo, context);
+        }
 
-		//attributes
-		const attributreNumber = this._gl.getProgramParameter(this._program, ACTIVE_ATTRIBUTES);
-		/**
-		 * @member {object}
-		 */
-		this.attrib = {};
-		for (ii = 0; ii < attributreNumber; ii++) {
-			let attrib = this._gl.getActiveAttrib(this._program, ii);
-			this.attrib[attrib.name] = {
-				location: this._gl.getAttribLocation(this._program, attrib.name),
-				type: attrib.type,
-				size: attrib.size
-			};
-		}
+        // ============
+        //  attributes
+        // ============
 
-		return this;
-	}
+        const attributreNumber = this._gl.getProgramParameter(this._program, ACTIVE_ATTRIBUTES);
+        /**
+         * @member {object}
+         */
+        this.attrib = {};
+        for (ii = 0; ii < attributreNumber; ii++) {
+            let attrib = this._gl.getActiveAttrib(this._program, ii);
+            this.attrib[attrib.name] = {
+                location: this._gl.getAttribLocation(this._program, attrib.name),
+                type: attrib.type,
+                size: attrib.size
+            };
+        }
 
-	/**
-	 * use program, as same function as bind()
-	 */
-	use() {
-		return this.bind();
-	}
+        return this;
+    }
 
-	/**
-	 * use program, as same function as use()
-	 */
-	bind() {
-		this._gl.useProgram(this._program);
-		return this;
-	}
+    /**
+     * use program, as same function as bind()
+     */
+    use() {
+        return this.bind();
+    }
 
-	/**
-	 * get the value of the attribute of program(it will be remove)
-	 *
-	 * @param {string} name name of attributes
-	 */
-	getAttrib(name) {
-		return this.attrib[name];
-	}
+    /**
+     * use program, as same function as use()
+     */
+    bind() {
+        this._gl.useProgram(this._program);
+        return this;
+    }
 
-	/**
-	 * get the value of uniform of program(it will be removed)
-	 * @param {string} name name of uniforms
-	 */
-	getUniforms(name) {
-		return this.uniform[name];
-	}
-	/**
-	 * set texture as uniform
-	 * @param {Texture} texture
-	 * @param {String} uniformName
-	 */
-	setUniformTexture(texture, uniformName) {
-		let { textureNum } = texture;
-		this.uniform[uniformName].update(textureNum);
-	}
+    /**
+     * get the value of the attribute of program(it will be remove)
+     *
+     * @param {string} name name of attributes
+     */
+    getAttrib(name) {
+        return this.attrib[name];
+    }
 
-	/**
-	 * dispose program
-	 */
-	dispose() {
-		if (this._gl === null) return;
+    /**
+     * get the value of uniform of program(it will be removed)
+     * @param {string} name name of uniforms
+     */
+    getUniforms(name) {
+            return this.uniform[name];
+        }
+        /**
+         * set texture as uniform
+         * @param {Texture} texture
+         * @param {String} uniformName
+         */
+    setUniformTexture(texture, uniformName) {
+		let unit = this.uniform[uniformName].unit;
+		texture.activeTexture(unit).bind();
+        this.uniform[uniformName].update(unit);
+    }
 
-		this._gl.deleteProgram(this._program);
-		this._gl.deleteShader(this._vertexShader);
-		this._gl.deleteShader(this._fragmentShader);
-		this._gl = null;
-	}
+    /**
+     * dispose program
+     */
+    dispose() {
+        if (this._gl === null) return;
+
+        this._gl.deleteProgram(this._program);
+        this._gl.deleteShader(this._vertexShader);
+        this._gl.deleteShader(this._fragmentShader);
+        this._gl = null;
+    }
 }
 
 function detectorWebGL2() {
@@ -544,7 +556,7 @@ class IndexArrayBuffer {
 	}
 }
 
-let textureNum = 0;
+// export let textureNum = 0;
 
 /**
  * Class representing a Texture
@@ -556,9 +568,8 @@ class Texture {
 	 * @param {GLenum} format
 	 * @param {GLenum} internalFormat
 	 * @param {GLenum} type
-	 * @param {GLenum} unit
 	 */
-	constructor(gl, format = RGB, internalFormat = RGB, type = UNSIGNED_BYTE, unit = textureNum) {
+	constructor(gl, format = RGB, internalFormat = RGB, type = UNSIGNED_BYTE) {
 		this._gl = gl;
 		if (!this._gl) {
 			console.error('[Texture]gl is missed');
@@ -569,13 +580,8 @@ class Texture {
 		 * @member WebGLTexture */
 		this._texture = this._gl.createTexture();
 		/** @member GLenum */
-		this.textureNum = textureNum;
-		/** @member GLenum */
-		this.unit = TEXTURE0 + textureNum;
 
 		this.setFormat(format, internalFormat, type);
-
-		textureNum++;
 
 		return this;
 	}
@@ -584,8 +590,8 @@ class Texture {
 	 * @description active texture
 	 * @returns {Texture}
 	 */
-	activeTexture() {
-		this._gl.activeTexture(this.unit);
+	activeTexture(unit = 0) {
+		this._gl.activeTexture( this._gl.TEXTURE0 + (0|unit) );
 		return this;
 	}
 
@@ -1091,6 +1097,6 @@ let draw = {
 	}
 };
 
-console.log('[tubugl] version: 1.3.1, %o', 'https://github.com/kenjiSpecial/tubugl');
+console.log('[tubugl] version: 1.4.0, %o', 'https://github.com/kenjiSpecial/tubugl');
 
 export { Program, Program2, ArrayBuffer, IndexArrayBuffer, Texture, FrameBuffer, TransformFeedback, VAO, draw, webGLShader };

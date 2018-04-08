@@ -1,10 +1,9 @@
-export let textureNum = 0;
+// export let textureNum = 0;
 
 import {
 	TEXTURE_2D,
 	RGB,
 	UNSIGNED_BYTE,
-	TEXTURE0,
 	LINEAR,
 	NEAREST,
 	TEXTURE_MIN_FILTER,
@@ -23,9 +22,8 @@ export class Texture {
 	 * @param {GLenum} format
 	 * @param {GLenum} internalFormat
 	 * @param {GLenum} type
-	 * @param {GLenum} unit
 	 */
-	constructor(gl, format = RGB, internalFormat = RGB, type = UNSIGNED_BYTE, unit = textureNum) {
+	constructor(gl, format = RGB, internalFormat = RGB, type = UNSIGNED_BYTE) {
 		this._gl = gl;
 		if (!this._gl) {
 			console.error('[Texture]gl is missed');
@@ -36,13 +34,8 @@ export class Texture {
 		 * @member WebGLTexture */
 		this._texture = this._gl.createTexture();
 		/** @member GLenum */
-		this.textureNum = textureNum;
-		/** @member GLenum */
-		this.unit = TEXTURE0 + textureNum;
 
 		this.setFormat(format, internalFormat, type);
-
-		textureNum++;
 
 		return this;
 	}
@@ -51,8 +44,8 @@ export class Texture {
 	 * @description active texture
 	 * @returns {Texture}
 	 */
-	activeTexture() {
-		this._gl.activeTexture(this.unit);
+	activeTexture(unit = 0) {
+		this._gl.activeTexture( this._gl.TEXTURE0 + (0|unit) );
 		return this;
 	}
 

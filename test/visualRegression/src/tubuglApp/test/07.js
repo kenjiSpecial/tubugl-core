@@ -72,216 +72,210 @@ void main() {
 `;
 
 export default class App {
-	constructor(params) {
-		this.reset = this.reset.bind(this);
-		this._playAndStop = this._playAndStop.bind(this);
+    constructor(params) {
+        this.reset = this.reset.bind(this);
+        this._playAndStop = this._playAndStop.bind(this);
 
-		this._isPlay = false;
-		this._width = params.width ? params.width : window.innerWidth;
-		this._height = params.height ? params.height : window.innerHeight;
+        this._isPlay = false;
+        this._width = params.width ? params.width : window.innerWidth;
+        this._height = params.height ? params.height : window.innerHeight;
 
-		this.canvas = params.canvas;
-		this.gl = this.canvas.getContext('webgl');
-		if (!this.gl.getExtension('OES_texture_float')) {
-			throw new Error('This sddemo requires the OES_texture_float extension');
-		}
+        this.canvas = params.canvas;
+        this.gl = this.canvas.getContext('webgl');
+        if (!this.gl.getExtension('OES_texture_float')) {
+            throw new Error('This sddemo requires the OES_texture_float extension');
+        }
 
-		this.gl.disable(this.gl.DEPTH_TEST);
-		this._description = params.description;
+        this.gl.disable(this.gl.DEPTH_TEST);
+        this._description = params.description;
 
-		this.makeFrameBuffer();
-		this.makeProgram();
-		this.resize();
-		if (isDebug) this._setDebug();
-	}
+        this.makeFrameBuffer();
+        this.makeProgram();
+        this.resize();
+        if (isDebug) this._setDebug();
+    }
 
-	_playAndStop() {
-		if (this._isPlay) {
-			this.stop();
-			this._playAndStopGUI.name('play');
-		} else {
-			this.start();
-			this._playAndStopGUI.name('pause');
-		}
-	}
+    _playAndStop() {
+        if (this._isPlay) {
+            this.stop();
+            this._playAndStopGUI.name('play');
+        } else {
+            this.start();
+            this._playAndStopGUI.name('pause');
+        }
+    }
 
-	_setDebug() {
-		this.stats = new Stats();
-		document.body.appendChild(this.stats.dom);
-		let descriptionDom = document.createElement('div');
-		descriptionDom.style.color = '#ffffff';
-		descriptionDom.style.fontSize = '12px';
-		descriptionDom.style.marginTop = '5px';
-		descriptionDom.style.marginLeft = '4px';
-		this.stats.dom.appendChild(descriptionDom);
-		descriptionDom.innerHTML = this._description;
+    _setDebug() {
+        this.stats = new Stats();
+        document.body.appendChild(this.stats.dom);
+        let descriptionDom = document.createElement('div');
+        descriptionDom.style.color = '#ffffff';
+        descriptionDom.style.fontSize = '12px';
+        descriptionDom.style.marginTop = '5px';
+        descriptionDom.style.marginLeft = '4px';
+        this.stats.dom.appendChild(descriptionDom);
+        descriptionDom.innerHTML = this._description;
 
-		this.gui = new dat.GUI();
-		this.gui.add(this, 'reset');
-		this._playAndStopGUI = this.gui.add(this, '_playAndStop').name('pause');
-	}
+        this.gui = new dat.GUI();
+        this.gui.add(this, 'reset');
+        this._playAndStopGUI = this.gui.add(this, '_playAndStop').name('pause');
+    }
 
-	makeFrameBuffer() {
-		// this.gl.pixelStorei(UNPACK_FLIP_Y_WEBGL, 1);
-		let frameBuffer0 = new FrameBuffer(
-			this.gl,
-			{ type: FLOAT },
-			window.innerWidth,
-			window.innerHeight
-		);
-		frameBuffer0.unbind();
+    makeFrameBuffer() {
+        // this.gl.pixelStorei(UNPACK_FLIP_Y_WEBGL, 1);
+        let frameBuffer0 = new FrameBuffer(
+            this.gl, { type: FLOAT },
+            window.innerWidth,
+            window.innerHeight
+        );
+        frameBuffer0.unbind();
 
-		let frameBuffer1 = new FrameBuffer(
-			this.gl,
-			{ type: FLOAT },
-			window.innerWidth,
-			window.innerHeight
-		);
-		frameBuffer1.unbind();
+        let frameBuffer1 = new FrameBuffer(
+            this.gl, { type: FLOAT },
+            window.innerWidth,
+            window.innerHeight
+        );
+        frameBuffer1.unbind();
 
-		this._buffers = {
-			read: frameBuffer0,
-			write: frameBuffer1,
-			front: frameBuffer0,
-			back: frameBuffer1
-		};
-	}
+        this._buffers = {
+            read: frameBuffer0,
+            write: frameBuffer1,
+            front: frameBuffer0,
+            back: frameBuffer1
+        };
+    }
 
-	makeProgram() {
-		this._program = new Program(this.gl, vertexShader, fragmentShader);
-		let particleNum = 16 * 16;
-		let positions = [];
+    makeProgram() {
+        this._program = new Program(this.gl, vertexShader, fragmentShader);
+        let particleNum = 16 * 16;
+        let positions = [];
 
-		for (let ii = 0; ii < particleNum; ii++) {
-			positions[4 * ii + 0] = (ii % 16) / 16 * 1.4 - 0.7;
-			positions[4 * ii + 1] = parseInt(ii / 16) / 16 * 1.4 - 0.7;
-			positions[4 * ii + 2] = (ii % 16) / 16;
-			positions[4 * ii + 3] = parseInt(ii / 16) / 16;
-		}
+        for (let ii = 0; ii < particleNum; ii++) {
+            positions[4 * ii + 0] = (ii % 16) / 16 * 1.4 - 0.7;
+            positions[4 * ii + 1] = parseInt(ii / 16) / 16 * 1.4 - 0.7;
+            positions[4 * ii + 2] = (ii % 16) / 16;
+            positions[4 * ii + 3] = parseInt(ii / 16) / 16;
+        }
 
-		positions = new Float32Array(positions);
-		let positionBuffer = new ArrayBuffer(this.gl, positions);
-		positionBuffer.setAttribs('position', 4);
+        positions = new Float32Array(positions);
+        let positionBuffer = new ArrayBuffer(this.gl, positions);
+        positionBuffer.setAttribs('position', 4);
 
-		this._obj = {
-			program: this._program,
-			positionBuffer: positionBuffer,
-			count: particleNum
-		};
+        this._obj = {
+            program: this._program,
+            positionBuffer: positionBuffer,
+            count: particleNum
+        };
 
-		let program2 = new Program(this.gl, vertexShaderSrc, fragmentSrc);
+        let program2 = new Program(this.gl, vertexShaderSrc, fragmentSrc);
 
-		let side = 2.0;
-		let indices2 = new Uint16Array([0, 1, 2, 0, 2, 3]);
-		let vertices2 = new Float32Array([
-			-side / 2,
-			-side / 2,
-			side / 2,
-			-side / 2,
-			side / 2,
-			side / 2,
-			-side / 2,
-			side / 2
-		]);
-		let uvs = new Float32Array([0, 1, 1, 1, 1, 0, 0, 0]);
+        let side = 2.0;
+        let indices2 = new Uint16Array([0, 1, 2, 0, 2, 3]);
+        let vertices2 = new Float32Array([-side / 2, -side / 2,
+            side / 2, -side / 2,
+            side / 2,
+            side / 2, -side / 2,
+            side / 2
+        ]);
+        let uvs = new Float32Array([0, 1, 1, 1, 1, 0, 0, 0]);
 
-		let arrayBuffer = new ArrayBuffer(this.gl, vertices2);
-		arrayBuffer.setAttribs('a_position', 2, this.gl.FLOAT, false, 0, 0);
+        let arrayBuffer = new ArrayBuffer(this.gl, vertices2);
+        arrayBuffer.setAttribs('a_position', 2, this.gl.FLOAT, false, 0, 0);
 
-		let uvBuffer = new ArrayBuffer(this.gl, uvs);
-		uvBuffer.setAttribs('uv', 2, this.gl.FLOAT, false, 0, 0);
+        let uvBuffer = new ArrayBuffer(this.gl, uvs);
+        uvBuffer.setAttribs('uv', 2, this.gl.FLOAT, false, 0, 0);
 
-		let indexBuffer2 = new IndexArrayBuffer(this.gl, indices2);
+        let indexBuffer2 = new IndexArrayBuffer(this.gl, indices2);
 
-		this._position = {
-			program: program2,
-			indexBuffer: indexBuffer2,
-			positionBuffer: arrayBuffer,
-			uvBuffer: uvBuffer,
-			count: 6
-		};
+        this._position = {
+            program: program2,
+            indexBuffer: indexBuffer2,
+            positionBuffer: arrayBuffer,
+            uvBuffer: uvBuffer,
+            count: 6
+        };
 
-		this._debugProgram = new Program(this.gl, vertexShaderSrc, debugFragmentShader);
-	}
+        this._debugProgram = new Program(this.gl, vertexShaderSrc, debugFragmentShader);
+    }
 
-	reset() {
-		this._buffers.front.reset();
-		this._buffers.back.reset();
-	}
+    reset() {
+        this._buffers.front.reset();
+        this._buffers.back.reset();
+    }
 
-	start() {
-		this._isPlay = true;
+    start() {
+        this._isPlay = true;
 
-		if (isDebug) {
-			TweenMax.ticker.addEventListener('tick', this.update, this);
-		} else {
-			for (let ii = 0; ii < 10; ii++) {
-				this.update();
-			}
-		}
-	}
+        if (isDebug) {
+            TweenMax.ticker.addEventListener('tick', this.update, this);
+        } else {
+            for (let ii = 0; ii < 10; ii++) {
+                this.update();
+            }
+        }
+    }
 
-	stop() {
-		this._isPlay = false;
-		TweenMax.ticker.removeEventListener('tick', this.update, this);
-	}
+    stop() {
+        this._isPlay = false;
+        TweenMax.ticker.removeEventListener('tick', this.update, this);
+    }
 
-	update() {
-		if (this.stats) this.stats.update();
+    update() {
+        if (this.stats) this.stats.update();
 
-		/**
-		 * =====================================
-		 */
+        /**
+         * =====================================
+         */
 
-		this._buffers.write.bind().updateViewport();
-		this.gl.unif;
+        this._buffers.write.bind().updateViewport();
+        this.gl.unif;
 
-		this._position.program.bind();
+        this._position.program.bind();
 
-		this.gl.clearColor(0, 0, 0, 1);
-		this.gl.clear(this.gl.COLOR_BUFFER_BIT);
+        this.gl.clearColor(0, 0, 0, 1);
+        this.gl.clear(this.gl.COLOR_BUFFER_BIT);
 
-		this._position.program.setUniformTexture(this._buffers.read.texture, 'uTexture');
-		this._buffers.read.texture.activeTexture().bind();
+        this._position.program.setUniformTexture(this._buffers.read.texture, 'uTexture');
+        // this._buffers.read.texture.activeTexture().bind();
 
-		this._position.indexBuffer.bind();
-		this._position.positionBuffer.bind().attribPointer(this._position.program);
-		this._position.uvBuffer.bind().attribPointer(this._position.program);
-		this.gl.drawElements(this.gl.TRIANGLES, this._position.count, this.gl.UNSIGNED_SHORT, 0);
+        this._position.indexBuffer.bind();
+        this._position.positionBuffer.bind().attribPointer(this._position.program);
+        this._position.uvBuffer.bind().attribPointer(this._position.program);
+        this.gl.drawElements(this.gl.TRIANGLES, this._position.count, this.gl.UNSIGNED_SHORT, 0);
 
-		this._buffers.write.unbind();
+        this._buffers.write.unbind();
 
-		/**
-		 * ===============================
-		 */
+        /**
+         * ===============================
+         */
 
-		this._obj.program.bind();
+        this._obj.program.bind();
 
-		this.gl.clearColor(0, 0, 0, 1);
-		this.gl.clear(this.gl.COLOR_BUFFER_BIT);
-		this.gl.viewport(0, 0, this._width, this._height);
+        this.gl.clearColor(0, 0, 0, 1);
+        this.gl.clear(this.gl.COLOR_BUFFER_BIT);
+        this.gl.viewport(0, 0, this._width, this._height);
 
-		this._obj.program.setUniformTexture(this._buffers.write.texture, 'uTexture');
-		this._buffers.write.texture.activeTexture().bind();
+        this._obj.program.setUniformTexture(this._buffers.write.texture, 'uTexture');
+        // this._buffers.write.texture.activeTexture().bind();
 
-		this._obj.positionBuffer.bind().attribPointer(this._obj.program);
-		this.gl.drawArrays(this.gl.POINTS, 0, this._obj.count);
+        this._obj.positionBuffer.bind().attribPointer(this._obj.program);
+        this.gl.drawArrays(this.gl.POINTS, 0, this._obj.count);
 
-		if (this._buffers.read === this._buffers.front) {
-			this._buffers.read = this._buffers.back;
-			this._buffers.write = this._buffers.front;
-		} else {
-			this._buffers.read = this._buffers.front;
-			this._buffers.write = this._buffers.back;
-		}
-	}
+        if (this._buffers.read === this._buffers.front) {
+            this._buffers.read = this._buffers.back;
+            this._buffers.write = this._buffers.front;
+        } else {
+            this._buffers.read = this._buffers.front;
+            this._buffers.write = this._buffers.back;
+        }
+    }
 
-	resize(width, height) {
-		if (width) this._width = width;
-		if (height) this._height = height;
+    resize(width, height) {
+        if (width) this._width = width;
+        if (height) this._height = height;
 
-		this.canvas.width = this._width;
-		this.canvas.height = this._height;
-		this.gl.viewport(0, 0, this._width, this._height);
-	}
+        this.canvas.width = this._width;
+        this.canvas.height = this._height;
+        this.gl.viewport(0, 0, this._width, this._height);
+    }
 }
