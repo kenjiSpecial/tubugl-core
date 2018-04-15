@@ -858,7 +858,7 @@ class FrameBuffer {
 		/**
 		 * @member {texture}
 		 */
-		this.texture = this._makeTexture();
+		this.texture = this._makeTexture(params);
 		/**
 		 * @member WebGLFramebuffer
 		 */
@@ -978,17 +978,20 @@ class FrameBuffer {
 	 * @private
 	 *
 	 * @param {Object} params
-	 * @param {*} params.dataArray
+	 * @param {Float32Array | Float64Array} params.dataArray
 	 *
 	 * @returns Texture
 	 */
 	_makeTexture(params) {
 		let texture = new Texture(this._gl, this._internalFormat, this._format, this._type);
+
 		texture
 			.bind()
 			.setFilter(NEAREST) //https://evanw.github.io/lightgl.js/docs/texture.html
-			.wrap(CLAMP_TO_EDGE)
-			.fromData(this._width, this._height, params.dataArray);
+			.wrap(CLAMP_TO_EDGE);
+		if (params && params.dataArray)
+			texture.fromData(this._width, this._height, params.dataArray);
+		else texture.fromSize(this._width, this._height);
 
 		return texture;
 	}
@@ -1130,6 +1133,6 @@ let draw = {
 	}
 };
 
-console.log('[tubugl] version: 1.4.1, %o', 'https://github.com/kenjiSpecial/tubugl');
+console.log('[tubugl] version: 1.4.2, %o', 'https://github.com/kenjiSpecial/tubugl');
 
 export { Program, Program2, ArrayBuffer, IndexArrayBuffer, Texture, FrameBuffer, TransformFeedback, VAO, draw, webGLShader };

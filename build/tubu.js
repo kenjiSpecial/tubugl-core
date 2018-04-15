@@ -1075,7 +1075,7 @@ var FrameBuffer = function () {
 		/**
    * @member {texture}
    */
-		this.texture = this._makeTexture();
+		this.texture = this._makeTexture(params);
 		/**
    * @member WebGLFramebuffer
    */
@@ -1197,7 +1197,7 @@ var FrameBuffer = function () {
    * @private
    *
    * @param {Object} params
-   * @param {*} params.dataArray
+   * @param {Float32Array | Float64Array} params.dataArray
    *
    * @returns Texture
    */
@@ -1206,8 +1206,10 @@ var FrameBuffer = function () {
 		key: '_makeTexture',
 		value: function _makeTexture(params) {
 			var texture = new Texture(this._gl, this._internalFormat, this._format, this._type);
+
 			texture.bind().setFilter(tubuglConstants.NEAREST) //https://evanw.github.io/lightgl.js/docs/texture.html
-			.wrap(tubuglConstants.CLAMP_TO_EDGE).fromData(this._width, this._height, params.dataArray);
+			.wrap(tubuglConstants.CLAMP_TO_EDGE);
+			if (params && params.dataArray) texture.fromData(this._width, this._height, params.dataArray);else texture.fromSize(this._width, this._height);
 
 			return texture;
 		}
@@ -1409,7 +1411,7 @@ var DrawCall = function () {
 	return DrawCall;
 }();
 
-console.log('[tubugl] version: 1.4.1, %o', 'https://github.com/kenjiSpecial/tubugl');
+console.log('[tubugl] version: 1.4.2, %o', 'https://github.com/kenjiSpecial/tubugl');
 
 exports.Program = Program;
 exports.Program2 = Program2;
