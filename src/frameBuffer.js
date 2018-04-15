@@ -46,9 +46,21 @@ export class FrameBuffer {
 		 */
 		this._height = height;
 		/**
+		 * @member {GLenum}
+		 */
+		this._type = params.type;
+		/**
+		 * @member {GLenum}
+		 */
+		this._internalFormat = params.internalFormat;
+		/**
+		 * @member {GLenum}
+		 */
+		this._format = params.format;
+		/**
 		 * @member {texture}
 		 */
-		this.texture = this._makeTexture(params);
+		this.texture = this._makeTexture();
 		/**
 		 * @member WebGLFramebuffer
 		 */
@@ -82,6 +94,28 @@ export class FrameBuffer {
 		this._gl.framebufferRenderbuffer(FRAMEBUFFER, DEPTH_ATTACHMENT, RENDERBUFFER, depthBuffer);
 
 		return this;
+	}
+
+	/**
+	 * @description update texture and return old texture
+	 *
+	 * @returns {texture}
+	 */
+	updateTexture() {
+		let prevTexture = this.texture;
+		let texture = this._makeTexture();
+
+		this._gl.bindFramebuffer(FRAMEBUFFER, this._frameBuffer);
+
+		this._gl.framebufferTexture2D(
+			FRAMEBUFFER,
+			COLOR_ATTACHMENT0,
+			TEXTURE_2D,
+			texture.getTexture(),
+			0
+		);
+
+		return prevTexture;
 	}
 
 	/**
@@ -151,7 +185,7 @@ export class FrameBuffer {
 	 * @returns Texture
 	 */
 	_makeTexture(params) {
-		let texture = new Texture(this._gl, params.internalFormat, params.format, params.type);
+		let texture = new Texture(this._gl, this._internalFormat, this._format, this._type);
 		texture
 			.bind()
 			.setFilter(NEAREST) //https://evanw.github.io/lightgl.js/docs/texture.html

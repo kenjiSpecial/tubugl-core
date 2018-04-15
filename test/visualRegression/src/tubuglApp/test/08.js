@@ -42,7 +42,7 @@ void main(){
 }
 `;
 
-let size = 10;
+let size = 2;
 
 export default class App {
 	constructor(params) {
@@ -94,7 +94,7 @@ export default class App {
 
 	makeProgram() {
 		this._program = new Program(this.gl, vertexShader, fragmentShader);
-		let particleNum = (size + 1) * (size + 1);
+		let particleNum = size * size; //(size + 1) * (size + 1);
 		let positions = [];
 		let ids = [];
 
@@ -104,8 +104,8 @@ export default class App {
 			positions[4 * ii + 2] = 0.0;
 			positions[4 * ii + 3] = 1.0;
 
-			ids.push(parseInt(ii / (size + 1)) / size);
-			ids.push((ii % (size + 1)) / size);
+			ids.push(parseInt(ii / size) / (size - 1));
+			ids.push((ii % size) / (size - 1));
 		}
 
 		console.log(ids);
@@ -129,10 +129,10 @@ export default class App {
 		this._texture = new Texture(this.gl, RGBA, RGBA, FLOAT);
 
 		let dataArr = [];
-		for (let ii = 0; ii < (size + 1) * (size + 1); ii++) {
+		for (let ii = 0; ii < size * size; ii++) {
 			// let id = ii;
-			let xx = (ii % (size + 1)) / size - 0.5;
-			let yy = parseInt(ii / (size + 1)) / size - 0.5;
+			let xx = (ii % size) / (size - 1) - 0.5;
+			let yy = parseInt(ii / size) / (size - 1) - 0.5;
 
 			dataArr.push(xx * 100, yy, 0, 0);
 		}
@@ -142,7 +142,7 @@ export default class App {
 			.bind()
 			.setFilter(NEAREST)
 			.wrap(CLAMP_TO_EDGE)
-			.fromData(size + 1, size + 1, new Float32Array(dataArr));
+			.fromData(size, size, new Float32Array(dataArr));
 	}
 
 	start() {

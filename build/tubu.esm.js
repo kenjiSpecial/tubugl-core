@@ -579,7 +579,6 @@ class Texture {
 		/**
 		 * @member WebGLTexture */
 		this._texture = this._gl.createTexture();
-		/** @member GLenum */
 
 		this.setFormat(format, internalFormat, type);
 
@@ -591,7 +590,7 @@ class Texture {
 	 * @returns {Texture}
 	 */
 	activeTexture(unit = 0) {
-		this._gl.activeTexture( this._gl.TEXTURE0 + (0|unit) );
+		this._gl.activeTexture(this._gl.TEXTURE0 + (0 | unit));
 		return this;
 	}
 
@@ -845,9 +844,21 @@ class FrameBuffer {
 		 */
 		this._height = height;
 		/**
+		 * @member {GLenum}
+		 */
+		this._type = params.type;
+		/**
+		 * @member {GLenum}
+		 */
+		this._internalFormat = params.internalFormat;
+		/**
+		 * @member {GLenum}
+		 */
+		this._format = params.format;
+		/**
 		 * @member {texture}
 		 */
-		this.texture = this._makeTexture(params);
+		this.texture = this._makeTexture();
 		/**
 		 * @member WebGLFramebuffer
 		 */
@@ -881,6 +892,28 @@ class FrameBuffer {
 		this._gl.framebufferRenderbuffer(FRAMEBUFFER, DEPTH_ATTACHMENT, RENDERBUFFER, depthBuffer);
 
 		return this;
+	}
+
+	/**
+	 * @description update texture and return old texture
+	 *
+	 * @returns {texture}
+	 */
+	updateTexture() {
+		let prevTexture = this.texture;
+		let texture = this._makeTexture();
+
+		this._gl.bindFramebuffer(FRAMEBUFFER, this._frameBuffer);
+
+		this._gl.framebufferTexture2D(
+			FRAMEBUFFER,
+			COLOR_ATTACHMENT0,
+			TEXTURE_2D,
+			texture.getTexture(),
+			0
+		);
+
+		return prevTexture;
 	}
 
 	/**
@@ -950,7 +983,7 @@ class FrameBuffer {
 	 * @returns Texture
 	 */
 	_makeTexture(params) {
-		let texture = new Texture(this._gl, params.internalFormat, params.format, params.type);
+		let texture = new Texture(this._gl, this._internalFormat, this._format, this._type);
 		texture
 			.bind()
 			.setFilter(NEAREST) //https://evanw.github.io/lightgl.js/docs/texture.html
@@ -1097,6 +1130,6 @@ let draw = {
 	}
 };
 
-console.log('[tubugl] version: 1.4.0, %o', 'https://github.com/kenjiSpecial/tubugl');
+console.log('[tubugl] version: 1.4.1, %o', 'https://github.com/kenjiSpecial/tubugl');
 
 export { Program, Program2, ArrayBuffer, IndexArrayBuffer, Texture, FrameBuffer, TransformFeedback, VAO, draw, webGLShader };

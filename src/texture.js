@@ -33,7 +33,6 @@ export class Texture {
 		/**
 		 * @member WebGLTexture */
 		this._texture = this._gl.createTexture();
-		/** @member GLenum */
 
 		this.setFormat(format, internalFormat, type);
 
@@ -45,7 +44,7 @@ export class Texture {
 	 * @returns {Texture}
 	 */
 	activeTexture(unit = 0) {
-		this._gl.activeTexture( this._gl.TEXTURE0 + (0|unit) );
+		this._gl.activeTexture(this._gl.TEXTURE0 + (0 | unit));
 		return this;
 	}
 
