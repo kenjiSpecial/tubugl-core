@@ -3,7 +3,8 @@ import {
 	COLOR_ATTACHMENT0,
 	RENDERBUFFER,
 	DEPTH_COMPONENT16,
-	DEPTH_ATTACHMENT
+	DEPTH_ATTACHMENT,
+	LINEAR
 } from 'tubugl-constants';
 import { TEXTURE_2D, CLAMP_TO_EDGE, NEAREST } from 'tubugl-constants';
 import { RGBA, UNSIGNED_BYTE } from 'tubugl-constants';
@@ -57,6 +58,12 @@ export class FrameBuffer {
 		 * @member {GLenum}
 		 */
 		this._format = params.format;
+
+		/**
+		 * @member {GLenum}
+		 */
+		this._filter = params._filter ? params._filter : LINEAR;
+
 		/**
 		 * @member {texture}
 		 */
@@ -189,7 +196,7 @@ export class FrameBuffer {
 
 		texture
 			.bind()
-			.setFilter(NEAREST) //https://evanw.github.io/lightgl.js/docs/texture.html
+			.setFilter(this._filter) //https://evanw.github.io/lightgl.js/docs/texture.html
 			.wrap(CLAMP_TO_EDGE);
 		if (params && params.dataArray)
 			texture.fromData(this._width, this._height, params.dataArray);

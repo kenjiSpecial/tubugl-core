@@ -855,6 +855,12 @@ class FrameBuffer {
 		 * @member {GLenum}
 		 */
 		this._format = params.format;
+
+		/**
+		 * @member {GLenum}
+		 */
+		this._filter = params._filter ? params._filter : LINEAR;
+
 		/**
 		 * @member {texture}
 		 */
@@ -987,7 +993,7 @@ class FrameBuffer {
 
 		texture
 			.bind()
-			.setFilter(NEAREST) //https://evanw.github.io/lightgl.js/docs/texture.html
+			.setFilter(this._filter) //https://evanw.github.io/lightgl.js/docs/texture.html
 			.wrap(CLAMP_TO_EDGE);
 		if (params && params.dataArray)
 			texture.fromData(this._width, this._height, params.dataArray);
@@ -1133,6 +1139,6 @@ let draw = {
 	}
 };
 
-console.log('[tubugl] version: 1.4.2, %o', 'https://github.com/kenjiSpecial/tubugl');
+console.log('[tubugl] version: 1.4.3, %o', 'https://github.com/kenjiSpecial/tubugl');
 
 export { Program, Program2, ArrayBuffer, IndexArrayBuffer, Texture, FrameBuffer, TransformFeedback, VAO, draw, webGLShader };

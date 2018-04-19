@@ -1072,6 +1072,12 @@ var FrameBuffer = function () {
    * @member {GLenum}
    */
 		this._format = params.format;
+
+		/**
+   * @member {GLenum}
+   */
+		this._filter = params._filter ? params._filter : tubuglConstants.LINEAR;
+
 		/**
    * @member {texture}
    */
@@ -1207,7 +1213,7 @@ var FrameBuffer = function () {
 		value: function _makeTexture(params) {
 			var texture = new Texture(this._gl, this._internalFormat, this._format, this._type);
 
-			texture.bind().setFilter(tubuglConstants.NEAREST) //https://evanw.github.io/lightgl.js/docs/texture.html
+			texture.bind().setFilter(this._filter) //https://evanw.github.io/lightgl.js/docs/texture.html
 			.wrap(tubuglConstants.CLAMP_TO_EDGE);
 			if (params && params.dataArray) texture.fromData(this._width, this._height, params.dataArray);else texture.fromSize(this._width, this._height);
 
@@ -1411,7 +1417,7 @@ var DrawCall = function () {
 	return DrawCall;
 }();
 
-console.log('[tubugl] version: 1.4.2, %o', 'https://github.com/kenjiSpecial/tubugl');
+console.log('[tubugl] version: 1.4.3, %o', 'https://github.com/kenjiSpecial/tubugl');
 
 exports.Program = Program;
 exports.Program2 = Program2;
