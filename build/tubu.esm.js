@@ -859,7 +859,7 @@ class FrameBuffer {
 		/**
 		 * @member {GLenum}
 		 */
-		this._filter = params._filter ? params._filter : LINEAR;
+		this._filter = params.filter ? params.filter : LINEAR;
 
 		/**
 		 * @member {texture}

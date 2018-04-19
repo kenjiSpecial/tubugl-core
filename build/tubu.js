@@ -1076,7 +1076,7 @@ var FrameBuffer = function () {
 		/**
    * @member {GLenum}
    */
-		this._filter = params._filter ? params._filter : tubuglConstants.LINEAR;
+		this._filter = params.filter ? params.filter : tubuglConstants.LINEAR;
 
 		/**
    * @member {texture}
