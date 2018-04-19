@@ -859,7 +859,7 @@ class FrameBuffer {
 		/**
 		 * @member {GLenum}
 		 */
-		this._filter = params.filter ? params.filter : LINEAR;
+		this._filter = params.filter ? params.filter : NEAREST;
 
 		/**
 		 * @member {texture}
@@ -1139,6 +1139,6 @@ let draw = {
 	}
 };
 
-console.log('[tubugl] version: 1.4.3, %o', 'https://github.com/kenjiSpecial/tubugl');
+console.log('[tubugl] version: 1.4.4, %o', 'https://github.com/kenjiSpecial/tubugl');
 
 export { Program, Program2, ArrayBuffer, IndexArrayBuffer, Texture, FrameBuffer, TransformFeedback, VAO, draw, webGLShader };

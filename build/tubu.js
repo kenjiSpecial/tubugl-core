@@ -1076,7 +1076,7 @@ var FrameBuffer = function () {
 		/**
    * @member {GLenum}
    */
-		this._filter = params.filter ? params.filter : tubuglConstants.LINEAR;
+		this._filter = params.filter ? params.filter : tubuglConstants.NEAREST;
 
 		/**
    * @member {texture}
@@ -1417,7 +1417,7 @@ var DrawCall = function () {
 	return DrawCall;
 }();
 
-console.log('[tubugl] version: 1.4.3, %o', 'https://github.com/kenjiSpecial/tubugl');
+console.log('[tubugl] version: 1.4.4, %o', 'https://github.com/kenjiSpecial/tubugl');
 
 exports.Program = Program;
 exports.Program2 = Program2;
