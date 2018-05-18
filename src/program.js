@@ -1,12 +1,5 @@
 import { webGLShader } from './utils/webglShader';
 import { Uniform } from './uniform';
-import {
-    VERTEX_SHADER,
-    FRAGMENT_SHADER,
-    LINK_STATUS,
-    ACTIVE_UNIFORMS,
-    ACTIVE_ATTRIBUTES,
-} from 'tubugl-constants';
 
 export class Program {
     /**
@@ -56,13 +49,13 @@ export class Program {
          * @private
          * @member {WebGLShader}
          */
-        this._vertexShader = webGLShader(this._gl, VERTEX_SHADER, vertSrc);
+        this._vertexShader = webGLShader(this._gl, this._gl.VERTEX_SHADER, vertSrc);
         /**
          * @description fragmentShader
          * @private
          * @member {WebGLShader}
          */
-        this._fragmentShader = webGLShader(this._gl, FRAGMENT_SHADER, fragSrc);
+        this._fragmentShader = webGLShader(this._gl, this._gl.FRAGMENT_SHADER, fragSrc);
         /**
          * @description program
          * @private
@@ -74,7 +67,7 @@ export class Program {
         this._gl.linkProgram(this._program);
 
         try {
-            let success = this._gl.getProgramParameter(this._program, LINK_STATUS);
+            let success = this._gl.getProgramParameter(this._program, this._gl.LINK_STATUS);
             if (!success) throw this._gl.getProgramInfoLog(this._program);
         } catch (error) {
             console.error(`WebGLProgram: ${error}`);
@@ -95,7 +88,7 @@ export class Program {
         //   uniforms
         // ============
 	
-        const uniformNumber = this._gl.getProgramParameter(this._program, ACTIVE_UNIFORMS);
+        const uniformNumber = this._gl.getProgramParameter(this._program, this._gl.ACTIVE_UNIFORMS);
 
         /**
          * @member {object}
@@ -110,7 +103,7 @@ export class Program {
         //  attributes
         // ============
 
-        const attributreNumber = this._gl.getProgramParameter(this._program, ACTIVE_ATTRIBUTES);
+        const attributreNumber = this._gl.getProgramParameter(this._program, this._gl.ACTIVE_ATTRIBUTES);
         /**
          * @member {object}
          */

@@ -1,16 +1,9 @@
-// export let textureNum = 0;
+const RGB = 0x1907;
+const UNSIGNED_BYTE = 0x1401;
+const LINEAR = 0x2601;
+const CLAMP_TO_EDGE = 0x812F;
+const NEAREST = 0x2600;
 
-import {
-	TEXTURE_2D,
-	RGB,
-	UNSIGNED_BYTE,
-	LINEAR,
-	NEAREST,
-	TEXTURE_MIN_FILTER,
-	TEXTURE_MAG_FILTER,
-	UNPACK_FLIP_Y_WEBGL
-} from 'tubugl-constants';
-import { TEXTURE_WRAP_T, TEXTURE_WRAP_S, CLAMP_TO_EDGE } from 'tubugl-constants';
 
 /**
  * Class representing a Texture
@@ -54,7 +47,7 @@ export class Texture {
 	 * @returns {Texture}
 	 */
 	bind() {
-		this._gl.bindTexture(TEXTURE_2D, this._texture);
+		this._gl.bindTexture(this._gl.TEXTURE_2D, this._texture);
 		return this;
 	}
 
@@ -63,7 +56,7 @@ export class Texture {
 	 * @returns Texture
 	 */
 	unbind() {
-		this._gl.bindTexture(TEXTURE_2D, null);
+		this._gl.bindTexture(this._gl.TEXTURE_2D, null);
 		return this;
 	}
 
@@ -80,7 +73,7 @@ export class Texture {
 		this._width = width ? width : image.width;
 		this._height = height ? height : image.height;
 
-		this._gl.texImage2D(TEXTURE_2D, 0, this._internalFormt, this._format, this._type, image);
+		this._gl.texImage2D(this._gl.TEXTURE_2D, 0, this._internalFormt, this._format, this._type, image);
 
 		return this;
 	}
@@ -98,7 +91,7 @@ export class Texture {
 		if (height) this._height = height;
 
 		this._gl.texImage2D(
-			TEXTURE_2D,
+			this._gl.TEXTURE_2D,
 			0,
 			this._internalFormt,
 			this._width,
@@ -126,7 +119,7 @@ export class Texture {
 		if (height) this._height = height;
 
 		this._gl.texImage2D(
-			TEXTURE_2D,
+			this._gl.TEXTURE_2D,
 			0,
 			this._internalFormt,
 			this._width,
@@ -143,7 +136,7 @@ export class Texture {
 	 * @description flip the texture
 	 */
 	setFlip() {
-		this.setPixelStore(UNPACK_FLIP_Y_WEBGL, true);
+		this.setPixelStore(this._gl.UNPACK_FLIP_Y_WEBGL, true);
 		return this;
 	}
 
@@ -207,7 +200,7 @@ export class Texture {
 	 * @returns {Texture}
 	 */
 	setMagFilter(filter = LINEAR) {
-		this._gl.texParameteri(TEXTURE_2D, TEXTURE_MIN_FILTER, filter);
+		this._gl.texParameteri(this._gl.TEXTURE_2D, this._gl.TEXTURE_MAG_FILTER, filter);
 
 		return this;
 	}
@@ -220,7 +213,7 @@ export class Texture {
 	 * @returns {Texture}
 	 */
 	setMinFilter(filter = NEAREST) {
-		this._gl.texParameteri(TEXTURE_2D, TEXTURE_MAG_FILTER, filter);
+		this._gl.texParameteri(this._gl.TEXTURE_2D, this._gl.TEXTURE_MIN_FILTER, filter);
 
 		return this;
 	}
@@ -229,8 +222,8 @@ export class Texture {
 	 * @description set the wrap mode in texture
 	 */
 	wrap(wrap = CLAMP_TO_EDGE) {
-		this._gl.texParameteri(TEXTURE_2D, TEXTURE_WRAP_S, wrap);
-		this._gl.texParameteri(TEXTURE_2D, TEXTURE_WRAP_T, wrap);
+		this._gl.texParameteri(this._gl.TEXTURE_2D, this._gl.TEXTURE_WRAP_S, wrap);
+		this._gl.texParameteri(this._gl.TEXTURE_2D, this._gl.TEXTURE_WRAP_T, wrap);
 
 		return this;
 	}
@@ -241,7 +234,7 @@ export class Texture {
 	 * @returns {Texture}
 	 */
 	generateMipmap() {
-		this._gl.generateMipmap(TEXTURE_2D);
+		this._gl.generateMipmap(this._gl.TEXTURE_2D);
 
 		return this;
 	}

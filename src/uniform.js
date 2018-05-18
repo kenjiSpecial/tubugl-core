@@ -1,13 +1,11 @@
-import {
-    FLOAT,
-    FLOAT_VEC2,
-    FLOAT_VEC3,
-    FLOAT_VEC4,
-    FLOAT_MAT2,
-    FLOAT_MAT3,
-    FLOAT_MAT4,
-    SAMPLER_2D
-} from 'tubugl-constants';
+const FLOAT = 0x1406;
+const FLOAT_VEC2 = 0x8B50;
+const FLOAT_VEC3 = 0x8B51;
+const FLOAT_VEC4 = 0x8B52;
+const FLOAT_MAT2 = 0x8B5A;
+const FLOAT_MAT3 = 0x8B5B;
+const FLOAT_MAT4 = 0x8B5C;
+const SAMPLER_2D = 0x8B5E;
 
 /**
  * Class representing a Uniform for a Program class

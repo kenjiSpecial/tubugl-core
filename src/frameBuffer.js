@@ -1,13 +1,3 @@
-import {
-	FRAMEBUFFER,
-	COLOR_ATTACHMENT0,
-	RENDERBUFFER,
-	DEPTH_COMPONENT16,
-	DEPTH_ATTACHMENT,
-	LINEAR
-} from 'tubugl-constants';
-import { TEXTURE_2D, CLAMP_TO_EDGE, NEAREST } from 'tubugl-constants';
-import { RGBA, UNSIGNED_BYTE } from 'tubugl-constants';
 import { Texture } from './texture';
 
 /**
@@ -28,10 +18,10 @@ export class FrameBuffer {
 		if (typeof params == 'number') {
 			console.error('Framebuffer api has been updated. make sure Framebuffer code');
 		} else {
-			params.internalFormat = params.internalFormat ? params.internalFormat : RGBA;
-			params.format = params.format ? params.format : RGBA;
+			params.internalFormat = params.internalFormat ? params.internalFormat : gl.RGBA;
+			params.format = params.format ? params.format : gl.RGBA;
 
-			params.type = params.type ? params.type : UNSIGNED_BYTE;
+			params.type = params.type ? params.type : gl.UNSIGNED_BYTE;
 		}
 
 		/**
@@ -62,7 +52,7 @@ export class FrameBuffer {
 		/**
 		 * @member {GLenum}
 		 */
-		this._filter = params.filter ? params.filter : NEAREST;
+		this._filter = params.filter ? params.filter : this._gl.NEAREST;
 
 		/**
 		 * @member {texture}
@@ -72,12 +62,12 @@ export class FrameBuffer {
 		 * @member WebGLFramebuffer
 		 */
 		this._frameBuffer = this._gl.createFramebuffer();
-		this._gl.bindFramebuffer(FRAMEBUFFER, this._frameBuffer);
+		this._gl.bindFramebuffer(this._gl.FRAMEBUFFER, this._frameBuffer);
 
 		this._gl.framebufferTexture2D(
-			FRAMEBUFFER,
-			COLOR_ATTACHMENT0,
-			TEXTURE_2D,
+			this._gl.FRAMEBUFFER,
+			this._gl.COLOR_ATTACHMENT0,
+			this._gl.TEXTURE_2D,
 			this.texture.getTexture(),
 			0
 		);
@@ -94,11 +84,11 @@ export class FrameBuffer {
 		 */
 		// create a depth renderbuffer
 		let depthBuffer = this._gl.createRenderbuffer();
-		this._gl.bindRenderbuffer(RENDERBUFFER, depthBuffer);
+		this._gl.bindRenderbuffer(this._gl.RENDERBUFFER, depthBuffer);
 
 		// make a depth buffer and the same size as the targetTexture
-		this._gl.renderbufferStorage(RENDERBUFFER, DEPTH_COMPONENT16, this._width, this._height);
-		this._gl.framebufferRenderbuffer(FRAMEBUFFER, DEPTH_ATTACHMENT, RENDERBUFFER, depthBuffer);
+		this._gl.renderbufferStorage(this._gl.RENDERBUFFER, this._gl.DEPTH_COMPONENT16, this._width, this._height);
+		this._gl.framebufferRenderbuffer(this._gl.FRAMEBUFFER, this._gl.DEPTH_ATTACHMENT, this._gl.RENDERBUFFER, depthBuffer);
 
 		return this;
 	}
@@ -112,12 +102,12 @@ export class FrameBuffer {
 		let prevTexture = this.texture;
 		let texture = this._makeTexture();
 
-		this._gl.bindFramebuffer(FRAMEBUFFER, this._frameBuffer);
+		this._gl.bindFramebuffer(this._gl.FRAMEBUFFER, this._frameBuffer);
 
 		this._gl.framebufferTexture2D(
-			FRAMEBUFFER,
-			COLOR_ATTACHMENT0,
-			TEXTURE_2D,
+			this._gl.FRAMEBUFFER,
+			this._gl.COLOR_ATTACHMENT0,
+			this._gl.TEXTURE_2D,
 			texture.getTexture(),
 			0
 		);
@@ -131,7 +121,7 @@ export class FrameBuffer {
 	 * @returns {FrameBuffer}
 	 */
 	bind() {
-		this._gl.bindFramebuffer(FRAMEBUFFER, this._frameBuffer);
+		this._gl.bindFramebuffer(this._gl.FRAMEBUFFER, this._frameBuffer);
 
 		return this;
 	}
@@ -153,7 +143,7 @@ export class FrameBuffer {
 	 * @returns FrameBuffer
 	 */
 	unbind() {
-		this._gl.bindFramebuffer(FRAMEBUFFER, null);
+		this._gl.bindFramebuffer(this._gl.FRAMEBUFFER, null);
 		return this;
 	}
 
@@ -172,10 +162,10 @@ export class FrameBuffer {
 		this.texture.bind().fromSize(this._width, this._height);
 
 		if (this.depthBuffer) {
-			this._gl.bindRenderbuffer(RENDERBUFFER, this.depthBuffer);
+			this._gl.bindRenderbuffer(this._gl.RENDERBUFFER, this.depthBuffer);
 			this._gl.renderbufferStorage(
-				RENDERBUFFER,
-				DEPTH_COMPONENT16,
+				this._gl.RENDERBUFFER,
+				this._gl.DEPTH_COMPONENT16,
 				this._width,
 				this._height
 			);
@@ -197,7 +187,7 @@ export class FrameBuffer {
 		texture
 			.bind()
 			.setFilter(this._filter) //https://evanw.github.io/lightgl.js/docs/texture.html
-			.wrap(CLAMP_TO_EDGE);
+			.wrap(this._gl.CLAMP_TO_EDGE);
 		if (params && params.dataArray)
 			texture.fromData(this._width, this._height, params.dataArray);
 		else texture.fromSize(this._width, this._height);

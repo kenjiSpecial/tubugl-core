@@ -1,5 +1,3 @@
-import { FLOAT, FLOAT_VEC2, FLOAT_VEC3, FLOAT_VEC4, FLOAT_MAT2, FLOAT_MAT3, FLOAT_MAT4, SAMPLER_2D, VERTEX_SHADER, FRAGMENT_SHADER, LINK_STATUS, ACTIVE_UNIFORMS, ACTIVE_ATTRIBUTES, SEPARATE_ATTRIBS, ARRAY_BUFFER, STATIC_DRAW, TEXTURE_2D, RGB, UNSIGNED_BYTE, LINEAR, NEAREST, TEXTURE_MIN_FILTER, TEXTURE_MAG_FILTER, UNPACK_FLIP_Y_WEBGL, TEXTURE_WRAP_T, TEXTURE_WRAP_S, CLAMP_TO_EDGE, FRAMEBUFFER, COLOR_ATTACHMENT0, RENDERBUFFER, DEPTH_COMPONENT16, DEPTH_ATTACHMENT, RGBA, TRANSFORM_FEEDBACK, TRANSFORM_FEEDBACK_BUFFER, TRIANGLES, POINTS, LINES, UNSIGNED_SHORT } from 'tubugl-constants';
-
 /**
  * compile shader based on three.js
  */
@@ -37,6 +35,15 @@ function webGLShader(gl, type, shaderSource) {
 		}
 	}
 }
+
+const FLOAT = 0x1406;
+const FLOAT_VEC2 = 0x8B50;
+const FLOAT_VEC3 = 0x8B51;
+const FLOAT_VEC4 = 0x8B52;
+const FLOAT_MAT2 = 0x8B5A;
+const FLOAT_MAT3 = 0x8B5B;
+const FLOAT_MAT4 = 0x8B5C;
+const SAMPLER_2D = 0x8B5E;
 
 /**
  * Class representing a Uniform for a Program class
@@ -177,13 +184,13 @@ class Program {
          * @private
          * @member {WebGLShader}
          */
-        this._vertexShader = webGLShader(this._gl, VERTEX_SHADER, vertSrc);
+        this._vertexShader = webGLShader(this._gl, this._gl.VERTEX_SHADER, vertSrc);
         /**
          * @description fragmentShader
          * @private
          * @member {WebGLShader}
          */
-        this._fragmentShader = webGLShader(this._gl, FRAGMENT_SHADER, fragSrc);
+        this._fragmentShader = webGLShader(this._gl, this._gl.FRAGMENT_SHADER, fragSrc);
         /**
          * @description program
          * @private
@@ -195,7 +202,7 @@ class Program {
         this._gl.linkProgram(this._program);
 
         try {
-            let success = this._gl.getProgramParameter(this._program, LINK_STATUS);
+            let success = this._gl.getProgramParameter(this._program, this._gl.LINK_STATUS);
             if (!success) throw this._gl.getProgramInfoLog(this._program);
         } catch (error) {
             console.error(`WebGLProgram: ${error}`);
@@ -216,7 +223,7 @@ class Program {
         //   uniforms
         // ============
 	
-        const uniformNumber = this._gl.getProgramParameter(this._program, ACTIVE_UNIFORMS);
+        const uniformNumber = this._gl.getProgramParameter(this._program, this._gl.ACTIVE_UNIFORMS);
 
         /**
          * @member {object}
@@ -231,7 +238,7 @@ class Program {
         //  attributes
         // ============
 
-        const attributreNumber = this._gl.getProgramParameter(this._program, ACTIVE_ATTRIBUTES);
+        const attributreNumber = this._gl.getProgramParameter(this._program, this._gl.ACTIVE_ATTRIBUTES);
         /**
          * @member {object}
          */
@@ -327,27 +334,30 @@ class Program2 extends Program {
 	}
 
 	_initProgram(vertSrc, fragSrc, params = {}) {
-		this._vertexShader = webGLShader(this._gl, VERTEX_SHADER, vertSrc);
-		this._fragmentShader = webGLShader(this._gl, FRAGMENT_SHADER, fragSrc);
+		this._vertexShader = webGLShader(this._gl, this._gl.VERTEX_SHADER, vertSrc);
+		this._fragmentShader = webGLShader(this._gl, this._gl.FRAGMENT_SHADER, fragSrc);
 		this._program = this._gl.createProgram();
 		this._gl.attachShader(this._program, this._vertexShader);
 		this._gl.attachShader(this._program, this._fragmentShader);
 
 		if (params.transformFeedback && Array.isArray(params.transformFeedback)) {
 			this._transformFeedback = params.transformFeedback;
-			this._gl.transformFeedbackVaryings(this._program, this._transformFeedback, SEPARATE_ATTRIBS);
+			this._gl.transformFeedbackVaryings(this._program, this._transformFeedback, this._gl.SEPARATE_ATTRIBS);
 		}
 
 		this._gl.linkProgram(this._program);
 
 		try {
-			let success = this._gl.getProgramParameter(this._program, LINK_STATUS);
+			let success = this._gl.getProgramParameter(this._program, this._gl.LINK_STATUS);
 			if (!success) throw this._gl.getProgramInfoLog(this._program);
 		} catch (error) {
 			console.error(`WebGLProgram: ${error}`);
 		}
 	}
 }
+
+const FLOAT$1 = 0x1406;
+const STATIC_DRAW = 0x88E4;
 
 class ArrayBuffer {
 	/**
@@ -391,7 +401,7 @@ class ArrayBuffer {
 	 * @returns {ArrayBuffer}
 	 */
 	bind() {
-		this.gl.bindBuffer(ARRAY_BUFFER, this.buffer);
+		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.buffer);
 
 		return this;
 	}
@@ -403,7 +413,7 @@ class ArrayBuffer {
 	 *
 	 */
 	unbind() {
-		this.gl.bindBuffer(ARRAY_BUFFER, null);
+		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, null);
 
 		return this;
 	}
@@ -422,7 +432,7 @@ class ArrayBuffer {
 		 */
 		this.dataArray = array;
 
-		this.gl.bufferData(ARRAY_BUFFER, array, usage);
+		this.gl.bufferData(this.gl.ARRAY_BUFFER, array, usage);
 
 		return this;
 	}
@@ -439,7 +449,7 @@ class ArrayBuffer {
 	 *
 	 * @returns {ArrayBuffer}
 	 */
-	setAttribs(name, size, type = FLOAT, normalize = false, stride = 0, offset = 0) {
+	setAttribs(name, size, type = FLOAT$1, normalize = false, stride = 0, offset = 0) {
 		this.attribs.push({
 			name: name,
 			size: size,
@@ -504,11 +514,11 @@ class IndexArrayBuffer {
 		/**
 		 * @member {WebGLRenderingContext}
 		 */
-		this.gl = gl;
+		this._gl = gl;
 		/**
 		 * @member {WebGLBuffer}
 		 */
-		this.buffer = this.gl.createBuffer();
+		this.buffer = this._gl.createBuffer();
 
 		try {
 			let sucess = data instanceof Uint16Array || data instanceof Uint32Array;
@@ -533,7 +543,7 @@ class IndexArrayBuffer {
 		this.dataArray = data;
 
 		this.bind();
-		this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, data, this.gl.STATIC_DRAW);
+		this._gl.bufferData(this._gl.ELEMENT_ARRAY_BUFFER, data, this._gl.STATIC_DRAW);
 		return this;
 	}
 	/**
@@ -542,7 +552,7 @@ class IndexArrayBuffer {
 	 * @returns {IndexArrayBuffer}
 	 */
 	bind() {
-		this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.buffer);
+		this._gl.bindBuffer(this._gl.ELEMENT_ARRAY_BUFFER, this.buffer);
 		return this;
 	}
 	/**
@@ -556,7 +566,12 @@ class IndexArrayBuffer {
 	}
 }
 
-// export let textureNum = 0;
+const RGB = 0x1907;
+const UNSIGNED_BYTE = 0x1401;
+const LINEAR = 0x2601;
+const CLAMP_TO_EDGE = 0x812F;
+const NEAREST = 0x2600;
+
 
 /**
  * Class representing a Texture
@@ -600,7 +615,7 @@ class Texture {
 	 * @returns {Texture}
 	 */
 	bind() {
-		this._gl.bindTexture(TEXTURE_2D, this._texture);
+		this._gl.bindTexture(this._gl.TEXTURE_2D, this._texture);
 		return this;
 	}
 
@@ -609,7 +624,7 @@ class Texture {
 	 * @returns Texture
 	 */
 	unbind() {
-		this._gl.bindTexture(TEXTURE_2D, null);
+		this._gl.bindTexture(this._gl.TEXTURE_2D, null);
 		return this;
 	}
 
@@ -626,7 +641,7 @@ class Texture {
 		this._width = width ? width : image.width;
 		this._height = height ? height : image.height;
 
-		this._gl.texImage2D(TEXTURE_2D, 0, this._internalFormt, this._format, this._type, image);
+		this._gl.texImage2D(this._gl.TEXTURE_2D, 0, this._internalFormt, this._format, this._type, image);
 
 		return this;
 	}
@@ -644,7 +659,7 @@ class Texture {
 		if (height) this._height = height;
 
 		this._gl.texImage2D(
-			TEXTURE_2D,
+			this._gl.TEXTURE_2D,
 			0,
 			this._internalFormt,
 			this._width,
@@ -672,7 +687,7 @@ class Texture {
 		if (height) this._height = height;
 
 		this._gl.texImage2D(
-			TEXTURE_2D,
+			this._gl.TEXTURE_2D,
 			0,
 			this._internalFormt,
 			this._width,
@@ -689,7 +704,7 @@ class Texture {
 	 * @description flip the texture
 	 */
 	setFlip() {
-		this.setPixelStore(UNPACK_FLIP_Y_WEBGL, true);
+		this.setPixelStore(this._gl.UNPACK_FLIP_Y_WEBGL, true);
 		return this;
 	}
 
@@ -753,7 +768,7 @@ class Texture {
 	 * @returns {Texture}
 	 */
 	setMagFilter(filter = LINEAR) {
-		this._gl.texParameteri(TEXTURE_2D, TEXTURE_MIN_FILTER, filter);
+		this._gl.texParameteri(this._gl.TEXTURE_2D, this._gl.TEXTURE_MAG_FILTER, filter);
 
 		return this;
 	}
@@ -766,7 +781,7 @@ class Texture {
 	 * @returns {Texture}
 	 */
 	setMinFilter(filter = NEAREST) {
-		this._gl.texParameteri(TEXTURE_2D, TEXTURE_MAG_FILTER, filter);
+		this._gl.texParameteri(this._gl.TEXTURE_2D, this._gl.TEXTURE_MIN_FILTER, filter);
 
 		return this;
 	}
@@ -775,8 +790,8 @@ class Texture {
 	 * @description set the wrap mode in texture
 	 */
 	wrap(wrap = CLAMP_TO_EDGE) {
-		this._gl.texParameteri(TEXTURE_2D, TEXTURE_WRAP_S, wrap);
-		this._gl.texParameteri(TEXTURE_2D, TEXTURE_WRAP_T, wrap);
+		this._gl.texParameteri(this._gl.TEXTURE_2D, this._gl.TEXTURE_WRAP_S, wrap);
+		this._gl.texParameteri(this._gl.TEXTURE_2D, this._gl.TEXTURE_WRAP_T, wrap);
 
 		return this;
 	}
@@ -787,7 +802,7 @@ class Texture {
 	 * @returns {Texture}
 	 */
 	generateMipmap() {
-		this._gl.generateMipmap(TEXTURE_2D);
+		this._gl.generateMipmap(this._gl.TEXTURE_2D);
 
 		return this;
 	}
@@ -825,10 +840,10 @@ class FrameBuffer {
 		if (typeof params == 'number') {
 			console.error('Framebuffer api has been updated. make sure Framebuffer code');
 		} else {
-			params.internalFormat = params.internalFormat ? params.internalFormat : RGBA;
-			params.format = params.format ? params.format : RGBA;
+			params.internalFormat = params.internalFormat ? params.internalFormat : gl.RGBA;
+			params.format = params.format ? params.format : gl.RGBA;
 
-			params.type = params.type ? params.type : UNSIGNED_BYTE;
+			params.type = params.type ? params.type : gl.UNSIGNED_BYTE;
 		}
 
 		/**
@@ -859,7 +874,7 @@ class FrameBuffer {
 		/**
 		 * @member {GLenum}
 		 */
-		this._filter = params.filter ? params.filter : NEAREST;
+		this._filter = params.filter ? params.filter : this._gl.NEAREST;
 
 		/**
 		 * @member {texture}
@@ -869,12 +884,12 @@ class FrameBuffer {
 		 * @member WebGLFramebuffer
 		 */
 		this._frameBuffer = this._gl.createFramebuffer();
-		this._gl.bindFramebuffer(FRAMEBUFFER, this._frameBuffer);
+		this._gl.bindFramebuffer(this._gl.FRAMEBUFFER, this._frameBuffer);
 
 		this._gl.framebufferTexture2D(
-			FRAMEBUFFER,
-			COLOR_ATTACHMENT0,
-			TEXTURE_2D,
+			this._gl.FRAMEBUFFER,
+			this._gl.COLOR_ATTACHMENT0,
+			this._gl.TEXTURE_2D,
 			this.texture.getTexture(),
 			0
 		);
@@ -891,11 +906,11 @@ class FrameBuffer {
 		 */
 		// create a depth renderbuffer
 		let depthBuffer = this._gl.createRenderbuffer();
-		this._gl.bindRenderbuffer(RENDERBUFFER, depthBuffer);
+		this._gl.bindRenderbuffer(this._gl.RENDERBUFFER, depthBuffer);
 
 		// make a depth buffer and the same size as the targetTexture
-		this._gl.renderbufferStorage(RENDERBUFFER, DEPTH_COMPONENT16, this._width, this._height);
-		this._gl.framebufferRenderbuffer(FRAMEBUFFER, DEPTH_ATTACHMENT, RENDERBUFFER, depthBuffer);
+		this._gl.renderbufferStorage(this._gl.RENDERBUFFER, this._gl.DEPTH_COMPONENT16, this._width, this._height);
+		this._gl.framebufferRenderbuffer(this._gl.FRAMEBUFFER, this._gl.DEPTH_ATTACHMENT, this._gl.RENDERBUFFER, depthBuffer);
 
 		return this;
 	}
@@ -909,12 +924,12 @@ class FrameBuffer {
 		let prevTexture = this.texture;
 		let texture = this._makeTexture();
 
-		this._gl.bindFramebuffer(FRAMEBUFFER, this._frameBuffer);
+		this._gl.bindFramebuffer(this._gl.FRAMEBUFFER, this._frameBuffer);
 
 		this._gl.framebufferTexture2D(
-			FRAMEBUFFER,
-			COLOR_ATTACHMENT0,
-			TEXTURE_2D,
+			this._gl.FRAMEBUFFER,
+			this._gl.COLOR_ATTACHMENT0,
+			this._gl.TEXTURE_2D,
 			texture.getTexture(),
 			0
 		);
@@ -928,7 +943,7 @@ class FrameBuffer {
 	 * @returns {FrameBuffer}
 	 */
 	bind() {
-		this._gl.bindFramebuffer(FRAMEBUFFER, this._frameBuffer);
+		this._gl.bindFramebuffer(this._gl.FRAMEBUFFER, this._frameBuffer);
 
 		return this;
 	}
@@ -950,7 +965,7 @@ class FrameBuffer {
 	 * @returns FrameBuffer
 	 */
 	unbind() {
-		this._gl.bindFramebuffer(FRAMEBUFFER, null);
+		this._gl.bindFramebuffer(this._gl.FRAMEBUFFER, null);
 		return this;
 	}
 
@@ -969,10 +984,10 @@ class FrameBuffer {
 		this.texture.bind().fromSize(this._width, this._height);
 
 		if (this.depthBuffer) {
-			this._gl.bindRenderbuffer(RENDERBUFFER, this.depthBuffer);
+			this._gl.bindRenderbuffer(this._gl.RENDERBUFFER, this.depthBuffer);
 			this._gl.renderbufferStorage(
-				RENDERBUFFER,
-				DEPTH_COMPONENT16,
+				this._gl.RENDERBUFFER,
+				this._gl.DEPTH_COMPONENT16,
 				this._width,
 				this._height
 			);
@@ -994,7 +1009,7 @@ class FrameBuffer {
 		texture
 			.bind()
 			.setFilter(this._filter) //https://evanw.github.io/lightgl.js/docs/texture.html
-			.wrap(CLAMP_TO_EDGE);
+			.wrap(this._gl.CLAMP_TO_EDGE);
 		if (params && params.dataArray)
 			texture.fromData(this._width, this._height, params.dataArray);
 		else texture.fromSize(this._width, this._height);
@@ -1028,13 +1043,13 @@ class TransformFeedback {
 		this._arrayBuffers = [];
 	}
 	bind() {
-		this._gl.bindTransformFeedback(TRANSFORM_FEEDBACK, this._transfromFeedback);
+		this._gl.bindTransformFeedback(this._gl.TRANSFORM_FEEDBACK, this._transfromFeedback);
 
 		return this;
 	}
 	unbindBufferBase() {
 		this._arrayBuffers.forEach((arrayBuffers, index) =>
-			this._gl.bindBufferBase(TRANSFORM_FEEDBACK_BUFFER, index, null)
+			this._gl.bindBufferBase(this._gl.TRANSFORM_FEEDBACK_BUFFER, index, null)
 		);
 
 		return this;
@@ -1046,8 +1061,8 @@ class TransformFeedback {
 	 */
 	updateBufferBase(program) {
 		this._arrayBuffers.forEach((arrayBuffers, index) => {
-			this._gl.bindBuffer(ARRAY_BUFFER, arrayBuffers.read.buffer);
-			this._gl.bindBufferBase(TRANSFORM_FEEDBACK_BUFFER, index, arrayBuffers.write.buffer);
+			this._gl.bindBuffer(this._gl.ARRAY_BUFFER, arrayBuffers.read.buffer);
+			this._gl.bindBufferBase(this._gl.TRANSFORM_FEEDBACK_BUFFER, index, arrayBuffers.write.buffer);
 			arrayBuffers.read.attribPointer(program);
 		});
 	}
@@ -1116,29 +1131,29 @@ class VAO {
  *  https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/drawElements
  */
 let draw = {
-	array: function(gl, cnt, mode = TRIANGLES) {
+	array: function(gl, cnt, mode = gl.TRIANGLES) {
 		gl.drawArrays(mode, 0, cnt);
 	},
-	element: function(gl, cnt, mode = TRIANGLES) {
-		gl.drawElements(mode, cnt, UNSIGNED_SHORT, 0);
+	element: function(gl, cnt, mode = gl.TRIANGLES) {
+		gl.drawElements(mode, cnt, gl.UNSIGNED_SHORT, 0);
 	},
 	elementPoints: function(gl, cnt) {
-		this.element(gl, cnt, POINTS);
+		this.element(gl, cnt, gl.POINTS);
 	},
 	arrayPoint: function(gl, cnt) {
-		this.array(gl, cnt, POINTS);
+		this.array(gl, cnt, gl.POINTS);
 	},
 	elementTriangles: function(gl, cnt) {
-		this.element(gl, cnt, POINTS);
+		this.element(gl, cnt, gl.POINTS);
 	},
 	arrayLines: function(gl, cnt) {
-		this.array(gl, cnt, LINES);
+		this.array(gl, cnt, gl.LINES);
 	},
 	elementLines: function(gl, cnt) {
-		this.element(gl, cnt, LINES);
+		this.element(gl, cnt, gl.LINES);
 	}
 };
 
-console.log('[tubugl] version: 1.4.4, %o', 'https://github.com/kenjiSpecial/tubugl');
+console.log('[tubugl] version: 1.5.0, %o', 'https://github.com/kenjiSpecial/tubugl');
 
 export { Program, Program2, ArrayBuffer, IndexArrayBuffer, Texture, FrameBuffer, TransformFeedback, VAO, draw, webGLShader };

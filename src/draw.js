@@ -1,35 +1,28 @@
-import { TRIANGLES, POINTS, LINE_STRIP, LINES, TRIANGLE_STRIP, TRIANGLE_FAN } from 'tubugl-constants';
-import { UNSIGNED_SHORT } from 'tubugl-constants';
 
 /**
  *  https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/drawArrays
  *  https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/drawElements
  */
 export let draw = {
-	array: function(gl, cnt, mode = TRIANGLES) {
+	array: function(gl, cnt, mode = gl.TRIANGLES) {
 		gl.drawArrays(mode, 0, cnt);
 	},
-	element: function(gl, cnt, mode = TRIANGLES) {
-		gl.drawElements(mode, cnt, UNSIGNED_SHORT, 0);
+	element: function(gl, cnt, mode = gl.TRIANGLES) {
+		gl.drawElements(mode, cnt, gl.UNSIGNED_SHORT, 0);
 	},
 	elementPoints: function(gl, cnt) {
-		this.element(gl, cnt, POINTS);
+		this.element(gl, cnt, gl.POINTS);
 	},
 	arrayPoint: function(gl, cnt) {
-		this.array(gl, cnt, POINTS);
+		this.array(gl, cnt, gl.POINTS);
 	},
 	elementTriangles: function(gl, cnt) {
-		this.element(gl, cnt, POINTS);
+		this.element(gl, cnt, gl.POINTS);
 	},
 	arrayLines: function(gl, cnt) {
-		this.array(gl, cnt, LINES);
+		this.array(gl, cnt, gl.LINES);
 	},
 	elementLines: function(gl, cnt) {
-		this.element(gl, cnt, LINES);
+		this.element(gl, cnt, gl.LINES);
 	}
 };
-
-export class DrawCall {
-	constructor(primitives = TRIANGLES) {}
-	draw() {}
-}

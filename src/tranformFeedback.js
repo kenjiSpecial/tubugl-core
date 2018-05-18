@@ -2,8 +2,6 @@
  * only support webgl2
  */
 
-import { TRANSFORM_FEEDBACK, ARRAY_BUFFER, TRANSFORM_FEEDBACK_BUFFER } from 'tubugl-constants';
-
 export class TransformFeedback {
 	constructor(gl) {
 		this._gl = gl;
@@ -11,13 +9,13 @@ export class TransformFeedback {
 		this._arrayBuffers = [];
 	}
 	bind() {
-		this._gl.bindTransformFeedback(TRANSFORM_FEEDBACK, this._transfromFeedback);
+		this._gl.bindTransformFeedback(this._gl.TRANSFORM_FEEDBACK, this._transfromFeedback);
 
 		return this;
 	}
 	unbindBufferBase() {
 		this._arrayBuffers.forEach((arrayBuffers, index) =>
-			this._gl.bindBufferBase(TRANSFORM_FEEDBACK_BUFFER, index, null)
+			this._gl.bindBufferBase(this._gl.TRANSFORM_FEEDBACK_BUFFER, index, null)
 		);
 
 		return this;
@@ -29,8 +27,8 @@ export class TransformFeedback {
 	 */
 	updateBufferBase(program) {
 		this._arrayBuffers.forEach((arrayBuffers, index) => {
-			this._gl.bindBuffer(ARRAY_BUFFER, arrayBuffers.read.buffer);
-			this._gl.bindBufferBase(TRANSFORM_FEEDBACK_BUFFER, index, arrayBuffers.write.buffer);
+			this._gl.bindBuffer(this._gl.ARRAY_BUFFER, arrayBuffers.read.buffer);
+			this._gl.bindBufferBase(this._gl.TRANSFORM_FEEDBACK_BUFFER, index, arrayBuffers.write.buffer);
 			arrayBuffers.read.attribPointer(program);
 		});
 	}

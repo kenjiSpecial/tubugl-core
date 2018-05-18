@@ -1,4 +1,5 @@
-import { ARRAY_BUFFER, STATIC_DRAW, FLOAT } from 'tubugl-constants';
+const FLOAT = 0x1406;
+const STATIC_DRAW = 0x88E4;
 
 export class ArrayBuffer {
 	/**
@@ -42,7 +43,7 @@ export class ArrayBuffer {
 	 * @returns {ArrayBuffer}
 	 */
 	bind() {
-		this.gl.bindBuffer(ARRAY_BUFFER, this.buffer);
+		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.buffer);
 
 		return this;
 	}
@@ -54,7 +55,7 @@ export class ArrayBuffer {
 	 *
 	 */
 	unbind() {
-		this.gl.bindBuffer(ARRAY_BUFFER, null);
+		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, null);
 
 		return this;
 	}
@@ -73,7 +74,7 @@ export class ArrayBuffer {
 		 */
 		this.dataArray = array;
 
-		this.gl.bufferData(ARRAY_BUFFER, array, usage);
+		this.gl.bufferData(this.gl.ARRAY_BUFFER, array, usage);
 
 		return this;
 	}

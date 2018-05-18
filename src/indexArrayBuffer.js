@@ -10,11 +10,11 @@ export class IndexArrayBuffer {
 		/**
 		 * @member {WebGLRenderingContext}
 		 */
-		this.gl = gl;
+		this._gl = gl;
 		/**
 		 * @member {WebGLBuffer}
 		 */
-		this.buffer = this.gl.createBuffer();
+		this.buffer = this._gl.createBuffer();
 
 		try {
 			let sucess = data instanceof Uint16Array || data instanceof Uint32Array;
@@ -39,7 +39,7 @@ export class IndexArrayBuffer {
 		this.dataArray = data;
 
 		this.bind();
-		this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, data, this.gl.STATIC_DRAW);
+		this._gl.bufferData(this._gl.ELEMENT_ARRAY_BUFFER, data, this._gl.STATIC_DRAW);
 		return this;
 	}
 	/**
@@ -48,7 +48,7 @@ export class IndexArrayBuffer {
 	 * @returns {IndexArrayBuffer}
 	 */
 	bind() {
-		this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.buffer);
+		this._gl.bindBuffer(this._gl.ELEMENT_ARRAY_BUFFER, this.buffer);
 		return this;
 	}
 	/**

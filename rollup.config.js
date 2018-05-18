@@ -41,7 +41,7 @@ export default [
 	},
 	{
 		input: './src/index.js',
-		output: [{ file: pkg.module, format: 'es' }],
+		output: [{ file: pkg.esm, format: 'es' }],
 		plugins: [
 			replace({
 				TUBUGL_VERSOIN: pkg.version
