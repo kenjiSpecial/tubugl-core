@@ -130,7 +130,6 @@ export default class App {
 
 		let dataArr = [];
 		for (let ii = 0; ii < size * size; ii++) {
-			// let id = ii;
 			let xx = (ii % size) / (size - 1) - 0.5;
 			let yy = parseInt(ii / size) / (size - 1) - 0.5;
 
@@ -174,7 +173,6 @@ export default class App {
 		this._obj.positionBuffer.bind().attribPointer(this._obj.program);
 		this._obj.idBuffer.bind().attribPointer(this._obj.program);
 
-		// console.log(this._obj.count);
 		this.gl.drawArrays(this.gl.POINTS, 0, this._obj.count);
 	}
 

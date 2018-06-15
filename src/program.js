@@ -32,8 +32,8 @@ export class Program {
          */
         this._gl = gl;
 
-        if (vertSrc && fragSrc) {
-            this.initProgram(vertSrc, fragSrc);
+        if (vertSrc && fragSrc, params) {
+            this.initProgram(vertSrc, fragSrc, params);
         }
     }
 

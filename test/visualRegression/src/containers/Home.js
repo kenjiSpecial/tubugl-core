@@ -12,6 +12,12 @@ const ulStyle = {
 	lineHeight: '1.8em'
 };
 
+const lineThroughStyle = {
+	'fontWeight': 'bold',
+	'textDecoration': 'line-through',
+	'color': '#999999'
+};
+
 export default getSiteProps(() => (
 	<div style={divStyle}>
 		<h1>Tubugl Core Test Examples</h1>
@@ -25,8 +31,8 @@ export default getSiteProps(() => (
 			<li>
 				<Link to="/test/02">test #02</Link>
 			</li>
-			<li>
-				<Link to="/test/03">test #03</Link>
+			<li style={lineThroughStyle}>
+				test #03
 			</li>
 			<li>
 				<Link to="/test/04">test #04</Link>

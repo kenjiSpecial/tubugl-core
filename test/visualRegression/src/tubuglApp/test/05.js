@@ -161,9 +161,6 @@ export default class App {
 
     update() {
         if (this.stats) this.stats.update();
-
-        let gl = this.gl;
-
         /**
          * =====================================
          */

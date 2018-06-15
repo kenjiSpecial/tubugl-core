@@ -122,7 +122,6 @@ export default class App {
     }
 
     makeFrameBuffer() {
-        // this.gl.pixelStorei(UNPACK_FLIP_Y_WEBGL, 1);
         let frameBuffer0 = new FrameBuffer(
             this.gl, { type: FLOAT },
             window.innerWidth,

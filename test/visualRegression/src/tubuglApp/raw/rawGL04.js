@@ -5,14 +5,9 @@
 import {
 	Program2,
 	ArrayBuffer,
-	IndexArrayBuffer,
-	FrameBuffer,
-	VAO
+	FrameBuffer
 } from 'tubuGL';
 import {
-	UNSIGNED_SHORT,
-	FLOAT,
-	TRANSFORM_FEEDBACK_BUFFER,
 	TRANSFORM_FEEDBACK
 } from 'tubugl-constants';
 
@@ -264,7 +259,7 @@ export default class App {
 		this.gl.clearColor(0, 0, 0, 1);
 		this.gl.clear(this.gl.COLOR_BUFFER_BIT);
 
-		this._obj.program.bind();
+		this._obj.program.use();
 
 		this.gl.bindTransformFeedback(
 			TRANSFORM_FEEDBACK,
@@ -304,7 +299,7 @@ export default class App {
 			this._obj.positionBuffer.read = this._obj.positionBuffer.b;
 			this._obj.positionBuffer.write = this._obj.positionBuffer.a;
 		}
-
+		
 		this._obj2.program.bind();
 
 		this.gl.bindTransformFeedback(
@@ -344,6 +339,7 @@ export default class App {
 			this._obj2.positionBuffer.read = this._obj2.positionBuffer.b;
 			this._obj2.positionBuffer.write = this._obj2.positionBuffer.a;
 		}
+		
 	}
 
 	resize(width, height) {
