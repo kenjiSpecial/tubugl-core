@@ -31,9 +31,9 @@ In program class, parogram is created, shaders are compiled, and they are liked 
  
 ## functionality test
 
-https://kenjispecial.github.io/tubugl-core/
+https://kenjispecial.github.io/tubugl-core/example
 
-source: https://github.com/kenjiSpecial/tubugl-core/tree/master/test/visualRegression
+source: https://github.com/kenjiSpecial/tubugl-core/tree/master/docs/example
 
 ## other modules
 
