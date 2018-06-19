@@ -1,0 +1,235 @@
+<html>
+   <meta charset="UTF-8">
+   <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+   <style>
+       *{
+           margin: 0;
+       }
+       html, body{
+        font-family: 'Roboto', sans-serif;
+           width: 100%;
+           height: 100%;
+           overflow: hidden;
+           background: #000000;
+       }
+       canvas{
+           display: block;
+       }
+       #tubugl-desc{
+           position: absolute;
+           bottom: 20px;
+           left: 20px;
+           color: #aaaaaa;
+           font-size: 12px;
+           line-height: 1.5em;
+       }
+       
+       #tubugl-loading{
+           font-size: 14px;
+           color: #ffffff;
+           position: absolute;
+           top:20px;
+           left: 20px;
+       }
+       
+       #tubugl-loading-initializing{
+           display: none;
+       }
+       
+       a{
+            color: white;
+       }
+       a:hover{
+           text-decoration: none;
+       }
+   </style>
+   <script id="vertexShader" type="x-shader/x-vertex">
+    #version 300 es
+    precision mediump float;
+    #define POSITION_LOCATION 0
+    #define COLOR_LOCATION  1
+    #define PI 3.141592
+
+    layout(location = POSITION_LOCATION) in vec4 position;
+    layout(location = COLOR_LOCATION) in vec3 color; 
+
+    out vec3 vColor;
+
+    // all shaders have a main function
+    void main() {
+        float theta = -1.0/180. *  PI;
+        float COS = cos(theta);
+        float SIN = sin(theta);
+        mat2 rotation = mat2( COS, SIN,
+                            -SIN, COS);
+        vec2 pos = rotation * position.xy;
+        gl_Position = vec4(pos.xy, 0.0, 1.0);
+        vColor = color;
+    }
+    </script>
+        
+    <script id="fragmentShader" type="x-shader/x-fragment">
+    #version 300 es
+    precision mediump float;
+    
+    in vec3 vColor;
+    
+    out vec4 outColor;
+    
+    void main() {
+        outColor = vec4(vColor, 1.0);
+    }
+    </script>
+    
+   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
+   <script src="./vendor/gl-matrix-min.js"></script>
+   <script src="../../build//tubu.js"></script>
+<body>
+    <div id="tubugl-desc">
+        <p class="tubugl-p">#01 - IndexArrayBuffer implement test</p>
+        <p class="tubugl-p">Developed with <a href="https://github.com/kenjiSpecial/tubugl">tubugl</a></p>
+        <p class="tubugl-p">See <a href="./index.html">other examples</a></p>
+    </div>
+    
+    <canvas id="gl-canvas"></canvas>
+    
+    <script>
+        var canvas, gl;
+        var obj, vao;
+        var loopId;
+        var urlParams = new URLSearchParams(window.location.search);
+        var isDebug = !(urlParams.has('NoDebug') || urlParams.has('NoDebug/'));
+        
+        // initialize the webgl context
+        function initializeGl(){
+            canvas = document.getElementById('gl-canvas');
+            gl = canvas.getContext('webgl2');
+            
+            if(!isDebug){
+                var desc = document.getElementById('tubugl-desc');
+                desc.style.display = 'none';
+            }
+        }
+        
+        // create webgl program
+        function createProgram(){
+            
+            var program = new Tubu.Program2(
+                gl, 
+                document.getElementById('vertexShader').textContent.trim(), 
+                document.getElementById('fragmentShader').textContent.trim(),
+                {transformFeedback: ['gl_Position']}
+            );
+            
+            var side = 0.1;
+            var xPos = 0.5;
+            var positions = new Float32Array([
+                -side + xPos,
+                -side,
+                0.0,
+                1.0,
+                side + xPos,
+                -side,
+                0.0,
+                1.0,
+                side + xPos,
+                side,
+                0.0,
+                1.0
+            ]);
+            var colors = new Float32Array([1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]);
+            
+            var vaoA = new Tubu.VAO(gl);
+            vaoA.bind();
+            var positionBufferA = new Tubu.ArrayBuffer(gl, positions, {
+                usage: gl.DYNAMIC_COPY
+            });
+            positionBufferA
+                .bind()
+                .setAttribs('position', 4)
+                .attribPointer(program);
+            
+            var colorBuffer = new Tubu.ArrayBuffer(gl, colors);
+            colorBuffer
+                .bind()
+                .setAttribs('color', 3)
+                .attribPointer(program);
+
+            var vaoB = new Tubu.VAO(this.gl);
+            vaoB.bind();
+            
+            var positionBufferB = new Tubu.ArrayBuffer(gl, positions, {
+                usage: gl.DYNAMIC_COPY
+            });
+            positionBufferB
+                .bind()
+                .setAttribs('position', 4)
+                .attribPointer(program);
+                
+            colorBuffer.bind().attribPointer(program);
+            
+            var positionAttribLocation = program.getAttrib('position').location;
+            var transformFeedback = new Tubu.TransformFeedback(gl);
+            transformFeedback.addArrayBufer(0, {
+                read: positionBufferA,
+                write: positionBufferB,
+                name: 'position'
+            });
+            
+            obj = {
+                program: program,
+                positionAttribLocation: positionAttribLocation,
+                vaos: {read: vaoA, write: vaoB, a: vaoA, b: vaoB},
+                transformFeedback: transformFeedback,
+                count: 3
+            }
+        }
+        
+        function loop(){
+            gl.clearColor(0, 0, 0, 1);
+            gl.clear(gl.COLOR_BUFFER_BIT);
+            obj.vaos.read.bind();
+
+            obj.program.bind();
+            // console.log('loop');
+            obj.transformFeedback.bind().updateBufferBase(obj.program);
+
+            gl.beginTransformFeedback(gl.TRIANGLES);
+            gl.drawArrays(gl.TRIANGLES, 0, 3);
+            gl.endTransformFeedback();
+
+            obj.transformFeedback.unbindBufferBase().swapArrayBuffers();
+
+            let temp = obj.vaos.read;
+            obj.vaos.read = obj.vaos.write;
+            obj.vaos.write = temp;
+
+            gl.bindVertexArray(null);
+        }
+        
+        function resizeHandler(){
+            resize();
+        }
+        
+        function resize(){
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+            
+            loop();
+        }
+        
+        initializeGl();
+        createProgram();
+        
+        resize();
+        for(var ii = 0; ii < 30; ii++){
+            loop();
+        }
+        
+        
+        window.addEventListener('resize', resizeHandler);
+    </script>
+</body>
+</html>

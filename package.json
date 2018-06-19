@@ -1,6 +1,6 @@
 {
   "name": "tubugl-core",
-  "version": "1.5.0",
+  "version": "1.5.1",
   "description": "core parts of webgl module based framework ",
   "cjs": "build/tubu.cjs.js",
   "esm": "build/tubu.esm.js",
@@ -15,20 +15,24 @@
     "babelrc-rollup": "^3.0.0",
     "gsap": "^1.20.3",
     "http-server": "^0.11.1",
+    "jest": "^23.1.0",
+    "jest-image-snapshot": "^2.4.3",
     "jsdoc": "^3.5.5",
     "minami": "^1.2.3",
     "parcel-plugin-glsl": "kenjiSpecial/parcel-plugin-glsl",
+    "puppeteer": "^1.5.0",
     "rollup": "^0.55.0",
     "rollup-plugin-babel": "^3.0.3",
     "rollup-plugin-commonjs": "^8.2.6",
     "rollup-plugin-node-resolve": "^3.0.2",
-    "rollup-plugin-replace": "^2.0.0",
-    "stats.js": "mrdoob/stats.js"
+    "rollup-plugin-replace": "^2.0.0"
   },
   "scripts": {
     "build": "rollup -c",
+    "test" : "jest --config jest.config.json",
+    "updateTest": "jest --config jest.config.json -u",
     "00": "parcel examples/00/index.html --no-hmr",
     "jsdoc": "jsdoc src/program.js src/uniform.js  src/arrayBuffer.js src/indexArrayBuffer.js src/texture.js src/frameBuffer.js -R readme.md -d docs/api -t node_modules/minami",
-    "serve": "http-server ./docs"
+    "serve": "http-server"
   }
 }

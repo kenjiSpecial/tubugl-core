@@ -167,8 +167,8 @@ class Program {
          */
         this._gl = gl;
 
-        if (vertSrc && fragSrc) {
-            this.initProgram(vertSrc, fragSrc);
+        if (params) {
+            this.initProgram(vertSrc, fragSrc, params);
         }
     }
 
@@ -308,52 +308,6 @@ class Program {
         this._gl.deleteShader(this._fragmentShader);
         this._gl = null;
     }
-}
-
-function detectorWebGL2() {
-	let c = document.createElement('canvas');
-	try {
-		return !!window.WebGL2RenderingContext && !!c.getContext('webgl');
-	} catch (e) {
-		return null;
-	}
-}
-
-/**
- * Program2 support Vertex Buffer Object(VBO)
- */
-class Program2 extends Program {
-	constructor(gl, vertSrc, fragSrc, params = {}) {
-		if (!detectorWebGL2()) {
-			console.error(
-				'gl is not webgl2. make sure your webgl context is webgl2, or use the brose which support webgl2.'
-			);
-		}
-
-		super(gl, vertSrc, fragSrc, params);
-	}
-
-	_initProgram(vertSrc, fragSrc, params = {}) {
-		this._vertexShader = webGLShader(this._gl, this._gl.VERTEX_SHADER, vertSrc);
-		this._fragmentShader = webGLShader(this._gl, this._gl.FRAGMENT_SHADER, fragSrc);
-		this._program = this._gl.createProgram();
-		this._gl.attachShader(this._program, this._vertexShader);
-		this._gl.attachShader(this._program, this._fragmentShader);
-
-		if (params.transformFeedback && Array.isArray(params.transformFeedback)) {
-			this._transformFeedback = params.transformFeedback;
-			this._gl.transformFeedbackVaryings(this._program, this._transformFeedback, this._gl.SEPARATE_ATTRIBS);
-		}
-
-		this._gl.linkProgram(this._program);
-
-		try {
-			let success = this._gl.getProgramParameter(this._program, this._gl.LINK_STATUS);
-			if (!success) throw this._gl.getProgramInfoLog(this._program);
-		} catch (error) {
-			console.error(`WebGLProgram: ${error}`);
-		}
-	}
 }
 
 const FLOAT$1 = 0x1406;
@@ -1032,6 +986,56 @@ class FrameBuffer {
 	}
 }
 
+function detectorWebGL2() {
+	let c = document.createElement('canvas');
+	try {
+		return !!window.WebGL2RenderingContext && !!c.getContext('webgl');
+	} catch (e) {
+		return null;
+	}
+}
+
+/**
+ * Program2 support Vertex Buffer Object(VBO)
+ */
+class Program2 extends Program {
+	constructor(gl, vertSrc, fragSrc, params = {}) {
+		if (!detectorWebGL2()) {
+			console.error(
+				'gl is not webgl2. make sure your webgl context is webgl2, or use the brose which support webgl2.'
+			);
+		}
+		
+
+		super(gl, vertSrc, fragSrc, params);
+	}
+
+	initProgram(vertSrc, fragSrc, params = {}) {
+		this._vertexShader = webGLShader(this._gl, this._gl.VERTEX_SHADER, vertSrc);
+		this._fragmentShader = webGLShader(this._gl, this._gl.FRAGMENT_SHADER, fragSrc);
+		this._program = this._gl.createProgram();
+		this._gl.attachShader(this._program, this._vertexShader);
+		this._gl.attachShader(this._program, this._fragmentShader);
+		
+		
+		if (params.transformFeedback && Array.isArray(params.transformFeedback)) {
+			this._transformFeedback = params.transformFeedback;
+			this._gl.transformFeedbackVaryings(this._program, this._transformFeedback, this._gl.SEPARATE_ATTRIBS);
+		}
+
+		this._gl.linkProgram(this._program);
+
+		try {
+			let success = this._gl.getProgramParameter(this._program, this._gl.LINK_STATUS);
+			if (!success) throw this._gl.getProgramInfoLog(this._program);
+		} catch (error) {
+			console.error(`WebGLProgram: ${error}`);
+		}
+		
+		this._setProperties();
+	}
+}
+
 /**
  * only support webgl2
  */
@@ -1126,34 +1130,6 @@ class VAO {
 	}
 }
 
-/**
- *  https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/drawArrays
- *  https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/drawElements
- */
-let draw = {
-	array: function(gl, cnt, mode = gl.TRIANGLES) {
-		gl.drawArrays(mode, 0, cnt);
-	},
-	element: function(gl, cnt, mode = gl.TRIANGLES) {
-		gl.drawElements(mode, cnt, gl.UNSIGNED_SHORT, 0);
-	},
-	elementPoints: function(gl, cnt) {
-		this.element(gl, cnt, gl.POINTS);
-	},
-	arrayPoint: function(gl, cnt) {
-		this.array(gl, cnt, gl.POINTS);
-	},
-	elementTriangles: function(gl, cnt) {
-		this.element(gl, cnt, gl.POINTS);
-	},
-	arrayLines: function(gl, cnt) {
-		this.array(gl, cnt, gl.LINES);
-	},
-	elementLines: function(gl, cnt) {
-		this.element(gl, cnt, gl.LINES);
-	}
-};
-
 console.log('[tubugl] version: 1.5.0, %o', 'https://github.com/kenjiSpecial/tubugl');
 
-export { Program, Program2, ArrayBuffer, IndexArrayBuffer, Texture, FrameBuffer, TransformFeedback, VAO, draw, webGLShader };
+export { Program, ArrayBuffer, IndexArrayBuffer, Texture, FrameBuffer, Program2, TransformFeedback, VAO, webGLShader };

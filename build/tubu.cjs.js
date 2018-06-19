@@ -241,8 +241,8 @@ var Program = function () {
      */
     this._gl = gl;
 
-    if (vertSrc && fragSrc) {
-      this.initProgram(vertSrc, fragSrc);
+    if (params) {
+      this.initProgram(vertSrc, fragSrc, params);
     }
   }
 
@@ -410,61 +410,6 @@ var Program = function () {
   }]);
   return Program;
 }();
-
-function detectorWebGL2() {
-	var c = document.createElement('canvas');
-	try {
-		return !!window.WebGL2RenderingContext && !!c.getContext('webgl');
-	} catch (e) {
-		return null;
-	}
-}
-
-/**
- * Program2 support Vertex Buffer Object(VBO)
- */
-var Program2 = function (_Program) {
-	inherits(Program2, _Program);
-
-	function Program2(gl, vertSrc, fragSrc) {
-		var params = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
-		classCallCheck(this, Program2);
-
-		if (!detectorWebGL2()) {
-			console.error('gl is not webgl2. make sure your webgl context is webgl2, or use the brose which support webgl2.');
-		}
-
-		return possibleConstructorReturn(this, (Program2.__proto__ || Object.getPrototypeOf(Program2)).call(this, gl, vertSrc, fragSrc, params));
-	}
-
-	createClass(Program2, [{
-		key: '_initProgram',
-		value: function _initProgram(vertSrc, fragSrc) {
-			var params = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
-
-			this._vertexShader = webGLShader(this._gl, this._gl.VERTEX_SHADER, vertSrc);
-			this._fragmentShader = webGLShader(this._gl, this._gl.FRAGMENT_SHADER, fragSrc);
-			this._program = this._gl.createProgram();
-			this._gl.attachShader(this._program, this._vertexShader);
-			this._gl.attachShader(this._program, this._fragmentShader);
-
-			if (params.transformFeedback && Array.isArray(params.transformFeedback)) {
-				this._transformFeedback = params.transformFeedback;
-				this._gl.transformFeedbackVaryings(this._program, this._transformFeedback, this._gl.SEPARATE_ATTRIBS);
-			}
-
-			this._gl.linkProgram(this._program);
-
-			try {
-				var success = this._gl.getProgramParameter(this._program, this._gl.LINK_STATUS);
-				if (!success) throw this._gl.getProgramInfoLog(this._program);
-			} catch (error) {
-				console.error('WebGLProgram: ' + error);
-			}
-		}
-	}]);
-	return Program2;
-}(Program);
 
 var FLOAT$1 = 0x1406;
 var STATIC_DRAW = 0x88E4;
@@ -1257,6 +1202,63 @@ var FrameBuffer = function () {
 	return FrameBuffer;
 }();
 
+function detectorWebGL2() {
+	var c = document.createElement('canvas');
+	try {
+		return !!window.WebGL2RenderingContext && !!c.getContext('webgl');
+	} catch (e) {
+		return null;
+	}
+}
+
+/**
+ * Program2 support Vertex Buffer Object(VBO)
+ */
+var Program2 = function (_Program) {
+	inherits(Program2, _Program);
+
+	function Program2(gl, vertSrc, fragSrc) {
+		var params = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
+		classCallCheck(this, Program2);
+
+		if (!detectorWebGL2()) {
+			console.error('gl is not webgl2. make sure your webgl context is webgl2, or use the brose which support webgl2.');
+		}
+
+		return possibleConstructorReturn(this, (Program2.__proto__ || Object.getPrototypeOf(Program2)).call(this, gl, vertSrc, fragSrc, params));
+	}
+
+	createClass(Program2, [{
+		key: 'initProgram',
+		value: function initProgram(vertSrc, fragSrc) {
+			var params = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+			this._vertexShader = webGLShader(this._gl, this._gl.VERTEX_SHADER, vertSrc);
+			this._fragmentShader = webGLShader(this._gl, this._gl.FRAGMENT_SHADER, fragSrc);
+			this._program = this._gl.createProgram();
+			this._gl.attachShader(this._program, this._vertexShader);
+			this._gl.attachShader(this._program, this._fragmentShader);
+
+			if (params.transformFeedback && Array.isArray(params.transformFeedback)) {
+				this._transformFeedback = params.transformFeedback;
+				this._gl.transformFeedbackVaryings(this._program, this._transformFeedback, this._gl.SEPARATE_ATTRIBS);
+			}
+
+			this._gl.linkProgram(this._program);
+
+			try {
+				var success = this._gl.getProgramParameter(this._program, this._gl.LINK_STATUS);
+				if (!success) throw this._gl.getProgramInfoLog(this._program);
+			} catch (error) {
+				console.error('WebGLProgram: ' + error);
+			}
+
+			this._setProperties();
+		}
+	}]);
+	return Program2;
+}(Program);
+
 /**
  * only support webgl2
  */
@@ -1387,47 +1389,14 @@ var VAO = function () {
 	return VAO;
 }();
 
-/**
- *  https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/drawArrays
- *  https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/drawElements
- */
-var draw = {
-	array: function array(gl, cnt) {
-		var mode = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : gl.TRIANGLES;
-
-		gl.drawArrays(mode, 0, cnt);
-	},
-	element: function element(gl, cnt) {
-		var mode = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : gl.TRIANGLES;
-
-		gl.drawElements(mode, cnt, gl.UNSIGNED_SHORT, 0);
-	},
-	elementPoints: function elementPoints(gl, cnt) {
-		this.element(gl, cnt, gl.POINTS);
-	},
-	arrayPoint: function arrayPoint(gl, cnt) {
-		this.array(gl, cnt, gl.POINTS);
-	},
-	elementTriangles: function elementTriangles(gl, cnt) {
-		this.element(gl, cnt, gl.POINTS);
-	},
-	arrayLines: function arrayLines(gl, cnt) {
-		this.array(gl, cnt, gl.LINES);
-	},
-	elementLines: function elementLines(gl, cnt) {
-		this.element(gl, cnt, gl.LINES);
-	}
-};
-
 console.log('[tubugl] version: 1.5.0, %o', 'https://github.com/kenjiSpecial/tubugl');
 
 exports.Program = Program;
-exports.Program2 = Program2;
 exports.ArrayBuffer = ArrayBuffer;
 exports.IndexArrayBuffer = IndexArrayBuffer;
 exports.Texture = Texture;
 exports.FrameBuffer = FrameBuffer;
+exports.Program2 = Program2;
 exports.TransformFeedback = TransformFeedback;
 exports.VAO = VAO;
-exports.draw = draw;
 exports.webGLShader = webGLShader;

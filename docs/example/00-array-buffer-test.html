@@ -1,0 +1,171 @@
+<html>
+   <meta charset="UTF-8">
+   <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+   <style>
+       *{
+           margin: 0;
+       }
+       html, body{
+        font-family: 'Roboto', sans-serif;
+           width: 100%;
+           height: 100%;
+           overflow: hidden;
+           background: #000000;
+       }
+       canvas{
+           display: block;
+       }
+       #tubugl-desc{
+           position: absolute;
+           bottom: 20px;
+           left: 20px;
+           color: #aaaaaa;
+           font-size: 12px;
+           line-height: 1.5em;
+       }
+       
+       #tubugl-loading{
+           font-size: 14px;
+           color: #ffffff;
+           position: absolute;
+           top:20px;
+           left: 20px;
+       }
+       
+       #tubugl-loading-initializing{
+           display: none;
+       }
+       
+       a{
+            color: white;
+       }
+       a:hover{
+           text-decoration: none;
+       }
+   </style>
+   <script id="vertexShader" type="x-shader/x-vertex">
+    attribute vec4 a_position;
+
+    uniform mat4 uMat;
+
+    void main() {
+        gl_Position = uMat * a_position ;
+    }
+    </script>
+    
+    <script id="fragmentShader" type="x-shader/x-fragment">
+    precision mediump float;
+    uniform vec3 uColor;
+    
+    void main(){
+        gl_FragColor = vec4(uColor, 1.0);
+    }
+    </script>
+    
+   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
+   <script src="./vendor/gl-matrix-min.js"></script>
+   <script src="../../build//tubu.js"></script>
+<body>
+    <div id="tubugl-desc">
+        <p class="tubugl-p">#00 - ArrayBuffer implement test</p>
+        <p class="tubugl-p">Developed with <a href="https://github.com/kenjiSpecial/tubugl">tubugl</a></p>
+        <p class="tubugl-p">See <a href="./index.html">other examples</a></p>
+    </div>
+    
+    <canvas id="gl-canvas"></canvas>
+    
+    <script>
+        var canvas, gl;
+        var obj1, obj2;
+        var loopId;
+        var urlParams = new URLSearchParams(window.location.search);
+        var isDebug = !(urlParams.has('NoDebug') || urlParams.has('NoDebug/'));
+        
+        // initialize the webgl context
+        function initializeGl(){
+            canvas = document.getElementById('gl-canvas');
+            gl = canvas.getContext('webgl');
+            
+            if(!isDebug){
+                var desc = document.getElementById('tubugl-desc');
+                desc.style.display = 'none';
+            }
+            
+            resize();
+        }
+        
+        // create webgl program
+        function createProgram(){
+            
+            var program = new Tubu.Program(gl, document.getElementById('vertexShader').textContent, document.getElementById('fragmentShader').textContent);
+            var positions = [-0.5, -0.5, -0.3, 0.1, 0, -0.5];
+            var positionArrayBuffer = new Tubu.ArrayBuffer(gl, new Float32Array(positions));
+            positionArrayBuffer.setAttribs('a_position', 2, gl.FLOAT, false, 0, 0);
+            var uMat0 = mat4.create();
+            mat4.scale(uMat0, uMat0, [1, 1, 1]);
+            
+            obj1 = {
+                program: program,
+                positionBuffer: positionArrayBuffer,
+                uniforms: {
+                    uColor: {value: [1.0, 1.0, 0.0]},
+                    uMat: {value: uMat0}
+                },
+                count: 3
+            };
+            
+            // -----------------
+            var positions2 = [0, 0, 0, 0.5, 0.7, 0];
+            positionArrayBuffer2 = new Tubu.ArrayBuffer(gl, new Float32Array(positions2));
+            positionArrayBuffer2.setAttribs('a_position', 2, gl.FLOAT, false, 0, 0);
+            
+            obj2 = {
+                program: program,
+                positionBuffer: positionArrayBuffer2,
+                uniforms: {
+                    uColor: {value: [1.0, 0.0, 1.0]},
+                    uMat: {value: uMat0}
+                },
+                count: 3
+            };
+        }
+        
+        function loop(){
+            gl.clearColor(0, 0, 0, 1);
+            gl.clear(this.gl.COLOR_BUFFER_BIT);
+            
+            gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+            
+            [obj1, obj2].forEach(obj=>{
+                obj.program.use();
+                obj.positionBuffer.bind().attribPointer(obj.program);
+                
+                obj.program.uniform['uColor'].update(obj.uniforms.uColor.value[0], obj.uniforms.uColor.value[1], obj.uniforms.uColor.value[2]);
+                obj.program.uniform['uMat'].update(obj.uniforms.uMat.value);
+                gl.drawArrays(gl.TRIANGLES, 0, 3);    
+            })
+            
+            
+            
+            // loopId = requestAnimationFrame(loop);
+        }
+        
+        function resizeHandler(){
+            resize();
+        }
+        
+        function resize(){
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+        }
+        
+        initializeGl();
+        createProgram();
+        loop();
+        
+        window.addEventListener('resize', resizeHandler);
+    </script>
+</body>
+</html>

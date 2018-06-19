@@ -1,7 +1,7 @@
-import { webGLShader } from './utils/webglShader';
-import { detectorWebGL2 } from './utils/detector';
+import { webGLShader } from '../utils/webglShader';
+import { detectorWebGL2 } from '../utils/detector';
 
-import { Program } from './program';
+import { Program } from '../program';
 
 /**
  * Program2 support Vertex Buffer Object(VBO)
@@ -39,5 +39,7 @@ export class Program2 extends Program {
 		} catch (error) {
 			console.error(`WebGLProgram: ${error}`);
 		}
+		
+		this._setProperties();
 	}
 }
