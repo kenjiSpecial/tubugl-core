@@ -1130,6 +1130,6 @@ class VAO {
 	}
 }
 
-console.log('[tubugl] version: 1.5.0, %o', 'https://github.com/kenjiSpecial/tubugl');
+console.log('[tubugl] version: 1.5.1, %o', 'https://github.com/kenjiSpecial/tubugl');
 
 export { Program, ArrayBuffer, IndexArrayBuffer, Texture, FrameBuffer, Program2, TransformFeedback, VAO, webGLShader };

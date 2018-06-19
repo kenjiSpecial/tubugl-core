@@ -1389,7 +1389,7 @@ var VAO = function () {
 	return VAO;
 }();
 
-console.log('[tubugl] version: 1.5.0, %o', 'https://github.com/kenjiSpecial/tubugl');
+console.log('[tubugl] version: 1.5.1, %o', 'https://github.com/kenjiSpecial/tubugl');
 
 exports.Program = Program;
 exports.ArrayBuffer = ArrayBuffer;

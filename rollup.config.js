@@ -2,7 +2,6 @@
 // https://github.com/rollup/rollup-starter-lib
 // https://github.com/rollup
 
-import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
 import pkg from './package.json';
 import babel from 'rollup-plugin-babel';
@@ -23,6 +22,21 @@ export default [
 		plugins: [
 			babel(babelrc()),
 			// resolve(), // so Rollup can find `ms`
+			commonjs(),
+			replace({
+				TUBUGL_VERSOIN: pkg.version
+			})
+		]
+	},
+	{
+		input: './src/index.js',
+		output: {
+			name: pkg.libName,
+			file: './docs/example/vendor/tubu.js',
+			format: 'umd'
+		},
+		plugins: [
+			babel(babelrc()),
 			commonjs(),
 			replace({
 				TUBUGL_VERSOIN: pkg.version
