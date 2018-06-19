@@ -9,7 +9,7 @@
 
 ### test gallery page
 
-https://kenjispecial.github.io/tubugl-core/example
+[https://kenjispecial.github.io/tubugl-core/example](https://kenjispecial.github.io/tubugl-core/example)
 
 
 [source-program]: https://github.com/kenjiSpecial/tubugl-core/blob/master/src/program.js
