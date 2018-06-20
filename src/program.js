@@ -173,4 +173,11 @@ export class Program {
         this._gl.deleteShader(this._fragmentShader);
         this._gl = null;
     }
+    
+    /**
+     * return WebGLProgram(aka id)
+     */
+    get id(){
+        return this._program;
+    }
 }

@@ -18,7 +18,10 @@ export class IndexArrayBuffer {
 
 		try {
 			let sucess = data instanceof Uint16Array || data instanceof Uint32Array;
-			if (sucess) this.setData(data);
+			if (sucess) {
+				this.bind();
+				this.setData(data);
+			}
 			else throw 'data should be Uint16Array or Uint32Array';
 		} catch (error) {
 			console.error(error);
@@ -38,7 +41,6 @@ export class IndexArrayBuffer {
 		 */
 		this.dataArray = data;
 
-		this.bind();
 		this._gl.bufferData(this._gl.ELEMENT_ARRAY_BUFFER, data, this._gl.STATIC_DRAW);
 		return this;
 	}

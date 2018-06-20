@@ -61,48 +61,6 @@ var createClass = function () {
   };
 }();
 
-
-
-
-
-
-
-
-
-var inherits = function (subClass, superClass) {
-  if (typeof superClass !== "function" && superClass !== null) {
-    throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
-  }
-
-  subClass.prototype = Object.create(superClass && superClass.prototype, {
-    constructor: {
-      value: subClass,
-      enumerable: false,
-      writable: true,
-      configurable: true
-    }
-  });
-  if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
-};
-
-
-
-
-
-
-
-
-
-
-
-var possibleConstructorReturn = function (self, call) {
-  if (!self) {
-    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-  }
-
-  return call && (typeof call === "object" || typeof call === "function") ? call : self;
-};
-
 var FLOAT = 0x1406;
 var FLOAT_VEC2 = 0x8B50;
 var FLOAT_VEC3 = 0x8B51;
@@ -409,6 +367,16 @@ var Program = function () {
       this._gl.deleteShader(this._fragmentShader);
       this._gl = null;
     }
+
+    /**
+     * return WebGLProgram(aka id)
+     */
+
+  }, {
+    key: 'id',
+    get: function get$$1() {
+      return this._program;
+    }
   }]);
   return Program;
 }();
@@ -621,7 +589,10 @@ var IndexArrayBuffer = function () {
 
 		try {
 			var sucess = data instanceof Uint16Array || data instanceof Uint32Array;
-			if (sucess) this.setData(data);else throw 'data should be Uint16Array or Uint32Array';
+			if (sucess) {
+				this.bind();
+				this.setData(data);
+			} else throw 'data should be Uint16Array or Uint32Array';
 		} catch (error) {
 			console.error(error);
 		}
@@ -644,7 +615,6 @@ var IndexArrayBuffer = function () {
     */
 			this.dataArray = data;
 
-			this.bind();
 			this._gl.bufferData(this._gl.ELEMENT_ARRAY_BUFFER, data, this._gl.STATIC_DRAW);
 			return this;
 		}
@@ -1204,193 +1174,6 @@ var FrameBuffer = function () {
 	return FrameBuffer;
 }();
 
-function detectorWebGL2() {
-	var c = document.createElement('canvas');
-	try {
-		return !!window.WebGL2RenderingContext && !!c.getContext('webgl');
-	} catch (e) {
-		return null;
-	}
-}
-
-/**
- * Program2 support Vertex Buffer Object(VBO)
- */
-var Program2 = function (_Program) {
-	inherits(Program2, _Program);
-
-	function Program2(gl, vertSrc, fragSrc) {
-		var params = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
-		classCallCheck(this, Program2);
-
-		if (!detectorWebGL2()) {
-			console.error('gl is not webgl2. make sure your webgl context is webgl2, or use the brose which support webgl2.');
-		}
-
-		return possibleConstructorReturn(this, (Program2.__proto__ || Object.getPrototypeOf(Program2)).call(this, gl, vertSrc, fragSrc, params));
-	}
-
-	createClass(Program2, [{
-		key: 'initProgram',
-		value: function initProgram(vertSrc, fragSrc) {
-			var params = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
-
-			this._vertexShader = webGLShader(this._gl, this._gl.VERTEX_SHADER, vertSrc);
-			this._fragmentShader = webGLShader(this._gl, this._gl.FRAGMENT_SHADER, fragSrc);
-			this._program = this._gl.createProgram();
-			this._gl.attachShader(this._program, this._vertexShader);
-			this._gl.attachShader(this._program, this._fragmentShader);
-
-			if (params.transformFeedback && Array.isArray(params.transformFeedback)) {
-				this._transformFeedback = params.transformFeedback;
-				this._gl.transformFeedbackVaryings(this._program, this._transformFeedback, this._gl.SEPARATE_ATTRIBS);
-			}
-
-			this._gl.linkProgram(this._program);
-
-			try {
-				var success = this._gl.getProgramParameter(this._program, this._gl.LINK_STATUS);
-				if (!success) throw this._gl.getProgramInfoLog(this._program);
-			} catch (error) {
-				console.error('WebGLProgram: ' + error);
-			}
-
-			this._setProperties();
-		}
-	}]);
-	return Program2;
-}(Program);
-
-/**
- * only support webgl2
- */
-
-var TransformFeedback = function () {
-	function TransformFeedback(gl) {
-		classCallCheck(this, TransformFeedback);
-
-		this._gl = gl;
-		this._transfromFeedback = gl.createTransformFeedback();
-		this._arrayBuffers = [];
-	}
-
-	createClass(TransformFeedback, [{
-		key: "bind",
-		value: function bind() {
-			this._gl.bindTransformFeedback(this._gl.TRANSFORM_FEEDBACK, this._transfromFeedback);
-
-			return this;
-		}
-	}, {
-		key: "unbindBufferBase",
-		value: function unbindBufferBase() {
-			var _this = this;
-
-			this._arrayBuffers.forEach(function (arrayBuffers, index) {
-				return _this._gl.bindBufferBase(_this._gl.TRANSFORM_FEEDBACK_BUFFER, index, null);
-			});
-
-			return this;
-		}
-
-		/**
-   *
-   * @param {Program} program
-   */
-
-	}, {
-		key: "updateBufferBase",
-		value: function updateBufferBase(program) {
-			var _this2 = this;
-
-			this._arrayBuffers.forEach(function (arrayBuffers, index) {
-				_this2._gl.bindBuffer(_this2._gl.ARRAY_BUFFER, arrayBuffers.read.buffer);
-				_this2._gl.bindBufferBase(_this2._gl.TRANSFORM_FEEDBACK_BUFFER, index, arrayBuffers.write.buffer);
-				arrayBuffers.read.attribPointer(program);
-			});
-		}
-		/**
-   *
-   * @param {Number} index
-   * @param {{read: arrayBuffer, write: arrayBuffer, name: string}} arrayBuffers
-   */
-
-	}, {
-		key: "addArrayBufer",
-		value: function addArrayBufer(index, arrayBuffers) {
-			this._arrayBuffers[index] = arrayBuffers;
-		}
-	}, {
-		key: "swapArrayBuffers",
-		value: function swapArrayBuffers() {
-			this._arrayBuffers.forEach(function (arrayBuffers) {
-				var a = arrayBuffers.read;
-				arrayBuffers.read = arrayBuffers.write;
-				arrayBuffers.write = a;
-			});
-		}
-	}, {
-		key: "update",
-		value: function update() {}
-	}]);
-	return TransformFeedback;
-}();
-
-/**
- * VertexArray for only webgl2
- */
-var VAO = function () {
-	/**
-  * @param {WebGLRenderingContext} gl
-  */
-	function VAO(gl) {
-		classCallCheck(this, VAO);
-
-		this._gl = gl;
-		this._vao = gl.createVertexArray();
-
-		this._arrayBuffers = {};
-	}
-
-	createClass(VAO, [{
-		key: "bind",
-		value: function bind() {
-			this._gl.bindVertexArray(this._vao);
-
-			return this;
-		}
-	}, {
-		key: "unbind",
-		value: function unbind() {
-			this._gl.bindVertexArray(null);
-
-			return this;
-		}
-	}, {
-		key: "updateArrayBuffer",
-		value: function updateArrayBuffer(program, arrayBuffer, name) {
-			this._arrayBuffers[name] = arrayBuffer;
-			arrayBuffer.attribPointer(program);
-
-			return this;
-		}
-	}, {
-		key: "updateIndexBuffer",
-		value: function updateIndexBuffer(indexArrayBuffer) {
-			indexArrayBuffer.bind();
-			return;
-		}
-	}, {
-		key: "delete",
-		value: function _delete() {
-			this._gl.deleteVertexArray(this._vao);
-
-			return this;
-		}
-	}]);
-	return VAO;
-}();
-
 console.log('[tubugl] version: 1.5.1, %o', 'https://github.com/kenjiSpecial/tubugl');
 
 exports.Program = Program;
@@ -1398,9 +1181,6 @@ exports.ArrayBuffer = ArrayBuffer;
 exports.IndexArrayBuffer = IndexArrayBuffer;
 exports.Texture = Texture;
 exports.FrameBuffer = FrameBuffer;
-exports.Program2 = Program2;
-exports.TransformFeedback = TransformFeedback;
-exports.VAO = VAO;
 exports.webGLShader = webGLShader;
 
 Object.defineProperty(exports, '__esModule', { value: true });

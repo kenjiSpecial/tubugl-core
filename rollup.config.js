@@ -29,10 +29,56 @@ export default [
 		]
 	},
 	{
+		input: './src/index2.js',
+		output: {
+			name: pkg.libName,
+			file: pkg.main2,
+			format: 'umd'
+		},
+		plugins: [
+			babel(babelrc()),
+			// resolve(), // so Rollup can find `ms`
+			commonjs(),
+			replace({
+				TUBUGL_VERSOIN: pkg.version
+			})
+		]
+	},
+	{
 		input: './src/index.js',
 		output: {
 			name: pkg.libName,
 			file: './docs/example/vendor/tubu.js',
+			format: 'umd'
+		},
+		plugins: [
+			babel(babelrc()),
+			commonjs(),
+			replace({
+				TUBUGL_VERSOIN: pkg.version
+			})
+		]
+	},
+	{
+		input: './src/index.js',
+		output: {
+			name: pkg.libName,
+			file: './docs/example/vendor/tubu.js',
+			format: 'umd'
+		},
+		plugins: [
+			babel(babelrc()),
+			commonjs(),
+			replace({
+				TUBUGL_VERSOIN: pkg.version
+			})
+		]
+	},
+	{
+		input: './src/index2.js',
+		output: {
+			name: pkg.libName,
+			file: './docs/example/vendor/tubu2.js',
 			format: 'umd'
 		},
 		plugins: [
@@ -54,8 +100,27 @@ export default [
 		]
 	},
 	{
+		input: './src/index2.js',
+		output: [{ file: pkg.cjs2, format: 'cjs' }],
+		plugins: [
+			babel(babelrc()),
+			replace({
+				TUBUGL_VERSOIN: pkg.version
+			})
+		]
+	},
+	{
 		input: './src/index.js',
 		output: [{ file: pkg.esm, format: 'es' }],
+		plugins: [
+			replace({
+				TUBUGL_VERSOIN: pkg.version
+			})
+		]
+	},
+	{
+		input: './src/index2.js',
+		output: [{ file: pkg.esm2, format: 'es' }],
 		plugins: [
 			replace({
 				TUBUGL_VERSOIN: pkg.version

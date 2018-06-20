@@ -995,6 +995,234 @@ class FrameBuffer {
 	}
 }
 
-console.log('[tubugl] version: 1.5.1, %o', 'https://github.com/kenjiSpecial/tubugl');
+function detectorWebGL2() {
+	let c = document.createElement('canvas');
+	try {
+		return !!window.WebGL2RenderingContext && !!c.getContext('webgl');
+	} catch (e) {
+		return null;
+	}
+}
 
-export { Program, ArrayBuffer, IndexArrayBuffer, Texture, FrameBuffer, webGLShader };
+/**
+ * Program2 support Vertex Buffer Object(VBO)
+ */
+class Program2 extends Program {
+	constructor(gl, vertSrc, fragSrc, params = {}) {
+		if (!detectorWebGL2()) {
+			console.error(
+				'gl is not webgl2. make sure your webgl context is webgl2, or use the brose which support webgl2.'
+			);
+		}
+		
+
+		super(gl, vertSrc, fragSrc, params);
+	}
+
+	initProgram(vertSrc, fragSrc, params = {}) {
+		this._vertexShader = webGLShader(this._gl, this._gl.VERTEX_SHADER, vertSrc);
+		this._fragmentShader = webGLShader(this._gl, this._gl.FRAGMENT_SHADER, fragSrc);
+		this._program = this._gl.createProgram();
+		this._gl.attachShader(this._program, this._vertexShader);
+		this._gl.attachShader(this._program, this._fragmentShader);
+		
+		
+		if (params.transformFeedback && Array.isArray(params.transformFeedback)) {
+			this._transformFeedback = params.transformFeedback;
+			this._gl.transformFeedbackVaryings(this._program, this._transformFeedback, this._gl.SEPARATE_ATTRIBS);
+		}
+
+		this._gl.linkProgram(this._program);
+
+		try {
+			let success = this._gl.getProgramParameter(this._program, this._gl.LINK_STATUS);
+			if (!success) throw this._gl.getProgramInfoLog(this._program);
+		} catch (error) {
+			console.error(`WebGLProgram: ${error}`);
+		}
+		
+		this._setProperties();
+	}
+}
+
+/**
+ * only support webgl2
+ */
+
+class TransformFeedback {
+	constructor(gl) {
+		this._gl = gl;
+		this._transfromFeedback = gl.createTransformFeedback();
+		this._arrayBuffers = [];
+	}
+	bind() {
+		this._gl.bindTransformFeedback(this._gl.TRANSFORM_FEEDBACK, this._transfromFeedback);
+
+		return this;
+	}
+	unbindBufferBase() {
+		this._arrayBuffers.forEach((arrayBuffers, index) =>
+			this._gl.bindBufferBase(this._gl.TRANSFORM_FEEDBACK_BUFFER, index, null)
+		);
+
+		return this;
+	}
+
+	/**
+	 *
+	 * @param {Program} program
+	 */
+	updateBufferBase(program) {
+		this._arrayBuffers.forEach((arrayBuffers, index) => {
+			this._gl.bindBuffer(this._gl.ARRAY_BUFFER, arrayBuffers.read.buffer);
+			this._gl.bindBufferBase(this._gl.TRANSFORM_FEEDBACK_BUFFER, index, arrayBuffers.write.buffer);
+			arrayBuffers.read.attribPointer(program);
+		});
+	}
+	/**
+	 *
+	 * @param {Number} index
+	 * @param {{read: arrayBuffer, write: arrayBuffer, name: string}} arrayBuffers
+	 */
+	addArrayBufer(index, arrayBuffers) {
+		this._arrayBuffers[index] = arrayBuffers;
+	}
+
+	swapArrayBuffers() {
+		this._arrayBuffers.forEach(arrayBuffers => {
+			let a = arrayBuffers.read;
+			arrayBuffers.read = arrayBuffers.write;
+			arrayBuffers.write = a;
+		});
+	}
+
+	update() {}
+}
+
+/**
+ * VertexArray for only webgl2
+ */
+class VAO {
+	/**
+	 * @param {WebGLRenderingContext} gl
+	 */
+	constructor(gl) {
+		this._gl = gl;
+		this._vao = gl.createVertexArray();
+
+		this._arrayBuffers = {};
+	}
+	bind() {
+		this._gl.bindVertexArray(this._vao);
+
+		return this;
+	}
+	unbind() {
+		this._gl.bindVertexArray(null);
+
+		return this;
+	}
+	updateArrayBuffer(program, arrayBuffer, name) {
+		this._arrayBuffers[name] = arrayBuffer;
+		arrayBuffer.attribPointer(program);
+
+		return this;
+	}
+	updateIndexBuffer(indexArrayBuffer) {
+		indexArrayBuffer.bind();
+		return;
+	}
+	delete() {
+		this._gl.deleteVertexArray(this._vao);
+
+		return this;
+	}
+}
+
+class UniformBlock {
+    constructor(gl, name, location, data, program) {
+        this._gl = gl;
+        this._name = name;
+        this._location = location;
+
+        this._initializeUniformBlock(program);
+        this._createBuffer();
+        
+        if(data)
+            this.bind()
+                .setData(data)
+                .updateBuffer()
+                .subData();
+                
+        this._initializeBufferBase();
+    }
+    
+    _initializeUniformBlock(program){
+        console.log(program, this._name);
+        var uniformBlockLocation= this._gl.getUniformBlockIndex(program.id, this._name);
+        this._gl.uniformBlockBinding(program.id, uniformBlockLocation, this._location);
+    }
+    
+    /**
+     * create buffer for uniform block
+     */
+    _createBuffer() {
+        this._buffer = this._gl.createBuffer();
+        
+        return this;
+    }
+    
+    /**
+     * binds a given WebGLBuffer to a given binding point (target) at a given index
+     */
+    _initializeBufferBase(){
+        this._gl.bindBufferBase( this._gl.UNIFORM_BUFFER, this._location, this._buffer);
+        
+        return this;
+    }
+    
+    /**
+     * bind buffer to uniform block
+     */
+    bind() {
+        this._gl.bindBuffer(this._gl.UNIFORM_BUFFER, this._buffer);
+        
+        return this;
+    }
+    
+    /**
+     * update/set data for UniformBlock
+     * 
+     * @param {Uint16Array | Uint32Array} data 
+     * 
+     */
+    setData(data){
+        /**
+		 * @member {Float32Array | Float64Array}
+		 */
+        this.dataArray = data;
+        
+        return this;
+    }
+    
+    updateBuffer(){
+        this._gl.bufferData(this._gl.UNIFORM_BUFFER, this.dataArray, this._gl.DYNAMIC_DRAW);
+        
+        return this;
+    }
+    
+    subData(num = 0){
+        this._gl.bufferSubData( this._gl.UNIFORM_BUFFER, num, this.dataArray);
+        
+        return this;
+    }
+    
+    get loaction(){
+        return this._location;
+    }
+       
+}
+
+console.log('[tubugl] version: 1.5.1, %o(support webgl2)', 'https://github.com/kenjiSpecial/tubugl');
+
+export { Program, ArrayBuffer, IndexArrayBuffer, Texture, FrameBuffer, Program2, TransformFeedback, VAO, UniformBlock, webGLShader };

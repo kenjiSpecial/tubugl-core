@@ -1,0 +1,275 @@
+<html>
+   <meta charset="UTF-8">
+   <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+   <style>
+       *{
+           margin: 0;
+       }
+       html, body{
+        font-family: 'Roboto', sans-serif;
+           width: 100%;
+           height: 100%;
+           overflow: hidden;
+           background: #000000;
+       }
+       canvas{
+           display: block;
+       }
+       #tubugl-desc{
+           position: absolute;
+           bottom: 20px;
+           left: 20px;
+           color: #aaaaaa;
+           font-size: 12px;
+           line-height: 1.5em;
+       }
+       
+       #tubugl-loading{
+           font-size: 14px;
+           color: #ffffff;
+           position: absolute;
+           top:20px;
+           left: 20px;
+       }
+       
+       #tubugl-loading-initializing{
+           display: none;
+       }
+       
+       a{
+            color: white;
+       }
+       a:hover{
+           text-decoration: none;
+       }
+   </style>
+   <script id="vertexShader" type="x-shader/x-vertex">
+    #version 300 es
+    precision highp float;
+    precision highp int;
+    
+    layout(std140, column_major) uniform;
+ 
+    struct Transform
+    {
+        mat4 P;
+        mat4 MV;
+        mat4 Mnormal;
+    };
+    uniform PerDraw
+    {
+        Transform transform;
+    } u_perDraw;
+    layout(location = 0) in vec3 position;
+    layout(location = 1) in vec3 normal;
+    layout(location = 2) in vec4 color;
+
+    out vec3 v_normal;
+    out vec3 v_view;
+    out vec4 v_color;
+    void main()
+    {
+        vec4 pEC = u_perDraw.transform.MV * vec4(position, 1.0);
+        v_normal = (u_perDraw.transform.Mnormal * vec4(normal, 0.0)).xyz;
+        v_view = -pEC.xyz;
+        v_color = color;
+        gl_Position = u_perDraw.transform.P * pEC;
+    }
+    </script>
+        
+    <script id="fragmentShader" type="x-shader/x-fragment">
+    #version 300 es
+    precision highp float;
+    precision highp int;
+    
+    layout(std140, column_major) uniform;
+    struct Material
+    {
+        vec3 ambient;
+        vec3 diffuse;
+        vec3 specular;
+        float shininess;
+    };
+    struct Light
+    {
+        vec3 position; // Camera space
+    };
+    uniform PerScene
+    {
+        Material material;
+    } u_perScene;
+    uniform PerPass
+    {
+        Light light;
+    } u_perPass;
+    
+    in vec3 v_normal;
+    in vec3 v_view;
+    in vec4 v_color;
+    out vec4 color;
+    void main()
+    {
+        vec3 n = normalize(v_normal);
+        vec3 l = normalize(u_perPass.light.position + v_view);
+        vec3 v = normalize(v_view);
+        vec3 diffuse = max(dot(n, l), 0.0) * (u_perScene.material.diffuse + v_color.rgb);
+        vec3 r = - reflect(l, n);
+        vec3 specular = pow(max(dot(r, v), 0.0), u_perScene.material.shininess) * u_perScene.material.specular;
+        color = vec4(u_perScene.material.ambient + diffuse + specular, 1.0);
+    }
+    </script>
+    
+   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
+   <script src="./vendor/gl-matrix-min.js"></script>
+   <script src="./vendor/tubu2.js"></script>
+<body>
+    <div id="tubugl-desc">
+        <p class="tubugl-p">#01 - IndexArrayBuffer implement test</p>
+        <p class="tubugl-p">Developed with <a href="https://github.com/kenjiSpecial/tubugl">tubugl</a></p>
+        <p class="tubugl-p">See <a href="./index.html">other examples</a></p>
+    </div>
+    
+    <canvas id="gl-canvas"></canvas>
+    
+    <script>
+        var canvas, gl;
+        var obj, vao, arrayBuffer, program;
+        var uniformBlockObj = {};
+        var loopId;
+        var urlParams = new URLSearchParams(window.location.search);
+        var isDebug = !(urlParams.has('NoDebug') || urlParams.has('NoDebug/'));
+        
+        // initialize the webgl context
+        function initializeGl(){
+            canvas = document.getElementById('gl-canvas');
+            gl = canvas.getContext('webgl2');
+            
+            if(!isDebug){
+                var desc = document.getElementById('tubugl-desc');
+                desc.style.display = 'none';
+            }
+        }
+        
+        // create webgl program
+        function createProgram(){
+            program = new Tubu.Program2(
+                gl, 
+                document.getElementById('vertexShader').textContent.trim(), 
+                document.getElementById('fragmentShader').textContent.trim()
+            );
+        }
+        
+        function createVao(){
+            vao = new Tubu.VAO(gl);
+            vao.bind();
+        }
+        
+        function createArrayBuffer(){
+            var vertices = new Float32Array([
+                -1.0, -1.0, -0.5,    0.0, 0.0, 1.0,     1.0, 0.0, 0.0, 1.0, 
+                1.0, -1.0, -0.5,    0.0, 0.0, 1.0,     0.0, 1.0, 0.0, 1.0, 
+                1.0, 1.0, -0.5,     0.0, 0.0, 1.0,     0.0, 0.0, 1.0, 1.0, 
+                -1.0, 1.0, -0.5,     0.0, 0.0, 1.0,     1.0, 1.0, 1.0, 1.0
+            ]);
+        
+            arrayBuffer = new Tubu.ArrayBuffer(gl, vertices);
+            arrayBuffer.setAttribs('position', 3, gl.FLOAT, false, 40, 0);
+            arrayBuffer.setAttribs('normal', 3, gl.FLOAT, false, 40, 12);
+            arrayBuffer.setAttribs('color', 4, gl.FLOAT, false, 40, 24);
+        }
+        
+        function createIndexArray(){
+            var indices = new Uint16Array([
+                0, 1, 2,
+                2, 3, 0
+            ]);
+            var indexBuffer = new Tubu.IndexArrayBuffer(gl, indices);
+            console.log('indexArrary');
+            // indexBuffer.bind();
+        }
+            
+        function createUniformBlock(){
+            var transforms = new Float32Array([
+                1.0, 0.0, 0.0, 0.0,
+                0.0, 1.0, 0.0, 0.0,
+                0.0, 0.0, 1.0, 0.0,
+                0.0, 0.0, 0.0, 1.0,
+
+                0.5, 0.0, 0.0, 0.0,
+                0.0, 0.5, 0.0, 0.0,
+                0.0, 0.0, 0.5, 0.0,
+                0.0, 0.0, 0.0, 1.0,
+
+                1.0, 0.0, 0.0, 0.0,
+                0.0, 1.0, 0.0, 0.0,
+                0.0, 0.0, 1.0, 0.0,
+                0.0, 0.0, 0.0, 1.0
+            ]);
+            
+            var lightPos = new Float32Array([
+                0, 0, 0, 0
+            ]);
+            
+            //vec3 ambient, diffuse, specular, float shininess
+            var material = new Float32Array([
+                0.1, 0.0, 0.0, 0.0,
+                0.5, 0.0, 0.0, 0.0,
+                1.0, 1.0, 1.0, 4.0,
+            ]);
+            
+            uniformBlockObj['perDraw'] = new Tubu.UniformBlock(gl, 'PerDraw', 0, transforms, program);
+            uniformBlockObj['perPass'] = new Tubu.UniformBlock(gl, 'PerPass', 1, lightPos, program);
+            uniformBlockObj['perScene'] = new Tubu.UniformBlock(gl, 'PerScene', 2, material, program);
+        }
+        
+        function enableAttribute(){
+            // program.use();
+            arrayBuffer.bind().attribPointer(program);
+        }
+        
+        function loop(){
+            gl.clearColor(0, 0, 0, 1);
+            gl.clear(gl.COLOR_BUFFER_BIT);
+            
+            program.use();
+            vao.bind();
+            
+            
+            gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
+        }
+        
+        function resizeHandler(){
+            resize();
+        }
+        
+        function resize(){
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+            
+            loop();
+        }
+        
+        initializeGl();
+        createProgram();
+        createVao()
+        createArrayBuffer();
+        enableAttribute();
+        createIndexArray();
+        
+        createUniformBlock();
+        
+        
+        resize();
+        loop();
+        
+        // for(var ii = 0; ii < 10; ii++){
+        //     loop();
+        // }
+        
+        
+        window.addEventListener('resize', resizeHandler);
+    </script>
+</body>
+</html>
