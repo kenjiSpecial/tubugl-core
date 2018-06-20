@@ -1,6 +1,6 @@
 {
   "name": "tubugl-core",
-  "version": "1.5.1",
+  "version": "1.5.2",
   "description": "core parts of webgl module based framework ",
   "cjs": "build/tubu.cjs.js",
   "esm": "build/tubu.esm.js",
