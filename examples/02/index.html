@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        * {
+            margin: 0;
+        }
+        
+        canvas{
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <script id="geo-vs" type="x-vertex-shader">
+        #version 300 es
+        layout(std140, column_major) uniform;
+        layout(location=0) in vec4 aPosition;
+        layout(location=1) in vec3 aNormal;
+        layout(location=2) in vec4 aUV;
+        uniform Matrices {
+            mat4 uModelMatrix;
+            mat4 uMVP;
+        };
+        
+        out vec4 vPosition;
+        out vec4 vNormal;
+        out vec4 vUV;
+        
+        void main() {
+            vPosition = uModelMatrix * aPosition;
+            vNormal = uModelMatrix * vec4(aNormal, 0.0);
+            vUV = aUV;
+            gl_Position = uMVP * aPosition;
+        }
+    </script>
+    <script id="geo-fs" type="x-fragment-shader">
+        #version 300 es
+        precision highp float;
+        
+        in vec4 vPosition;
+        in vec4 vNormal; 
+        in vec4 vUV;
+        layout(location=0) out vec4 fragPosition;
+        layout(location=1) out vec4 fragNormal;
+        layout(location=2) out vec4 fragUV; 
+        void main() {
+            fragPosition = vPosition;
+            fragNormal = vec4(normalize(vNormal.xyz), 0.0);
+            fragUV = vUV;
+        }
+    </script> 
+    
+
+    <script>
+        function getShaderSource(id) {
+            return document.getElementById(id).textContent.replace(/^\s+|\s+$/g, '').trim();
+        };
+        
+        function createShader(gl, source, type){
+            var shader = gl.createShader(type);
+            gl.shaderSource(shader, source);
+            gl.compileShader(shader);
+            return shader;
+        }
+
+        function createProgram(gl, vertexShaderSource, fragmentShaderSource) {
+            var program = gl.createProgram();
+            var vshader = createShader(gl, vertexShaderSource, gl.VERTEX_SHADER);
+            var fshader = createShader(gl, fragmentShaderSource, gl.FRAGMENT_SHADER);
+            gl.attachShader(program, vshader);
+            gl.deleteShader(vshader);
+            gl.attachShader(program, fshader);
+            gl.deleteShader(fshader);
+            gl.linkProgram(program);
+
+            var log = gl.getProgramInfoLog(program);
+            if (log) {
+                console.log(log);
+            }
+
+            log = gl.getShaderInfoLog(vshader);
+            if (log) {
+                console.log(log);
+            }
+
+            log = gl.getShaderInfoLog(fshader);
+            if (log) {
+                console.log(log);
+            }
+
+            return program;
+        };
+
+        var canvas = document.createElement('canvas');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        document.body.appendChild(canvas);
+
+        var gl = canvas.getContext('webgl2', {
+            antialias: false
+        });
+        var isWebGL2 = !!gl;
+         
+        /**
+         * setup g buffer
+        */
+       
+        let geoProgram = createProgram(gl, getShaderSource('geo-vs'), getShaderSource('geo-fs'));
+        
+        /**
+         * get g buffer program uniform locations
+        */
+       
+        var matrixUniformLocation = gl.getUniformBlockIndex(geoProgram, "Matrices");
+        gl.uniformBlockBinding(geoProgram, matrixUniformLocation, 0);
+        
+        
+        /**
+         * setup g buffer
+        */ 
+       
+        let gBuffer = gl.createFramebuffer();
+        
+        
+        render();
+
+        function render() {
+            uTime += 0.01;
+            // -- update uniform buffer
+            transforms[16] = 0.1 * Math.cos(uTime) + 0.4;
+            gl.bindBuffer(gl.UNIFORM_BUFFER, uniformPerDrawBuffer);
+            gl.bufferSubData(gl.UNIFORM_BUFFER, 0, transforms);
+            lightPos[0] = Math.cos(3 * uTime);
+            lightPos[1] = Math.sin(6 * uTime);
+            gl.bindBuffer(gl.UNIFORM_BUFFER, uniformPerPassBuffer);
+            gl.bufferSubData(gl.UNIFORM_BUFFER, 0, lightPos);
+            gl.bindBuffer(gl.UNIFORM_BUFFER, null);
+            gl.clearColor(0.0, 0.0, 0.0, 1.0);
+            gl.clear(gl.COLOR_BUFFER_BIT);
+
+            gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
+            requestAnimationFrame(render);
+        }
+        
+    </script>
+
+</body>
+
+</html>
