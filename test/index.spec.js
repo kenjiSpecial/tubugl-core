@@ -5,7 +5,10 @@ import puppeteer from 'puppeteer';
 async function captureScreen(url) {
 	const browser = await puppeteer.launch();
 	const page = await browser.newPage();
-	page.setViewport({width: 640, height: 360});
+	page.setViewport({
+		width: 640,
+		height: 360
+	});
 	await page.goto(url);
 	let screenshot = await page.screenshot();
 	browser.close();
@@ -36,3 +39,10 @@ it('#05: transformfeedback', async () => {
 	await captureScreen('http://localhost:8080/docs/example/05-transformfeedback-test.html?NoDebug');
 });
 
+it('#06: uniform block', async () => {
+	await captureScreen('http://localhost:8080/docs/example/06-uniform-block-test.html?NoDebug');
+});
+
+it('#07 transformfeedback', async () => {
+	await captureScreen('http://localhost:8080/docs/example/07-multi-render-targets-test.html?NoDebug');
+});

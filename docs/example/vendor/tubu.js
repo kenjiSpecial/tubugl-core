@@ -1,7 +1,7 @@
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
 	typeof define === 'function' && define.amd ? define(['exports'], factory) :
-	(factory((global.Tubu = {})));
+	(factory((global.Tubu = global.Tubu || {})));
 }(this, (function (exports) { 'use strict';
 
 /**
@@ -189,11 +189,18 @@ var Program = function () {
      * @member {boolean}
      */
     this._isReady = false;
+
     /**
      * @private
      * @member {boolean}
      */
     this._isDebgu = params.isDebug;
+
+    /**
+     * @private
+     * @member {boolean}
+     */
+    this._isAutoSetProperties = params.isAutoSetProperties === undefined ? true : params.isAutoSetProperties;
 
     /**
      * @private
@@ -246,7 +253,7 @@ var Program = function () {
         console.error('WebGLProgram: ' + error);
       }
 
-      this._setProperties();
+      if (this._isAutoSetProperties) this._setProperties();
     }
 
     /**
@@ -297,7 +304,19 @@ var Program = function () {
     }
 
     /**
+     * update properties
+     * @public
+     */
+
+  }, {
+    key: 'updateProperties',
+    value: function updateProperties() {
+      this._setProperties();
+    }
+
+    /**
      * use program, as same function as bind()
+     * @public
      */
 
   }, {
@@ -1174,7 +1193,7 @@ var FrameBuffer = function () {
 	return FrameBuffer;
 }();
 
-console.log('[tubugl] version: 1.5.1, %o', 'https://github.com/kenjiSpecial/tubugl');
+console.log('[tubugl] version: 1.5.2, %o', 'https://github.com/kenjiSpecial/tubugl');
 
 exports.Program = Program;
 exports.ArrayBuffer = ArrayBuffer;

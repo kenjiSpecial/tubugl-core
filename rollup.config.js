@@ -17,7 +17,8 @@ export default [
 		output: {
 			name: pkg.libName,
 			file: pkg.main,
-			format: 'umd'
+			format: 'umd',
+			extend: true
 		},
 		plugins: [
 			babel(babelrc()),
@@ -33,7 +34,8 @@ export default [
 		output: {
 			name: pkg.libName,
 			file: pkg.main2,
-			format: 'umd'
+			format: 'umd',
+			extend: true
 		},
 		plugins: [
 			babel(babelrc()),
@@ -49,22 +51,8 @@ export default [
 		output: {
 			name: pkg.libName,
 			file: './docs/example/vendor/tubu.js',
-			format: 'umd'
-		},
-		plugins: [
-			babel(babelrc()),
-			commonjs(),
-			replace({
-				TUBUGL_VERSOIN: pkg.version
-			})
-		]
-	},
-	{
-		input: './src/index.js',
-		output: {
-			name: pkg.libName,
-			file: './docs/example/vendor/tubu.js',
-			format: 'umd'
+			format: 'umd',
+			extend: true
 		},
 		plugins: [
 			babel(babelrc()),
@@ -79,7 +67,8 @@ export default [
 		output: {
 			name: pkg.libName,
 			file: './docs/example/vendor/tubu2.js',
-			format: 'umd'
+			format: 'umd',
+			extend: true
 		},
 		plugins: [
 			babel(babelrc()),

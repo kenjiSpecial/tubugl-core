@@ -20,11 +20,18 @@ export class Program {
          * @member {boolean}
          */
         this._isReady = false;
+        
         /**
          * @private
          * @member {boolean}
          */
         this._isDebgu = params.isDebug;
+        
+        /**
+         * @private
+         * @member {boolean}
+         */
+        this._isAutoSetProperties = (params.isAutoSetProperties === undefined) ? true : params.isAutoSetProperties;
 
         /**
          * @private
@@ -73,7 +80,7 @@ export class Program {
             console.error(`WebGLProgram: ${error}`);
         }
 
-        this._setProperties();
+        if(this._isAutoSetProperties) this._setProperties();
     }
 
     /**
@@ -119,9 +126,18 @@ export class Program {
 
         return this;
     }
+    
+    /**
+     * update properties
+     * @public
+     */
+    updateProperties(){
+        this._setProperties();
+    }
 
     /**
      * use program, as same function as bind()
+     * @public
      */
     use() {
         return this.bind();

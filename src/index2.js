@@ -10,5 +10,6 @@ export { Program2 } from './webgl2/program2';
 export { TransformFeedback } from './webgl2/tranformFeedback';
 export { VAO } from './webgl2/vao';
 export { UniformBlock } from './webgl2/uniformBlock';
+export { MultiRenderTarget } from './webgl2/multiRenderTarget';
 
 export { webGLShader } from './utils/webglShader';

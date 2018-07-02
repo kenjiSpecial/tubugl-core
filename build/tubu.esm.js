@@ -155,11 +155,18 @@ class Program {
          * @member {boolean}
          */
         this._isReady = false;
+        
         /**
          * @private
          * @member {boolean}
          */
         this._isDebgu = params.isDebug;
+        
+        /**
+         * @private
+         * @member {boolean}
+         */
+        this._isAutoSetProperties = (params.isAutoSetProperties === undefined) ? true : params.isAutoSetProperties;
 
         /**
          * @private
@@ -208,7 +215,7 @@ class Program {
             console.error(`WebGLProgram: ${error}`);
         }
 
-        this._setProperties();
+        if(this._isAutoSetProperties) this._setProperties();
     }
 
     /**
@@ -254,9 +261,18 @@ class Program {
 
         return this;
     }
+    
+    /**
+     * update properties
+     * @public
+     */
+    updateProperties(){
+        this._setProperties();
+    }
 
     /**
      * use program, as same function as bind()
+     * @public
      */
     use() {
         return this.bind();
@@ -995,6 +1011,6 @@ class FrameBuffer {
 	}
 }
 
-console.log('[tubugl] version: 1.5.1, %o', 'https://github.com/kenjiSpecial/tubugl');
+console.log('[tubugl] version: 1.5.2, %o', 'https://github.com/kenjiSpecial/tubugl');
 
 export { Program, ArrayBuffer, IndexArrayBuffer, Texture, FrameBuffer, webGLShader };

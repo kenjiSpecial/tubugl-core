@@ -229,11 +229,18 @@ var Program = function () {
      * @member {boolean}
      */
     this._isReady = false;
+
     /**
      * @private
      * @member {boolean}
      */
     this._isDebgu = params.isDebug;
+
+    /**
+     * @private
+     * @member {boolean}
+     */
+    this._isAutoSetProperties = params.isAutoSetProperties === undefined ? true : params.isAutoSetProperties;
 
     /**
      * @private
@@ -286,7 +293,7 @@ var Program = function () {
         console.error('WebGLProgram: ' + error);
       }
 
-      this._setProperties();
+      if (this._isAutoSetProperties) this._setProperties();
     }
 
     /**
@@ -337,7 +344,19 @@ var Program = function () {
     }
 
     /**
+     * update properties
+     * @public
+     */
+
+  }, {
+    key: 'updateProperties',
+    value: function updateProperties() {
+      this._setProperties();
+    }
+
+    /**
      * use program, as same function as bind()
+     * @public
      */
 
   }, {
@@ -1217,7 +1236,7 @@ var FrameBuffer = function () {
 function detectorWebGL2() {
 	var c = document.createElement('canvas');
 	try {
-		return !!window.WebGL2RenderingContext && !!c.getContext('webgl');
+		return !!window.WebGL2RenderingContext && !!c.getContext('webgl2');
 	} catch (e) {
 		return null;
 	}
@@ -1503,7 +1522,99 @@ var UniformBlock = function () {
     return UniformBlock;
 }();
 
-console.log('[tubugl] version: 1.5.1, %o(support webgl2)', 'https://github.com/kenjiSpecial/tubugl');
+var MultiRenderTarget = function () {
+    function MultiRenderTarget(gl, vertexShaderSrc, fragmentShaderSrc) {
+        classCallCheck(this, MultiRenderTarget);
+
+        if (!gl.getExtension('EXT_color_buffer_float')) {
+            console.error('FLOAT color buffer not available');
+            return;
+        }
+
+        this._program = new Program2(gl, vertexShaderSrc, fragmentShaderSrc);
+        this._gl = gl;
+        this._gBuffer = gl.createFramebuffer();
+        this._targets = {};
+        this._index = 0;
+    }
+
+    createClass(MultiRenderTarget, [{
+        key: 'bind',
+        value: function bind() {
+            this._gl.bindFramebuffer(this._gl.FRAMEBUFFER, this._gBuffer);
+
+            return this;
+        }
+    }, {
+        key: 'useProgram',
+        value: function useProgram() {
+            this._program.use();
+
+            return this;
+        }
+    }, {
+        key: 'createTexture',
+        value: function createTexture(targetName, internalFormat) {
+            var target = this._gl.createTexture();
+            var gl = this._gl;
+            internalFormat = internalFormat ? internalFormat : this._gl.RGBA;
+
+            gl.bindTexture(gl.TEXTURE_2D, target);
+            gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+            gl.texStorage2D(gl.TEXTURE_2D, 1, internalFormat, gl.drawingBufferWidth, gl.drawingBufferHeight);
+            gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0 + this._index, gl.TEXTURE_2D, target, 0);
+
+            this._targets[targetName] = target;
+            this._index++;
+        }
+    }, {
+        key: 'createDepthTexture',
+        value: function createDepthTexture() {
+            var gl = this._gl;
+            var depthTexture = gl.createTexture();
+            gl.bindTexture(gl.TEXTURE_2D, depthTexture);
+            gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+            gl.texStorage2D(gl.TEXTURE_2D, 1, gl.DEPTH_COMPONENT16, gl.drawingBufferWidth, gl.drawingBufferHeight);
+            gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, depthTexture, 0);
+
+            this._depthTexture = depthTexture;
+        }
+    }, {
+        key: 'updateDrawBuffers',
+        value: function updateDrawBuffers() {
+            var drawBufferArray = [];
+            for (var ii = 0; ii < this._index; ii++) {
+                drawBufferArray.push(this._gl.COLOR_ATTACHMENT0 + ii);
+            }
+            this._gl.drawBuffers(drawBufferArray);
+
+            return this;
+        }
+    }, {
+        key: 'unbind',
+        value: function unbind() {
+            this._gl.bindFramebuffer(this._gl.FRAMEBUFFER, null);
+
+            return this;
+        }
+    }, {
+        key: 'target',
+        get: function get$$1() {
+            return this._targets;
+        }
+    }]);
+    return MultiRenderTarget;
+}();
+
+console.log('[tubugl] version: 1.5.2, %o(support webgl2)', 'https://github.com/kenjiSpecial/tubugl');
 
 exports.Program = Program;
 exports.ArrayBuffer = ArrayBuffer;
@@ -1514,4 +1625,5 @@ exports.Program2 = Program2;
 exports.TransformFeedback = TransformFeedback;
 exports.VAO = VAO;
 exports.UniformBlock = UniformBlock;
+exports.MultiRenderTarget = MultiRenderTarget;
 exports.webGLShader = webGLShader;

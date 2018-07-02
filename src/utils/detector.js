@@ -12,7 +12,7 @@ export function detectorWebGL() {
 export function detectorWebGL2() {
 	let c = document.createElement('canvas');
 	try {
-		return !!window.WebGL2RenderingContext && !!c.getContext('webgl');
+		return !!window.WebGL2RenderingContext && !!c.getContext('webgl2');
 	} catch (e) {
 		return null;
 	}
