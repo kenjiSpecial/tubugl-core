@@ -1,4 +1,6 @@
-import { Texture } from './texture';
+import {
+	Texture
+} from './texture';
 
 /**
  * Class representing a Framebuffer

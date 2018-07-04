@@ -254,6 +254,7 @@
             transforms[16] = 0.1 * Math.cos(uTime) + 0.4;
             gl.bindBuffer(gl.UNIFORM_BUFFER, uniformPerDrawBuffer);
             gl.bufferSubData(gl.UNIFORM_BUFFER, 0, transforms);
+            
             lightPos[0] = Math.cos(3 * uTime);
             lightPos[1] = Math.sin(6 * uTime);
             gl.bindBuffer(gl.UNIFORM_BUFFER, uniformPerPassBuffer);

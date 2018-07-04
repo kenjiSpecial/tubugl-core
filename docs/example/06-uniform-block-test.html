@@ -136,6 +136,7 @@
         var obj, vao, arrayBuffer, program;
         var uniformBlockObj = {};
         var loopId;
+        var uTime = 0;
         var urlParams = new URLSearchParams(window.location.search);
         var isDebug = !(urlParams.has('NoDebug') || urlParams.has('NoDebug/'));
         
@@ -228,14 +229,19 @@
         }
         
         function loop(){
+            uTime += 1/60;
             gl.clearColor(0, 0, 0, 1);
-            gl.clear(gl.COLOR_BUFFER_BIT);
+            gl.clear(gl.COLOR_BUFFER_BIT)
             
+            uniformBlockObj['perDraw'].dataArray[16] = 0.1 * Math.cos(uTime) + 0.4;
+            uniformBlockObj['perDraw'].bind().update();
+        
             program.use();
             vao.bind();
             
-            
             gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
+            
+            if(isDebug) requestAnimationFrame(loop);
         }
         
         function resizeHandler(){
@@ -248,7 +254,6 @@
             
             gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
             
-            loop();
         }
         
         initializeGl();

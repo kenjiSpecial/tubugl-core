@@ -117,7 +117,13 @@ export class ArrayBuffer {
 				// console.warn(`attribute ${attrib.name} is not used`);
 			} else {
 				let location = programAttr.location;
-				let { size, type, normalize, stride, offset } = attrib;
+				let {
+					size,
+					type,
+					normalize,
+					stride,
+					offset
+				} = attrib;
 
 				this.gl.enableVertexAttribArray(location);
 				this.gl.vertexAttribPointer(location, size, type, normalize, stride, offset);

@@ -11,5 +11,6 @@ export { TransformFeedback } from './webgl2/tranformFeedback';
 export { VAO } from './webgl2/vao';
 export { UniformBlock } from './webgl2/uniformBlock';
 export { MultiRenderTarget } from './webgl2/multiRenderTarget';
+export { MultiSample } from './webgl2/multiSample';
 
 export { webGLShader } from './utils/webglShader';

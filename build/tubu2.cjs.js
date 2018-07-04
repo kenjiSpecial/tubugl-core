@@ -976,7 +976,7 @@ var Texture = function () {
 		/**
    * generate mipmap for texture
    *
-   * @returns {Texture}
+   * @returns {WebGLTexture}
    */
 
 	}, {
@@ -1005,6 +1005,17 @@ var Texture = function () {
 		value: function _delete() {
 			this._gl.deleteTexture(this._texture);
 			this._texture = null;
+		}
+
+		/**
+   * @description get webgl texture as id
+   * @return {WebGLTexture}
+   */
+
+	}, {
+		key: 'id',
+		get: function get$$1() {
+			return this._texture;
 		}
 	}]);
 	return Texture;
@@ -1286,6 +1297,11 @@ var Program2 = function (_Program) {
 
 			this._setProperties();
 		}
+	}, {
+		key: 'isWebGL2',
+		get: function get$$1() {
+			return true;
+		}
 	}]);
 	return Program2;
 }(Program);
@@ -1431,7 +1447,7 @@ var UniformBlock = function () {
         this._initializeUniformBlock(program);
         this._createBuffer();
 
-        if (data) this.bind().setData(data).updateBuffer().subData();
+        if (data) this.bind().setData(data).initializeBuffer().subData();
 
         this._initializeBufferBase();
     }
@@ -1439,7 +1455,7 @@ var UniformBlock = function () {
     createClass(UniformBlock, [{
         key: "_initializeUniformBlock",
         value: function _initializeUniformBlock(program) {
-            console.log(program, this._name);
+            // console.log(program, this._name);
             var uniformBlockLocation = this._gl.getUniformBlockIndex(program.id, this._name);
             this._gl.uniformBlockBinding(program.id, uniformBlockLocation, this._location);
         }
@@ -1491,17 +1507,32 @@ var UniformBlock = function () {
         key: "setData",
         value: function setData(data) {
             /**
-            * @member {Float32Array | Float64Array}
-            */
+             * @member {Float32Array | Float64Array}
+             */
             this.dataArray = data;
 
             return this;
         }
     }, {
-        key: "updateBuffer",
-        value: function updateBuffer() {
+        key: "initializeBuffer",
+        value: function initializeBuffer() {
             this._gl.bufferData(this._gl.UNIFORM_BUFFER, this.dataArray, this._gl.DYNAMIC_DRAW);
+            return this;
+        }
+    }, {
+        key: "updateBuffer",
+        value: function updateBuffer(dataArray) {
+            var num = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
 
+            this.setData(dataArray);
+            this.subData(num);
+
+            return;
+        }
+    }, {
+        key: "update",
+        value: function update() {
+            this.subData();
             return this;
         }
     }, {
@@ -1610,11 +1641,148 @@ var MultiRenderTarget = function () {
         get: function get$$1() {
             return this._targets;
         }
+    }, {
+        key: 'program',
+        get: function get$$1() {
+            return this._program;
+        }
     }]);
     return MultiRenderTarget;
 }();
 
-console.log('[tubugl] version: 1.5.2, %o(support webgl2)', 'https://github.com/kenjiSpecial/tubugl');
+// https://github.com/BabylonJS/Babylon.js/blob/eb75d8064ea755d2a9433c4edfb2cb32dd32cd83/src/Engine/babylon.engine.ts#L5186-L5190
+// http://doc.babylonjs.com/features/webgl2 multisample render targets
+
+var MultiSample = function () {
+  /**
+   * 
+   * @param {webglContext} gl 
+   * @param {object} params 
+   * @param {GLenum} params.samples
+   * @param {boolean} params.isDepth
+   * @param {number} width 
+   * @param {number} height 
+   */
+  function MultiSample(gl) {
+    var params = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : { samples: 1, isDepth: true };
+    var width = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 256;
+    var height = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 256;
+    classCallCheck(this, MultiSample);
+
+    /**
+    * @type {webglContext2}
+    * @description webgl2 context
+    */
+    this._gl = gl;
+    /**
+     * @type {number}
+     */
+    this._samples = params.samples;
+    /**
+     * @type {boolean}
+     */
+    this._isDepth = params.isDepth;
+    /**
+    * @type {number}
+    */
+    this._width = width;
+    /**
+     * @type {number}
+     */
+    this._height = height;
+
+    this._createTexture();
+    this._createFramebuffers();
+  }
+
+  createClass(MultiSample, [{
+    key: '_createTexture',
+    value: function _createTexture() {
+      this._texture = new Texture(this._gl, this._gl.RGBA, this._gl.RGBA);
+      this._texture.bind().setMagFilter(this._gl.NEAREST).setMinFilter(this._gl.NEAREST).fromSize(this._width, this._height).unbind();
+    }
+  }, {
+    key: '_createFramebuffers',
+    value: function _createFramebuffers() {
+
+      /**
+       * @type {WebGLFrameBuffer}
+       */
+      this._colorFramebuffer = this._gl.createFramebuffer();
+
+      /**
+       * @type {WebGLFrameBuffer}
+       */
+      this._rendererFramebuffer = this._gl.createFramebuffer();
+
+      /**
+       * @type {WebGLRenderBuffer}
+       */
+      this._colorRenderbuffer = this._gl.createRenderbuffer();
+
+      this._gl.bindRenderbuffer(this._gl.RENDERBUFFER, this._colorRenderbuffer);
+      this._gl.renderbufferStorageMultisample(this._gl.RENDERBUFFER, this._samples, this._gl.RGBA8, this._width, this._height);
+
+      this._gl.bindFramebuffer(this._gl.FRAMEBUFFER, this._rendererFramebuffer);
+      this._gl.framebufferRenderbuffer(this._gl.FRAMEBUFFER, this._gl.COLOR_ATTACHMENT0, this._gl.RENDERBUFFER, this._colorRenderbuffer);
+
+      if (this._isDepth) {
+        /**
+         * @type {WebGLRenderBuffer}
+         */
+        this._depthBuffer = this._gl.createRenderbuffer();
+        this._gl.bindRenderbuffer(this._gl.RENDERBUFFER, this._depthBuffer);
+
+        // make a depth buffer and the same size as the targetTexture
+        // https://github.com/BabylonJS/Babylon.js/blob/eb75d8064ea755d2a9433c4edfb2cb32dd32cd83/src/Engine/babylon.engine.ts#L5186-L5190
+        if (this._samples > 0) this._gl.renderbufferStorageMultisample(this._gl.RENDERBUFFER, this._samples, this._gl.DEPTH_COMPONENT16, this._width, this._height);else this._gl.renderbufferStorage(this._gl.RENDERBUFFER, this._gl.DEPTH_COMPONENT16, this._width, this._height);
+
+        this._gl.framebufferRenderbuffer(this._gl.FRAMEBUFFER, this._gl.DEPTH_ATTACHMENT, this._gl.RENDERBUFFER, this._depthBuffer);
+      }
+      this._gl.bindFramebuffer(this._gl.FRAMEBUFFER, null);
+
+      this._gl.bindFramebuffer(this._gl.FRAMEBUFFER, this._colorFramebuffer);
+      this._gl.framebufferTexture2D(this._gl.FRAMEBUFFER, this._gl.COLOR_ATTACHMENT0, this._gl.TEXTURE_2D, this._texture.id, 0);
+      this._gl.bindFramebuffer(this._gl.FRAMEBUFFER, null);
+    }
+
+    /**
+     * @description Blitting means bit-boundary block transfer
+     */
+
+  }, {
+    key: 'blit',
+    value: function blit() {
+      this._gl.bindFramebuffer(this._gl.READ_FRAMEBUFFER, this._rendererFramebuffer);
+      this._gl.bindFramebuffer(this._gl.DRAW_FRAMEBUFFER, this._colorFramebuffer);
+      this._gl.clearBufferfv(this._gl.COLOR, 0, [0.0, 0.0, 0.0, 1.0]);
+      this._gl.blitFramebuffer(0, 0, this._width, this._height, 0, 0, this._width, this._height, this._gl.COLOR_BUFFER_BIT, this._gl.NEAREST);
+    }
+  }, {
+    key: 'bind',
+    value: function bind() {
+      this._gl.bindFramebuffer(this._gl.FRAMEBUFFER, this._rendererFramebuffer);
+    }
+  }, {
+    key: 'unbind',
+    value: function unbind() {
+      this._gl.bindFramebuffer(this._gl.FRAMEBUFFER, null);
+    }
+
+    /**
+     * @return {WebGLTexture}
+     */
+
+  }, {
+    key: 'texture',
+    get: function get$$1() {
+      return this._texture;
+    }
+  }]);
+  return MultiSample;
+}();
+
+console.log('[tubugl] version: 1.6.0, %o(support webgl2)', 'https://github.com/kenjiSpecial/tubugl');
 
 exports.Program = Program;
 exports.ArrayBuffer = ArrayBuffer;
@@ -1626,4 +1794,5 @@ exports.TransformFeedback = TransformFeedback;
 exports.VAO = VAO;
 exports.UniformBlock = UniformBlock;
 exports.MultiRenderTarget = MultiRenderTarget;
+exports.MultiSample = MultiSample;
 exports.webGLShader = webGLShader;

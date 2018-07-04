@@ -21,13 +21,13 @@ export class MultiRenderTarget {
 
         return this;
     }
-    
+
     useProgram() {
         this._program.use();
-        
+
         return this;
     }
-    
+
     createTexture(targetName, internalFormat) {
         let target = this._gl.createTexture();
         let gl = this._gl;
@@ -67,7 +67,7 @@ export class MultiRenderTarget {
             drawBufferArray.push(this._gl.COLOR_ATTACHMENT0 + ii);
         }
         this._gl.drawBuffers(drawBufferArray);
-        
+
         return this;
     }
 
@@ -79,5 +79,9 @@ export class MultiRenderTarget {
 
     get target() {
         return this._targets;
+    }
+
+    get program() {
+        return this._program;
     }
 }

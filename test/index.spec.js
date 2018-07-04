@@ -46,3 +46,7 @@ it('#06: uniform block', async () => {
 it('#07 transformfeedback', async () => {
 	await captureScreen('http://localhost:8080/docs/example/07-multi-render-targets-test.html?NoDebug');
 });
+
+it('#08 multi sample', async () => {
+	await captureScreen('http://localhost:8080/docs/example/08-multi-sample-test.html?NoDebug');
+});

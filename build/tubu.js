@@ -936,7 +936,7 @@ var Texture = function () {
 		/**
    * generate mipmap for texture
    *
-   * @returns {Texture}
+   * @returns {WebGLTexture}
    */
 
 	}, {
@@ -965,6 +965,17 @@ var Texture = function () {
 		value: function _delete() {
 			this._gl.deleteTexture(this._texture);
 			this._texture = null;
+		}
+
+		/**
+   * @description get webgl texture as id
+   * @return {WebGLTexture}
+   */
+
+	}, {
+		key: 'id',
+		get: function get$$1() {
+			return this._texture;
 		}
 	}]);
 	return Texture;
@@ -1193,7 +1204,7 @@ var FrameBuffer = function () {
 	return FrameBuffer;
 }();
 
-console.log('[tubugl] version: 1.5.2, %o', 'https://github.com/kenjiSpecial/tubugl');
+console.log('[tubugl] version: 1.6.0, %o', 'https://github.com/kenjiSpecial/tubugl');
 
 exports.Program = Program;
 exports.ArrayBuffer = ArrayBuffer;

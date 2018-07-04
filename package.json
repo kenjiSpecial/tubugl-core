@@ -1,6 +1,6 @@
 {
   "name": "tubugl-core",
-  "version": "1.5.2",
+  "version": "1.6.0",
   "description": "core parts of webgl module based framework ",
   "cjs": "build/tubu.cjs.js",
   "esm": "build/tubu.esm.js",
@@ -34,7 +34,6 @@
     "build": "rollup -c",
     "test" : "jest --config jest.config.json",
     "updateTest": "jest --config jest.config.json -u",
-    "00": "parcel examples/00/index.html --no-hmr",
     "jsdoc": "jsdoc src/program.js src/uniform.js  src/arrayBuffer.js src/indexArrayBuffer.js src/texture.js src/frameBuffer.js -R readme.md -d docs/api -t node_modules/minami",
     "serve": "http-server ./docs",
     "serve2": "http-server"

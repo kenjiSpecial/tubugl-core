@@ -452,7 +452,13 @@ class ArrayBuffer {
 				// console.warn(`attribute ${attrib.name} is not used`);
 			} else {
 				let location = programAttr.location;
-				let { size, type, normalize, stride, offset } = attrib;
+				let {
+					size,
+					type,
+					normalize,
+					stride,
+					offset
+				} = attrib;
 
 				this.gl.enableVertexAttribArray(location);
 				this.gl.vertexAttribPointer(location, size, type, normalize, stride, offset);
@@ -778,7 +784,7 @@ class Texture {
 	/**
 	 * generate mipmap for texture
 	 *
-	 * @returns {Texture}
+	 * @returns {WebGLTexture}
 	 */
 	generateMipmap() {
 		this._gl.generateMipmap(this._gl.TEXTURE_2D);
@@ -798,6 +804,14 @@ class Texture {
 	delete() {
 		this._gl.deleteTexture(this._texture);
 		this._texture = null;
+	}
+	
+	/**
+	 * @description get webgl texture as id
+	 * @return {WebGLTexture}
+	 */
+	get id(){
+		return this._texture;
 	}
 }
 
@@ -1011,6 +1025,6 @@ class FrameBuffer {
 	}
 }
 
-console.log('[tubugl] version: 1.5.2, %o', 'https://github.com/kenjiSpecial/tubugl');
+console.log('[tubugl] version: 1.6.0, %o', 'https://github.com/kenjiSpecial/tubugl');
 
 export { Program, ArrayBuffer, IndexArrayBuffer, Texture, FrameBuffer, webGLShader };

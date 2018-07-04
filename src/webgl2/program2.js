@@ -42,4 +42,8 @@ export class Program2 extends Program {
 		
 		this._setProperties();
 	}
+	
+	get isWebGL2(){
+		return true;
+	}
 }

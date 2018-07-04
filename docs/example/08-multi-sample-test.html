@@ -127,14 +127,15 @@
     
     <script>
         var canvas, gl;
-        var obj, vao, arrayBuffer, program, numCubeVertices;
+        var obj, vao, arrayBuffer, program, geoProgram, numCubeVertices;
         var cubeVertexArray, planeVertexArray;
         var uniformBlockObj = {};
         var loopId;
         var textureLocation;
         var urlParams = new URLSearchParams(window.location.search);
         var isDebug = !(urlParams.has('NoDebug') || urlParams.has('NoDebug/'));
-        var multiRenderTarget;
+        // var multiRenderTarget;
+        var multiSample;
         var viewProjMatrix, boxes, matrixUniformData, matrixUniformBuffer;
         
         var translateMat = mat4.create();
@@ -145,7 +146,8 @@
         var matrixUniformBlock;
         
         initializeGl();
-        createMultiRenderTarget();
+        createMultiSample();
+        createGeoprogram();
         createProgram();
         createGeometry();
         
@@ -169,15 +171,19 @@
             }
         }
         
-        function createMultiRenderTarget(){
-            multiRenderTarget = new Tubu.MultiRenderTarget(gl, document.getElementById('geo-vs').textContent.trim(), document.getElementById('geo-fs').textContent.trim());
-            multiRenderTarget.bind();
-            multiRenderTarget.createTexture('positionTarget', gl.RGBA16F);
-            multiRenderTarget.createTexture('normalTarget', gl.RGBA16F);
-            multiRenderTarget.createTexture('uvTarget', gl.RG16F);
-            multiRenderTarget.createDepthTexture();
-            multiRenderTarget.updateDrawBuffers();
-            multiRenderTarget.unbind();
+        function createMultiSample(){
+            multiSample = new Tubu.MultiSample(gl, {
+                samples: 4,
+                isDepth: true,
+            }, canvas.width, canvas.height);
+        }
+        
+        function createGeoprogram(){
+            geoProgram = new Tubu.Program2(
+                gl,
+                document.getElementById('geo-vs').textContent.trim(), 
+                document.getElementById('geo-fs').textContent.trim()
+            );
         }
         
         // create webgl program
@@ -197,15 +203,15 @@
             
             var positonBuffer = new Tubu.ArrayBuffer(gl, box.positions);
             positonBuffer.setAttribs('aPosition', 3, gl.FLOAT, false, 0, 0)
-                         .bind().attribPointer(multiRenderTarget.program);
+                         .bind().attribPointer(geoProgram);
                          
             var normalBuffer = new Tubu.ArrayBuffer(gl, box.normals);
             normalBuffer.setAttribs('aNormal', 3, gl.FLOAT, false, 0, 0)
-                         .bind().attribPointer(multiRenderTarget.program);
+                         .bind().attribPointer(geoProgram);
                          
             var uvBuffer = new Tubu.ArrayBuffer(gl, box.uvs);
             uvBuffer.setAttribs('aUV', 2, gl.FLOAT, false, 0, 0)
-                         .bind().attribPointer(multiRenderTarget.program);
+                         .bind().attribPointer(geoProgram);
             
             numCubeVertices = box.positions.length / 3;
             
@@ -256,7 +262,7 @@
             ];
             
             matrixUniformData = new Float32Array(32);
-            matrixUniformBlock = new Tubu.UniformBlock( gl, 'Matrices', 0, matrixUniformData, multiRenderTarget.program);
+            matrixUniformBlock = new Tubu.UniformBlock( gl, 'Matrices', 0, matrixUniformData, geoProgram);
         }
         
         function xformMatrix(xform, translate, rotate, scale) {
@@ -277,8 +283,13 @@
         }
         
         function loop(){
-            multiRenderTarget.bind();
-            multiRenderTarget.useProgram();
+            var width = gl.canvas.width;
+            var height = gl.canvas.height;
+            
+            // multiRenderTarget.bind();
+            // multiRenderTarget.useProgram();
+            multiSample.bind();
+            geoProgram.use();
             
             // gl.bindVertexArray(cubeVertexArray);
             cubeVertexArray.bind();
@@ -287,8 +298,7 @@
             gl.disable(gl.BLEND);
             gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
             
-            var width = gl.canvas.width;
-            var height = gl.canvas.height;
+            
             gl.viewport(0, 0, width, height);
             for (var i = 0, len = boxes.length; i < len; ++i) {
                 boxes[i].rotate[0] += 0.01;
@@ -304,47 +314,26 @@
                 
                 gl.drawArrays(gl.TRIANGLES, 0, numCubeVertices);
             }
-            multiRenderTarget.unbind();
+            multiSample.blit();
+            multiSample.unbind();
             
             // -----------
             
             program.use();
+    
+            gl.viewport(0, 0, width, height);
             
-            for(var ii = 0; ii < 3; ii++){
-                
-                var width = gl.canvas.width/2;
-                var height = gl.canvas.height/2;
-                var xx = width * parseInt(ii/2);
-                var yy = height * parseInt(ii%2);
-                gl.viewport(xx, yy, width, height);
-                
-                planeVertexArray.bind();
-                gl.depthMask(false);
-                gl.enable(gl.DEPTH_TEST);
-                gl.enable(gl.BLEND);
-                
-                let index = 0;
-                var texture;
-                switch(ii){
-                    case 0:
-                    texture  = multiRenderTarget.target['positionTarget'];
-                    break;
-                    
-                    case 1:
-                    texture  = multiRenderTarget.target['normalTarget'];
-                    break;
-                    
-                    case 2:
-                    texture  = multiRenderTarget.target['uvTarget'];
-                    break;
-                }
-                
-                gl.activeTexture(gl.TEXTURE0 + index);
-                gl.bindTexture(gl.TEXTURE_2D, texture);
-                gl.uniform1i(textureLocation, index);	
+            planeVertexArray.bind();
+            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+            gl.depthMask(false);
+            gl.enable(gl.DEPTH_TEST);
+            gl.enable(gl.BLEND);
             
-                gl.drawArrays(gl.TRIANGLES, 0, 6); 
-            }
+            gl.activeTexture(gl.TEXTURE0);
+            gl.bindTexture(gl.TEXTURE_2D, multiSample.texture.id);
+            gl.uniform1i(textureLocation, 0);	
+        
+            gl.drawArrays(gl.TRIANGLES, 0, 6);
             
             if(isDebug) requestAnimationFrame(loop);
         }

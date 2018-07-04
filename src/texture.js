@@ -231,7 +231,7 @@ export class Texture {
 	/**
 	 * generate mipmap for texture
 	 *
-	 * @returns {Texture}
+	 * @returns {WebGLTexture}
 	 */
 	generateMipmap() {
 		this._gl.generateMipmap(this._gl.TEXTURE_2D);
@@ -251,5 +251,13 @@ export class Texture {
 	delete() {
 		this._gl.deleteTexture(this._texture);
 		this._texture = null;
+	}
+	
+	/**
+	 * @description get webgl texture as id
+	 * @return {WebGLTexture}
+	 */
+	get id(){
+		return this._texture;
 	}
 }
