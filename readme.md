@@ -47,6 +47,7 @@ source: https://github.com/kenjiSpecial/tubugl-core/tree/master/docs/example
 - [stack.gl](http://stack.gl/)
 - [stack.gl/fbo.js](https://github.com/stackgl/gl-fbo/blob/master/fbo.js)
 - [picogl](https://tsherif.github.io/picogl.js/)
+- [luma.gl](https://github.com/uber/luma.gl)
 
 [npm-image]: https://img.shields.io/npm/v/tubugl-core.svg?style=flat-square
 [npm-url]: https://www.npmjs.com/package/tubugl-core 
